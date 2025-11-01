@@ -1,0 +1,111 @@
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #fefefe;
+  color: #333;
+}
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.navbar {
+  width: 100%;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0077b6;;
+  color: white;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.get-started {
+  background-color: white;
+  color: #0077b6;;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.get-started:hover {
+  background-color: #023e8a;
+  color: white;
+}
+
+.hero {
+  margin-top: 60px;
+  padding: 20px;
+  max-width: 800px;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  color: #0077b6;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 15px 0;
+}
+
+.primary-btn {
+  background-color: #0077b6;;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 40px 20px;
+  max-width: 1000px;
+}
+
+.feature-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.feature-card:hover {
+  transform: translateY(-10px);
+}
+
+.cta {
+  background-color: #0077b6;;
+  color: white;
+  padding: 40px 20px;
+  border-radius: 10px;
+  margin: 40px 0;
+  max-width: 800px;
+}
+
+.cta .secondary-btn {
+  background-color: white;
+  color: #0077b6;;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+footer {
+  margin: 30px 0;
+  color: #666;
+}

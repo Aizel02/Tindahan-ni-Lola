@@ -1,0 +1,367 @@
+/* General Page Setup */
+.product-list-page {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  padding: 30px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0077b6;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.back-btn {
+  background: white;
+  color: #0077b6;
+  border: none;
+  padding: 8px 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: #023e8a;
+  color: white;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.filters input,
+.filters select {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.filters input:focus,
+.filters select:focus {
+  border-color: #0077b6;
+}
+
+.add-product-btn {
+  background: #0077b6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-product-btn:hover {
+  background: #023e8a;
+}
+
+/* Category Filter Buttons */
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.category-buttons button {
+  background: #e3f2fd;
+  color: #0077b6;
+  border: 1px solid #0077b6;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.category-buttons button:hover,
+.category-buttons button.active {
+  background: #0077b6;
+  color: white;
+}
+
+/* Product Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  justify-content: center;
+  flex-grow: 1; /* Ensures grid expands to push footer down */
+}
+
+/* Product Card */
+.product-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* ✅ Updated image display (no cropping) */
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain; /* Show full image */
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.product-info {
+  flex-grow: 1;
+  text-align: center;
+  padding: 12px;
+}
+
+.product-info h4 {
+  margin: 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.product-info p {
+  margin: 2px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.price {
+  color: #0077b6;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Card actions */
+.card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  background: #f1f3f5;
+  width: 100%;
+}
+
+.card-actions button {
+  background: #0077b6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.card-actions button:hover {
+  background: #023e8a;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal Box */
+.modal {
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0077b6;
+  color: white;
+  padding: 15px 20px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-body label {
+  font-weight: 500;
+  color: #333;
+}
+
+.modal-body input,
+.modal-body select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.modal-body input:focus,
+.modal-body select:focus {
+  border-color: #0077b6;
+}
+
+.modal-body img {
+  width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-top: 10px;
+  background-color: #fff;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+}
+
+.modal-footer button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.modal-footer .cancel {
+  background: #e0e0e0;
+}
+
+.modal-footer .cancel:hover {
+  background: #bdbdbd;
+}
+
+.modal-footer .confirm {
+  background: #0077b6;
+  color: white;
+}
+
+.modal-footer .confirm:hover {
+  background: #023e8a;
+}
+
+/* No products / messages */
+.no-products,
+.status-text,
+.error-text {
+  text-align: center;
+  margin-top: 30px;
+  font-weight: 500;
+}
+
+.error-text {
+  color: #e63946;
+}
+
+/* ✅ Sticky Footer */
+.footer {
+  margin-top: auto;
+  text-align: center;
+  background-color: #f8f9fa;
+  padding: 12px 0;
+  color: #555;
+  font-size: 0.9rem;
+  border-top: 1px solid #ddd;
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters input,
+  .filters select,
+  .add-product-btn {
+    width: 100%;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
