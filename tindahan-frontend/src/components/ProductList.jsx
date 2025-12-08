@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./ProductList.css";
 
-// Use NEXT_PUBLIC_API_URL for Next.js or REACT_APP_API_URL for CRA.
-// If both exist, NEXT_PUBLIC_API_URL will be used first.
+// Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
+const DEFAULT_API = "https://tindahan-ni-lola-backend-1.onrender.com";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.REACT_APP_API_URL ||
-  "http://localhost:8080";
+  DEFAULT_API;
 
 const API_URL = `${API_BASE.replace(/\/+$/, "")}/api/products`;
 
@@ -164,9 +164,10 @@ const ProductList = () => {
       return imageUrl;
     }
     // Otherwise treat as relative path from backend root
-    return `${API_BASE.replace(/\/+$/, "")}${imageUrl.startsWith("/") ? "" : "/"}${
-      imageUrl || ""
-    }`;
+    // e.g. backend returns "/uploads/foo.jpg" or "uploads/foo.jpg"
+    const base = API_BASE.replace(/\/+$/, "");
+    const path = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
+    return `${base}${path}`;
   };
 
   const filteredProducts = products
