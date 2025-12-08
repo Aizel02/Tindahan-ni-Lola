@@ -1,11 +1,34 @@
 import React, { useState, useEffect } from "react";
 import "./ProductList.css";
 
-const API_URL = "http://localhost:8080/api/products";
+// Use NEXT_PUBLIC_API_URL for Next.js or REACT_APP_API_URL for CRA.
+// If both exist, NEXT_PUBLIC_API_URL will be used first.
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.REACT_APP_API_URL ||
+  "http://localhost:8080";
 
-// Centralized category list — just add new ones here
-const CATEGORIES = ["Biscuits", "Canned Goods","Cigarettes", "Coffee and Sugar", "Condiments", "Drinks", 
-  "Juice","Liquor","Rice", "Snacks", "Soap and Downy", "Shampoo", "Others.."];
+const API_URL = `${API_BASE.replace(/\/+$/, "")}/api/products`;
+
+// Centralized category list — add new ones here
+const CATEGORIES = [
+  "Biscuits",
+  "Canned Goods",
+  "Cigarettes",
+  "Coffee and Sugar",
+  "Condiments",
+  "Drinks",
+  "Juice",
+  "Liquor",
+  "Rice",
+  "Snacks",
+  "Soap and Downy",
+  "Shampoo",
+  "Others..",
+];
+
+const fallbackImage =
+  "https://via.placeholder.com/300x200?text=No+image"; // change if you want
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -27,6 +50,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProducts = async () => {
@@ -34,12 +58,14 @@ const ProductList = () => {
     setError("");
     try {
       const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching products:", err);
-      setError("Failed to load products. Please check the server connection.");
+      setError(
+        "Failed to load products. Please check the backend connection or environment variable."
+      );
     } finally {
       setLoading(false);
     }
@@ -55,7 +81,7 @@ const ProductList = () => {
     formData.append("name", newProduct.name);
     formData.append("category", newProduct.category);
     formData.append("price", newProduct.price);
-    formData.append("description", newProduct.description);
+    formData.append("description", newProduct.description || "");
     if (newProduct.imageFile) formData.append("image", newProduct.imageFile);
 
     try {
@@ -70,24 +96,34 @@ const ProductList = () => {
           description: "",
           imageFile: null,
         });
-      } else alert("Failed to add product");
+      } else {
+        const text = await res.text().catch(() => "");
+        alert(`Failed to add product. ${text}`);
+      }
     } catch (err) {
       console.error("Error adding product:", err);
+      alert("Network error while adding product.");
     }
   };
 
   const handleUpdateProduct = async () => {
     if (!editProduct) return;
 
+    const id = editProduct.id || editProduct._id;
+    if (!id) {
+      alert("Invalid product id.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", editProduct.name);
     formData.append("category", editProduct.category);
     formData.append("price", editProduct.price);
-    formData.append("description", editProduct.description);
+    formData.append("description", editProduct.description || "");
     if (editProduct.imageFile) formData.append("image", editProduct.imageFile);
 
     try {
-      const res = await fetch(`${API_URL}/${editProduct.id || editProduct._id}`, {
+      const res = await fetch(`${API_URL}/${id}`, {
         method: "PUT",
         body: formData,
       });
@@ -96,9 +132,13 @@ const ProductList = () => {
         await fetchProducts();
         setShowEditModal(false);
         setEditProduct(null);
-      } else alert("Failed to update product");
+      } else {
+        const text = await res.text().catch(() => "");
+        alert(`Failed to update product. ${text}`);
+      }
     } catch (err) {
       console.error("Error updating product:", err);
+      alert("Network error while updating product.");
     }
   };
 
@@ -107,22 +147,40 @@ const ProductList = () => {
     try {
       const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
       if (res.ok) await fetchProducts();
-      else alert("Failed to delete product");
+      else {
+        const text = await res.text().catch(() => "");
+        alert(`Failed to delete product. ${text}`);
+      }
     } catch (err) {
       console.error("Error deleting product:", err);
+      alert("Network error while deleting product.");
     }
   };
 
+  const normalizeImageUrl = (imageUrl) => {
+    if (!imageUrl) return fallbackImage;
+    // If backend sends absolute URL (http(s)://...), use it directly
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+      return imageUrl;
+    }
+    // Otherwise treat as relative path from backend root
+    return `${API_BASE.replace(/\/+$/, "")}${imageUrl.startsWith("/") ? "" : "/"}${
+      imageUrl || ""
+    }`;
+  };
+
   const filteredProducts = products
-    .filter(
-      (p) =>
-        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (categoryFilter === "All" ||
-          p.category?.toLowerCase() === categoryFilter.toLowerCase())
-    )
+    .filter((p) => {
+      const nameMatch = p.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const catMatch =
+        categoryFilter === "All" ||
+        (p.category && p.category.toLowerCase() === categoryFilter.toLowerCase());
+      return nameMatch && catMatch;
+    })
     .sort((a, b) => {
-      if (sortBy === "name") return a.name.localeCompare(b.name);
-      if (sortBy === "price") return parseFloat(a.price) - parseFloat(b.price);
+      if (sortBy === "name") return (a.name || "").localeCompare(b.name || "");
+      if (sortBy === "price")
+        return parseFloat(a.price || 0) - parseFloat(b.price || 0);
       return 0;
     });
 
@@ -145,7 +203,10 @@ const ProductList = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
           <option value="All">All Categories</option>
           {CATEGORIES.map((cat) => (
             <option key={cat} value={cat}>
@@ -169,34 +230,41 @@ const ProductList = () => {
       ) : (
         <div className="product-grid">
           {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <div key={product.id || product._id} className="product-card">
-                <img
-                  src={`http://localhost:8080${product.imageUrl}`}
-                  alt={product.name}
-                  className="product-image"
-                />
-                <div className="product-info">
-                  <h4>{product.name}</h4>
-                  <p>{product.category}</p>
-                  <p className="desc">{product.description}</p>
-                  <p className="price">₱{Number(product.price).toFixed(2)}</p>
-                </div>
-                <div className="card-actions">
-                  <button
-                    onClick={() => {
-                      setEditProduct(product);
-                      setShowEditModal(true);
+            filteredProducts.map((product) => {
+              const id = product.id || product._id;
+              return (
+                <div key={id || Math.random()} className="product-card">
+                  <img
+                    src={normalizeImageUrl(product.imageUrl || product.image || "")}
+                    alt={product.name || "product"}
+                    className="product-image"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = fallbackImage;
                     }}
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button onClick={() => handleDeleteProduct(product.id || product._id)}>
-                    🗑️ Delete
-                  </button>
+                  />
+                  <div className="product-info">
+                    <h4>{product.name}</h4>
+                    <p>{product.category}</p>
+                    <p className="desc">{product.description}</p>
+                    <p className="price">
+                      ₱{Number(product.price || 0).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="card-actions">
+                    <button
+                      onClick={() => {
+                        setEditProduct(product);
+                        setShowEditModal(true);
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button onClick={() => handleDeleteProduct(id)}>🗑️ Delete</button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="no-products">No products found.</p>
           )}
@@ -216,22 +284,30 @@ const ProductList = () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setNewProduct({ ...newProduct, imageFile: e.target.files[0] })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, imageFile: e.target.files?.[0] })
+                }
               />
               <label>Product Name</label>
               <input
                 type="text"
                 value={newProduct.name}
-                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, name: e.target.value })
+                }
               />
               <label>Category</label>
               <select
                 value={newProduct.category}
-                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, category: e.target.value })
+                }
               >
                 <option value="">Select Category</option>
                 {CATEGORIES.map((cat) => (
-                  <option key={cat}>{cat}</option>
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
               <label>Description</label>
@@ -239,13 +315,17 @@ const ProductList = () => {
                 rows="3"
                 placeholder="Enter product description"
                 value={newProduct.description}
-                onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, description: e.target.value })
+                }
               />
               <label>Price (₱)</label>
               <input
                 type="number"
                 value={newProduct.price}
-                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, price: e.target.value })
+                }
               />
             </div>
             <div className="modal-footer">
@@ -273,34 +353,46 @@ const ProductList = () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setEditProduct({ ...editProduct, imageFile: e.target.files[0] })}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, imageFile: e.target.files?.[0] })
+                }
               />
               <label>Product Name</label>
               <input
                 type="text"
-                value={editProduct.name}
-                onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                value={editProduct.name || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, name: e.target.value })
+                }
               />
               <label>Category</label>
               <select
-                value={editProduct.category}
-                onChange={(e) => setEditProduct({ ...editProduct, category: e.target.value })}
+                value={editProduct.category || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, category: e.target.value })
+                }
               >
                 {CATEGORIES.map((cat) => (
-                  <option key={cat}>{cat}</option>
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
               <label>Description</label>
               <textarea
                 rows="3"
-                value={editProduct.description}
-                onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
+                value={editProduct.description || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, description: e.target.value })
+                }
               />
               <label>Price (₱)</label>
               <input
                 type="number"
-                value={editProduct.price}
-                onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
+                value={editProduct.price || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, price: e.target.value })
+                }
               />
             </div>
             <div className="modal-footer">
