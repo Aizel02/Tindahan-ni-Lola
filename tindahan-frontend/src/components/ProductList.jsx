@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ProductList.css";
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
-const DEFAULT_API = "https://tindahan-ni-lola-backend-1.onrender.com";
+const DEFAULT_API = "https://tindahan-ni-lola-backend-3.onrender.com/";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.REACT_APP_API_URL ||
