@@ -9,6 +9,9 @@ const API_BASE =
   DEFAULT_API;
 
 const API_URL = `${API_BASE.replace(/\/+$/, "")}/api/products`;
+// Debug logs (remove after verifying)
+console.log("API_BASE", API_BASE);
+console.log("API_URL", API_URL);
 
 // Centralized category list — add new ones here
 const CATEGORIES = [
