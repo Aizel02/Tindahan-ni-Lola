@@ -9,6 +9,8 @@ const API_BASE =
   DEFAULT_API;
 
 const API_URL = `${API_BASE.replace(/\/+$/, "")}/api/products`;
+
+
 console.log("API_BASE", API_BASE);
 console.log("API_URL", API_URL);
 
