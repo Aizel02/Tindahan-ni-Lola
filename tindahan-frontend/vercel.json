@@ -4,9 +4,13 @@
     { "src": "tindahan-frontend/package.json", "use": "@vercel/static-build" }
   ],
   "routes": [
+    { "src": "^/static/(.*)$", "dest": "/static/$1" },
+    { "src": "^/_next/(.*)$", "dest": "/_next/$1" },
+    { "src": "^/api/(.*)$", "dest": "/api/$1" },
     {
-      "src": "^/(?!static/|api/|favicon\\.ico|robots\\.txt|manifest\\.json).*$",
-      "dest": "/index.html"
-    }
+      "src": "^/(?:favicon\\.ico|robots\\.txt|manifest\\.json)$",
+      "dest": "/$1"
+    },
+    { "src": "^/(.*)$", "dest": "/index.html" }
   ]
 }
