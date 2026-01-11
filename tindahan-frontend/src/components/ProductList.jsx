@@ -2,16 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ProductList.css";
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
-const DEFAULT_API = "https://tindahan-ni-lola-backend-3.onrender.com/";
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.REACT_APP_API_URL ||
-  DEFAULT_API;
-
-const API_URL = `${API_BASE.replace(/\/+$/, "")}/api/products`;
-
-
-console.log("API_BASE", API_BASE);
+const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
 console.log("API_URL", API_URL);
 
 // Centralized category list — add new ones here
@@ -160,19 +151,10 @@ const ProductList = () => {
       alert("Network error while deleting product.");
     }
   };
-
-  const normalizeImageUrl = (imageUrl) => {
-    if (!imageUrl) return fallbackImage;
-    // If backend sends absolute URL (http(s)://...), use it directly
-    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-      return imageUrl;
-    }
-    // Otherwise treat as relative path from backend root
-    // e.g. backend returns "/uploads/foo.jpg" or "uploads/foo.jpg"
-    const base = API_BASE.replace(/\/+$/, "");
-    const path = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
-    return `${base}${path}`;
-  };
+const normalizeImageUrl = (imageUrl) => {
+  if (!imageUrl) return fallbackImage;
+  return imageUrl.startsWith("http") ? imageUrl : fallbackImage;
+};
 
   const filteredProducts = products
     .filter((p) => {
