@@ -139,7 +139,7 @@
 .product-card img {
   width: 100%;
   height: 180px;
-  object-fit: cover; /* Show full image */
+  object-fit: contain; /* Show full image */
   background-color: #fff;
   border-bottom: 1px solid #eee;
 }
