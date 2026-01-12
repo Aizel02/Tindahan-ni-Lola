@@ -365,3 +365,145 @@
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 }
+.cart-btn {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  position: relative;
+}
+
+.cart-btn:hover {
+  background: #0b5ed7;
+}
+
+.badge {
+  background: #ff3b3b;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: #fff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 14px;
+  padding: 20px;
+  animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.modal img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.qty-controls button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #e9f1ff;
+  color: #0d6efd;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.qty-controls span {
+  font-size: 18px;
+  font-weight: 600;
+}
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-item img {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cart-item strong {
+  display: block;
+}
+
+.cart-item span {
+  margin-left: auto;
+  font-weight: 600;
+  color: #0d6efd;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-footer button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-footer .confirm {
+  background: #0d6efd;
+  color: white;
+}
+
+.modal-footer .confirm:hover {
+  background: #0b5ed7;
+}
+
+.modal-footer button:not(.confirm) {
+  background: #f1f1f1;
+}
+.product-image {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.product-image:hover {
+  transform: scale(1.03);
+}
