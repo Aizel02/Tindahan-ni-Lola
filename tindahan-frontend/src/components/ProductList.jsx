@@ -220,11 +220,6 @@ const cartTotal = cart.reduce(
         <button className="back-btn" onClick={() => (window.location.href = "/")}>
           🏠 Back to Home
         </button>
-        <button className="cart-btn" onClick={() => setShowCartModal(true)}>
-  🛒 View Cart
-  {cart.length > 0 && <span className="badge">{cart.length}</span>}
-</button>
-
       </div>
 
       <div className="filters">
@@ -360,7 +355,8 @@ const cartTotal = cart.reduce(
                   setNewProduct({ ...newProduct, price: e.target.value })
                 }
               />
-              {showQtyModal && selectedProduct && (
+            </div>
+            {showQtyModal && selectedProduct && (
   <div className="modal-overlay">
     <div className="modal">
       <h3>Select Quantity</h3>
@@ -379,7 +375,7 @@ const cartTotal = cart.reduce(
         <button onClick={() => setQuantity(quantity + 1)}>+</button>
       </div>
 
-      <p>Total: ₱{(quantity * selectedProduct.price).toFixed(2)}</p>
+      <p><strong>Total:</strong> ₱{(quantity * selectedProduct.price).toFixed(2)}</p>
 
       <div className="modal-footer">
         <button onClick={() => setShowQtyModal(false)}>Cancel</button>
@@ -435,7 +431,6 @@ const cartTotal = cart.reduce(
   </div>
 )}
 
-            </div>
             <div className="modal-footer">
               <button className="cancel" onClick={() => setShowAddModal(false)}>
                 Cancel
