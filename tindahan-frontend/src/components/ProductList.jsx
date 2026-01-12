@@ -162,45 +162,7 @@ const ProductList = () => {
         <div className="product-grid">
           {filteredProducts.map((p) => (
             <div key={p.id || p._id} className="product-card">
-              <div className="product-card">
-  <img
-    src={normalizeImageUrl(p.imageUrl)}
-    alt={p.name}
-    className="product-image"
-    onClick={() => {
-      setSelectedProduct(p);
-      setQuantity(1);
-      setShowQtyModal(true);
-    }}
-  />
-
-  <div className="product-info">
-    <h4>{p.name}</h4>
-    <p className="category">{p.category}</p>
-    <p className="price">₱{Number(p.price).toFixed(2)}</p>
-  </div>
-
-  {/* 👇 EDIT & DELETE ARE BACK */}
-  <div className="card-actions">
-    <button
-      className="edit-btn"
-      onClick={() => {
-        setEditProduct(p);
-        setShowEditModal(true);
-      }}
-    >
-      ✏️ Edit
-    </button>
-
-    <button
-      className="delete-btn"
-      onClick={() => handleDeleteProduct(p.id || p._id)}
-    >
-      🗑️ Delete
-    </button>
-  </div>
-</div>
-
+              
               <img
                 src={normalizeImageUrl(p.imageUrl)}
                 alt={p.name}
