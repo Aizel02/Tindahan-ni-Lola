@@ -49,10 +49,18 @@ const ProductList = () => {
   });
   const [editProduct, setEditProduct] = useState(null);
 
+  const [cart, setCart] = useState([]);
+const [showQtyModal, setShowQtyModal] = useState(false);
+const [showCartModal, setShowCartModal] = useState(false);
+const [selectedProduct, setSelectedProduct] = useState(null);
+const [quantity, setQuantity] = useState(1);
+
+
   useEffect(() => {
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -160,6 +168,33 @@ const ProductList = () => {
     }
   };
 
+  // ➕ ADD TO CART (ADD ONLY)
+const addToCart = (product, qty) => {
+  setCart((prev) => {
+    const existing = prev.find((i) => i.id === product.id);
+    if (existing) {
+      return prev.map((i) =>
+        i.id === product.id ? { ...i, qty: i.qty + qty } : i
+      );
+    }
+    return [
+      ...prev,
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        qty,
+      },
+    ];
+  });
+};
+
+const cartTotal = cart.reduce(
+  (sum, item) => sum + item.qty * item.price,
+  0
+);
+
   const filteredProducts = products
     .filter((p) => {
       const nameMatch = p.name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -185,6 +220,11 @@ const ProductList = () => {
         <button className="back-btn" onClick={() => (window.location.href = "/")}>
           🏠 Back to Home
         </button>
+        <button className="cart-btn" onClick={() => setShowCartModal(true)}>
+  🛒 View Cart
+  {cart.length > 0 && <span className="badge">{cart.length}</span>}
+</button>
+
       </div>
 
       <div className="filters">
@@ -226,14 +266,16 @@ const ProductList = () => {
               return (
                 <div key={id || Math.random()} className="product-card">
                   <img
-                    src={normalizeImageUrl(product.imageUrl || product.image || "")}
-                    alt={product.name || "product"}
-                    className="product-image"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = fallbackImage;
-                    }}
-                  />
+  src={normalizeImageUrl(product.imageUrl || product.image || "")}
+  alt={product.name || "product"}
+  className="product-image"
+  onClick={() => {
+    setSelectedProduct(product);
+    setQuantity(1);
+    setShowQtyModal(true);
+  }}
+/>
+
                   <div className="product-info">
                     <h4>{product.name}</h4>
                     <p>{product.category}</p>
@@ -318,6 +360,81 @@ const ProductList = () => {
                   setNewProduct({ ...newProduct, price: e.target.value })
                 }
               />
+              {showQtyModal && selectedProduct && (
+  <div className="modal-overlay">
+    <div className="modal">
+      <h3>Select Quantity</h3>
+
+      <img
+        src={normalizeImageUrl(selectedProduct.imageUrl)}
+        alt={selectedProduct.name}
+      />
+
+      <h4>{selectedProduct.name}</h4>
+      <p>₱{selectedProduct.price}</p>
+
+      <div className="qty-controls">
+        <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+        <span>{quantity}</span>
+        <button onClick={() => setQuantity(quantity + 1)}>+</button>
+      </div>
+
+      <p>Total: ₱{(quantity * selectedProduct.price).toFixed(2)}</p>
+
+      <div className="modal-footer">
+        <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+        <button
+          className="confirm"
+          onClick={() => {
+            addToCart(selectedProduct, quantity);
+            setShowQtyModal(false);
+          }}
+        >
+          Add ({quantity})
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{showCartModal && (
+  <div className="modal-overlay">
+    <div className="modal">
+      <h3>Shopping Cart</h3>
+
+      {cart.length === 0 && <p>No items yet.</p>}
+
+      {cart.map((item) => (
+        <div key={item.id} className="cart-item">
+          <img src={normalizeImageUrl(item.imageUrl)} alt={item.name} />
+          <div>
+            <strong>{item.name}</strong>
+            <p>{item.qty} × ₱{item.price}</p>
+          </div>
+          <span>₱{(item.qty * item.price).toFixed(2)}</span>
+        </div>
+      ))}
+
+      <h4>Grand Total: ₱{cartTotal.toFixed(2)}</h4>
+
+      <div className="modal-footer">
+        <button onClick={() => setShowCartModal(false)}>
+          Continue Shopping
+        </button>
+        <button
+          className="confirm"
+          onClick={() => {
+            alert(`Total Bill: ₱${cartTotal.toFixed(2)}`);
+            setCart([]);
+            setShowCartModal(false);
+          }}
+        >
+          OK – Confirm & Reset
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
             </div>
             <div className="modal-footer">
               <button className="cancel" onClick={() => setShowAddModal(false)}>
