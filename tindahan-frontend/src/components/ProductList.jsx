@@ -77,7 +77,9 @@ const ProductList = () => {
     formData.append("category", newProduct.category);
     formData.append("price", newProduct.price);
     formData.append("description", newProduct.description || "");
-    if (newProduct.imageFile) formData.append("image", newProduct.imageFile);
+    if (newProduct.imageFile instanceof File) {
+  formData.append("image", newProduct.imageFile);
+}
 
     try {
       const res = await fetch(API_URL, { method: "POST", body: formData });
@@ -152,8 +154,15 @@ const ProductList = () => {
     }
   };
 const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl) return fallbackImage;
-  return imageUrl.startsWith("http") ? imageUrl : fallbackImage;
+  if (!imageUrl || typeof imageUrl !== "string") {
+    return fallbackImage;
+  }
+
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  return fallbackImage;
 };
 
   const filteredProducts = products

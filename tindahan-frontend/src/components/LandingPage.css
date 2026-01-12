@@ -77,18 +77,22 @@ body {
 
 .features {
   width: 100%;
+  max-width: 100%;
   padding: 0 16px;
   display: grid;
-  grid-template-columns: 1fr; /* 🔑 MOBILE FIRST */
-  gap: 20px;
+  grid-template-columns: 1fr; /* MOBILE FIRST */
+  gap: 16px;
 }
 
 .feature-card {
+  width: 100%;
+  max-width: 100%;
   background: #f9f9f9;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 .feature-card:hover {
   transform: translateY(-10px);
 }
@@ -117,11 +121,13 @@ footer {
 }
 
 @media (min-width: 768px) {
+  @media (min-width: 768px) {
   .features {
     grid-template-columns: repeat(3, 1fr);
     max-width: 1000px;
     margin: 40px auto;
   }
+}
 
   .hero p {
     max-width: 600px;
