@@ -3,9 +3,9 @@ import "./ProductList.css";
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
 const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
-console.log("API_URL", API_URL);
+const BACKEND_BASE = "https://tindahan-ni-lola-backend-1.onrender.com";
+const fallbackImage = "/no-image.png";
 
-// Centralized category list — add new ones here
 const CATEGORIES = [
   "Biscuits",
   "Canned Goods",
@@ -22,8 +22,14 @@ const CATEGORIES = [
   "Others..",
 ];
 
-const fallbackImage =
-  "https://via.placeholder.com/300x200?text=No+image"; // change if you want
+const normalizeImageUrl = (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== "string") return fallbackImage;
+
+  if (imageUrl.startsWith("http")) return imageUrl;
+
+  // backend sends /uploads/filename.jpg
+  return `${BACKEND_BASE}${imageUrl}`;
+};
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -153,17 +159,6 @@ const ProductList = () => {
       alert("Network error while deleting product.");
     }
   };
-const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl || typeof imageUrl !== "string") {
-    return fallbackImage;
-  }
-
-  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-    return imageUrl;
-  }
-
-  return fallbackImage;
-};
 
   const filteredProducts = products
     .filter((p) => {
