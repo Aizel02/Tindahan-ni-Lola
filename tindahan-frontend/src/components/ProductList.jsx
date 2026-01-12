@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ProductList.css";
 
-// Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
 const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
 const BACKEND_BASE = "https://tindahan-ni-lola-backend-1.onrender.com";
 const fallbackImage = "/no-image.png";
@@ -23,11 +22,8 @@ const CATEGORIES = [
 ];
 
 const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl || typeof imageUrl !== "string") return fallbackImage;
-
+  if (!imageUrl) return fallbackImage;
   if (imageUrl.startsWith("http")) return imageUrl;
-
-  // backend sends /uploads/filename.jpg
   return `${BACKEND_BASE}${imageUrl}`;
 };
 
@@ -38,8 +34,10 @@ const ProductList = () => {
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -47,472 +45,216 @@ const ProductList = () => {
     description: "",
     imageFile: null,
   });
+
   const [editProduct, setEditProduct] = useState(null);
 
+  // 🛒 CART
   const [cart, setCart] = useState([]);
-const [showQtyModal, setShowQtyModal] = useState(false);
-const [showCartModal, setShowCartModal] = useState(false);
-const [selectedProduct, setSelectedProduct] = useState(null);
-const [quantity, setQuantity] = useState(1);
-
+  const [showQtyModal, setShowQtyModal] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   const fetchProducts = async () => {
     setLoading(true);
-    setError("");
     try {
       const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      setError(
-        "Failed to load products. Please check the backend connection or environment variable."
-      );
+    } catch {
+      setError("Failed to load products");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.category || !newProduct.price) {
-      alert("Please fill out all required fields!");
-      return;
-    }
+  // ➕ ADD TO CART (FIXED)
+  const addToCart = (product, qty) => {
+    const pid = product.id || product._id;
 
-    const formData = new FormData();
-    formData.append("name", newProduct.name);
-    formData.append("category", newProduct.category);
-    formData.append("price", newProduct.price);
-    formData.append("description", newProduct.description || "");
-    if (newProduct.imageFile instanceof File) {
-  formData.append("image", newProduct.imageFile);
-}
-
-    try {
-      const res = await fetch(API_URL, { method: "POST", body: formData });
-      if (res.ok) {
-        await fetchProducts();
-        setShowAddModal(false);
-        setNewProduct({
-          name: "",
-          category: "",
-          price: "",
-          description: "",
-          imageFile: null,
-        });
-      } else {
-        const text = await res.text().catch(() => "");
-        alert(`Failed to add product. ${text}`);
+    setCart((prev) => {
+      const existing = prev.find((i) => i.id === pid);
+      if (existing) {
+        return prev.map((i) =>
+          i.id === pid ? { ...i, qty: i.qty + qty } : i
+        );
       }
-    } catch (err) {
-      console.error("Error adding product:", err);
-      alert("Network error while adding product.");
-    }
+      return [
+        ...prev,
+        {
+          id: pid,
+          name: product.name,
+          price: product.price,
+          imageUrl: product.imageUrl,
+          qty,
+        },
+      ];
+    });
   };
 
-  const handleUpdateProduct = async () => {
-    if (!editProduct) return;
-
-    const id = editProduct.id || editProduct._id;
-    if (!id) {
-      alert("Invalid product id.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", editProduct.name);
-    formData.append("category", editProduct.category);
-    formData.append("price", editProduct.price);
-    formData.append("description", editProduct.description || "");
-    if (editProduct.imageFile) formData.append("image", editProduct.imageFile);
-
-    try {
-      const res = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (res.ok) {
-        await fetchProducts();
-        setShowEditModal(false);
-        setEditProduct(null);
-      } else {
-        const text = await res.text().catch(() => "");
-        alert(`Failed to update product. ${text}`);
-      }
-    } catch (err) {
-      console.error("Error updating product:", err);
-      alert("Network error while updating product.");
-    }
-  };
-
-  const handleDeleteProduct = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-    try {
-      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-      if (res.ok) await fetchProducts();
-      else {
-        const text = await res.text().catch(() => "");
-        alert(`Failed to delete product. ${text}`);
-      }
-    } catch (err) {
-      console.error("Error deleting product:", err);
-      alert("Network error while deleting product.");
-    }
-  };
-
-  // ➕ ADD TO CART (ADD ONLY)
-const addToCart = (product, qty) => {
-  setCart((prev) => {
-    const existing = prev.find((i) => i.id === product.id);
-    if (existing) {
-      return prev.map((i) =>
-        i.id === product.id ? { ...i, qty: i.qty + qty } : i
-      );
-    }
-    return [
-      ...prev,
-      {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        qty,
-      },
-    ];
-  });
-};
-
-const cartTotal = cart.reduce(
-  (sum, item) => sum + item.qty * item.price,
-  0
-);
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + item.qty * item.price,
+    0
+  );
 
   const filteredProducts = products
-    .filter((p) => {
-      const nameMatch = p.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      const catMatch =
+    .filter((p) =>
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter(
+      (p) =>
         categoryFilter === "All" ||
-        (p.category && p.category.toLowerCase() === categoryFilter.toLowerCase());
-      return nameMatch && catMatch;
-    })
-    .sort((a, b) => {
-      if (sortBy === "name") return (a.name || "").localeCompare(b.name || "");
-      if (sortBy === "price")
-        return parseFloat(a.price || 0) - parseFloat(b.price || 0);
-      return 0;
-    });
+        p.category?.toLowerCase() === categoryFilter.toLowerCase()
+    )
+    .sort((a, b) =>
+      sortBy === "price"
+        ? a.price - b.price
+        : a.name.localeCompare(b.name)
+    );
 
   return (
     <div className="product-list-page">
+      {/* HEADER */}
       <div className="header">
         <div>
           <h1>Tindahan ni Lola</h1>
           <p>Manage your product inventory</p>
         </div>
-        <button className="back-btn" onClick={() => (window.location.href = "/")}>
-          🏠 Back to Home
+
+        <button className="cart-btn" onClick={() => setShowCartModal(true)}>
+          🛒 View Cart
+          {cart.length > 0 && <span className="badge">{cart.length}</span>}
         </button>
       </div>
 
+      {/* FILTERS */}
       <div className="filters">
         <input
-          type="text"
-          placeholder="🔍 Search products..."
+          placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
-          <option value="All">All Categories</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
+          <option value="All">All</option>
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
           ))}
         </select>
+
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="name">Sort by Name</option>
-          <option value="price">Sort by Price</option>
+          <option value="name">Name</option>
+          <option value="price">Price</option>
         </select>
-        <button className="add-product-btn" onClick={() => setShowAddModal(true)}>
-          🛒 Add Product
-        </button>
       </div>
 
+      {/* PRODUCTS */}
       {loading ? (
-        <p className="status-text">⏳ Loading products...</p>
-      ) : error ? (
-        <p className="error-text">{error}</p>
+        <p>Loading...</p>
       ) : (
         <div className="product-grid">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => {
-              const id = product.id || product._id;
-              return (
-                <div key={id || Math.random()} className="product-card">
-                  <img
-  src={normalizeImageUrl(product.imageUrl || product.image || "")}
-  alt={product.name || "product"}
-  className="product-image"
-  onClick={() => {
-    setSelectedProduct(product);
-    setQuantity(1);
-    setShowQtyModal(true);
-  }}
-/>
+          {filteredProducts.map((p) => (
+            <div key={p.id || p._id} className="product-card">
+              <img
+                src={normalizeImageUrl(p.imageUrl)}
+                alt={p.name}
+                className="product-image"
+                onClick={() => {
+                  setSelectedProduct(p);
+                  setQuantity(1);
+                  setShowQtyModal(true);
+                }}
+              />
+              <h4>{p.name}</h4>
+              <p>{p.category}</p>
+              <p>₱{p.price}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
-                  <div className="product-info">
-                    <h4>{product.name}</h4>
-                    <p>{product.category}</p>
-                    <p className="desc">{product.description}</p>
-                    <p className="price">
-                      ₱{Number(product.price || 0).toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="card-actions">
-                    <button
-                      onClick={() => {
-                        setEditProduct(product);
-                        setShowEditModal(true);
-                      }}
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button onClick={() => handleDeleteProduct(id)}>🗑️ Delete</button>
-                  </div>
+      {/* 🔢 QUANTITY MODAL */}
+      {showQtyModal && selectedProduct && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{selectedProduct.name}</h3>
+
+            <img
+              src={normalizeImageUrl(selectedProduct.imageUrl)}
+              alt=""
+            />
+
+            <div className="qty-controls">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+              <span>{quantity}</span>
+              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+            </div>
+
+            <p>Total: ₱{(quantity * selectedProduct.price).toFixed(2)}</p>
+
+            <div className="modal-footer">
+              <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+              <button
+                className="confirm"
+                onClick={() => {
+                  addToCart(selectedProduct, quantity);
+                  setShowQtyModal(false);
+                }}
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🛒 CART MODAL */}
+      {showCartModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Shopping Cart</h3>
+
+            {cart.map((item) => (
+              <div key={item.id} className="cart-item">
+                <img src={normalizeImageUrl(item.imageUrl)} alt="" />
+                <div>
+                  <strong>{item.name}</strong>
+                  <p>{item.qty} × ₱{item.price}</p>
                 </div>
-              );
-            })
-          ) : (
-            <p className="no-products">No products found.</p>
-          )}
-        </div>
-      )}
+                <span>₱{(item.qty * item.price).toFixed(2)}</span>
+              </div>
+            ))}
 
-      {/* Add Modal */}
-      {showAddModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>Add New Product</h3>
-              <button onClick={() => setShowAddModal(false)}>✖</button>
-            </div>
-            <div className="modal-body">
-              <label>Upload Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, imageFile: e.target.files?.[0] })
-                }
-              />
-              <label>Product Name</label>
-              <input
-                type="text"
-                value={newProduct.name}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, name: e.target.value })
-                }
-              />
-              <label>Category</label>
-              <select
-                value={newProduct.category}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, category: e.target.value })
-                }
-              >
-                <option value="">Select Category</option>
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-              <label>Description</label>
-              <textarea
-                rows="3"
-                placeholder="Enter product description"
-                value={newProduct.description}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, description: e.target.value })
-                }
-              />
-              <label>Price (₱)</label>
-              <input
-                type="number"
-                value={newProduct.price}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, price: e.target.value })
-                }
-              />
-            </div>
-            {showQtyModal && selectedProduct && (
-  <div className="modal-overlay">
-    <div className="modal">
-      <h3>Select Quantity</h3>
-
-      <img
-        src={normalizeImageUrl(selectedProduct.imageUrl)}
-        alt={selectedProduct.name}
-      />
-
-      <h4>{selectedProduct.name}</h4>
-      <p>₱{selectedProduct.price}</p>
-
-      <div className="qty-controls">
-        <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-        <span>{quantity}</span>
-        <button onClick={() => setQuantity(quantity + 1)}>+</button>
-      </div>
-
-      <p><strong>Total:</strong> ₱{(quantity * selectedProduct.price).toFixed(2)}</p>
-
-      <div className="modal-footer">
-        <button onClick={() => setShowQtyModal(false)}>Cancel</button>
-        <button
-          className="confirm"
-          onClick={() => {
-            addToCart(selectedProduct, quantity);
-            setShowQtyModal(false);
-          }}
-        >
-          Add ({quantity})
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-{showCartModal && (
-  <div className="modal-overlay">
-    <div className="modal">
-      <h3>Shopping Cart</h3>
-
-      {cart.length === 0 && <p>No items yet.</p>}
-
-      {cart.map((item) => (
-        <div key={item.id} className="cart-item">
-          <img src={normalizeImageUrl(item.imageUrl)} alt={item.name} />
-          <div>
-            <strong>{item.name}</strong>
-            <p>{item.qty} × ₱{item.price}</p>
-          </div>
-          <span>₱{(item.qty * item.price).toFixed(2)}</span>
-        </div>
-      ))}
-
-      <h4>Grand Total: ₱{cartTotal.toFixed(2)}</h4>
-
-      <div className="modal-footer">
-        <button onClick={() => setShowCartModal(false)}>
-          Continue Shopping
-        </button>
-        <button
-          className="confirm"
-          onClick={() => {
-            alert(`Total Bill: ₱${cartTotal.toFixed(2)}`);
-            setCart([]);
-            setShowCartModal(false);
-          }}
-        >
-          OK – Confirm & Reset
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <h4>Total: ₱{cartTotal.toFixed(2)}</h4>
 
             <div className="modal-footer">
-              <button className="cancel" onClick={() => setShowAddModal(false)}>
-                Cancel
+              <button onClick={() => setShowCartModal(false)}>
+                Continue
               </button>
-              <button className="confirm" onClick={handleAddProduct}>
-                Add Product
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {showEditModal && editProduct && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>Edit Product</h3>
-              <button onClick={() => setShowEditModal(false)}>✖</button>
-            </div>
-            <div className="modal-body">
-              <label>Change Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setEditProduct({ ...editProduct, imageFile: e.target.files?.[0] })
-                }
-              />
-              <label>Product Name</label>
-              <input
-                type="text"
-                value={editProduct.name || ""}
-                onChange={(e) =>
-                  setEditProduct({ ...editProduct, name: e.target.value })
-                }
-              />
-              <label>Category</label>
-              <select
-                value={editProduct.category || ""}
-                onChange={(e) =>
-                  setEditProduct({ ...editProduct, category: e.target.value })
-                }
+              <button
+                className="confirm"
+                onClick={() => {
+                  alert(`Total Bill ₱${cartTotal.toFixed(2)}`);
+                  setCart([]);
+                  setShowCartModal(false);
+                }}
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-              <label>Description</label>
-              <textarea
-                rows="3"
-                value={editProduct.description || ""}
-                onChange={(e) =>
-                  setEditProduct({ ...editProduct, description: e.target.value })
-                }
-              />
-              <label>Price (₱)</label>
-              <input
-                type="number"
-                value={editProduct.price || ""}
-                onChange={(e) =>
-                  setEditProduct({ ...editProduct, price: e.target.value })
-                }
-              />
-            </div>
-            <div className="modal-footer">
-              <button className="cancel" onClick={() => setShowEditModal(false)}>
-                Cancel
-              </button>
-              <button className="confirm" onClick={handleUpdateProduct}>
-                Update Product
+                OK – Confirm & Reset
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Sticky Footer */}
       <footer className="footer">
-        <p>© 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez 🎬</p>
+        © 2025 Tindahan ni Lola
       </footer>
     </div>
   );
