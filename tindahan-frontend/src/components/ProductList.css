@@ -484,9 +484,11 @@
   background: #1d4ed8;
 }
 .cart-footer {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e5e7eb;
   padding-top: 12px;
+  margin-top: auto; /* 🔥 pushes footer to bottom */
 }
+
 
 .cart-btn {
   position: relative;
@@ -507,24 +509,34 @@
   background: #1d4ed8;
 }
 
+.cart-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
 
 .cart-buttons button {
   flex: 1;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: none;
   font-weight: 600;
   cursor: pointer;
 }
-
 .cart-buttons button:first-child {
-  background: #f1f1f1;
+  background: #f1f5f9;
+  color: #111827;
 }
 
 .cart-buttons .confirm {
   background: #2563eb;
   color: white;
 }
+
+.cart-buttons .confirm:hover {
+  background: #1d4ed8;
+}
+
 @media (max-width: 480px) {
   .qty-modal,
 .cart-modal {
@@ -532,23 +544,26 @@
   width: 90%;
   max-width: 420px;
   border-radius: 18px;
-  padding: 18px;
+  padding: 16px;
   max-height: 85vh;
+
   display: flex;
   flex-direction: column;
+
+  position: relative; /* 🔥 important */
   z-index: 2100;
 }
-
 
   .qty-header h3 {
     font-size: 16px;
   }
 
-  .cart-items {
-  flex: 1;
+ .cart-items {
+  flex: 1;              /* 🔥 takes remaining space */
   overflow-y: auto;
   margin: 12px 0;
 }
+
 
 .cart-item {
   display: flex;
