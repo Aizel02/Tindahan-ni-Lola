@@ -530,7 +530,7 @@ const cartTotal = cart.reduce(
                 className="remove-btn"
                 onClick={() => removeFromCart(item.id)}
               >
-                ❌
+                🗑️
               </button>
               
             </div>
