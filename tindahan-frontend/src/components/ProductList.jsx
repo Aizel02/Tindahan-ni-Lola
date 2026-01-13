@@ -168,6 +168,7 @@ const [showCartModal, setShowCartModal] = useState(false);
     }
   };
 // ➕ ADD TO CART
+// ➕ ADD TO CART
 const addToCart = (product, qty) => {
   setCart((prev) => {
     const existing = prev.find((item) => item.id === product.id);
@@ -179,16 +180,11 @@ const addToCart = (product, qty) => {
           : item
       );
     }
-    // ❌ REMOVE ITEM FROM CART
-const removeFromCart = (id) => {
-  setCart((prev) => prev.filter((item) => item.id !== id));
-};
-
 
     return [
       ...prev,
       {
-        id: product.id,
+        id: product.id || product._id,
         name: product.name,
         price: product.price,
         imageUrl: product.imageUrl,
@@ -197,6 +193,12 @@ const removeFromCart = (id) => {
     ];
   });
 };
+
+// ❌ REMOVE ITEM FROM CART (MUST BE OUTSIDE)
+const removeFromCart = (id) => {
+  setCart((prev) => prev.filter((item) => item.id !== id));
+};
+
 
   const filteredProducts = products
     .filter((p) => {
@@ -526,6 +528,7 @@ const removeFromCart = (id) => {
               >
                 ❌
               </button>
+              
             </div>
           </div>
         ))}
