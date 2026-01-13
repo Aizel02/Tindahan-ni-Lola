@@ -53,6 +53,8 @@ const [cart, setCart] = useState([]);
 const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
+const [showCartModal, setShowCartModal] = useState(false);
+
 
 
   useEffect(() => {
@@ -177,6 +179,11 @@ const addToCart = (product, qty) => {
           : item
       );
     }
+    // ❌ REMOVE ITEM FROM CART
+const removeFromCart = (id) => {
+  setCart((prev) => prev.filter((item) => item.id !== id));
+};
+
 
     return [
       ...prev,
@@ -216,6 +223,11 @@ const addToCart = (product, qty) => {
         <button className="back-btn" onClick={() => (window.location.href = "/")}>
           🏠 Back to Home
         </button>
+        <button className="cart-btn" onClick={() => setShowCartModal(true)}>
+  🛒 View Cart
+  {cart.length > 0 && <span className="badge">{cart.length}</span>}
+</button>
+
       </div>
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
@@ -480,6 +492,67 @@ const addToCart = (product, qty) => {
           </div>
         </div>
       )}
+{/* CART MODAL */}
+{showCartModal && (
+  <div className="modal-overlay">
+    <div className="cart-modal">
+      <div className="cart-header">
+        <h3>Shopping Cart</h3>
+        <button onClick={() => setShowCartModal(false)}>✖</button>
+      </div>
+
+      {cart.length === 0 && (
+        <p className="empty-cart">Your cart is empty.</p>
+      )}
+
+      <div className="cart-items">
+        {cart.map((item) => (
+          <div key={item.id} className="cart-item">
+            <img
+              src={normalizeImageUrl(item.imageUrl)}
+              alt={item.name}
+            />
+
+            <div className="cart-info">
+              <strong>{item.name}</strong>
+              <p>{item.qty} × ₱{item.price}</p>
+            </div>
+
+            <div className="cart-actions">
+              <span>₱{(item.qty * item.price).toFixed(2)}</span>
+              <button
+                className="remove-btn"
+                onClick={() => removeFromCart(item.id)}
+              >
+                ❌
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="cart-footer">
+        <h4>Grand Total: ₱{cartTotal.toFixed(2)}</h4>
+
+        <div className="cart-buttons">
+          <button onClick={() => setShowCartModal(false)}>
+            Continue Shopping
+          </button>
+          <button
+            className="confirm"
+            onClick={() => {
+              alert(`Total Bill: ₱${cartTotal.toFixed(2)}`);
+              setCart([]);
+              setShowCartModal(false);
+            }}
+          >
+            OK – Confirm & Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Sticky Footer */}
       <footer className="footer">
