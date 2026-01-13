@@ -198,7 +198,11 @@ const addToCart = (product, qty) => {
 const removeFromCart = (id) => {
   setCart((prev) => prev.filter((item) => item.id !== id));
 };
-
+// 💰 CART TOTAL
+const cartTotal = cart.reduce(
+  (sum, item) => sum + item.qty * item.price,
+  0
+);
 
   const filteredProducts = products
     .filter((p) => {
