@@ -48,6 +48,12 @@ const ProductList = () => {
     imageFile: null,
   });
   const [editProduct, setEditProduct] = useState(null);
+  // 🛒 CART + QUANTITY MODAL STATES
+const [cart, setCart] = useState([]);
+const [showQtyModal, setShowQtyModal] = useState(false);
+const [selectedProduct, setSelectedProduct] = useState(null);
+const [quantity, setQuantity] = useState(1);
+
 
   useEffect(() => {
     fetchProducts();
@@ -159,6 +165,31 @@ const ProductList = () => {
       alert("Network error while deleting product.");
     }
   };
+// ➕ ADD TO CART
+const addToCart = (product, qty) => {
+  setCart((prev) => {
+    const existing = prev.find((item) => item.id === product.id);
+
+    if (existing) {
+      return prev.map((item) =>
+        item.id === product.id
+          ? { ...item, qty: item.qty + qty }
+          : item
+      );
+    }
+
+    return [
+      ...prev,
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        qty,
+      },
+    ];
+  });
+};
 
   const filteredProducts = products
     .filter((p) => {
@@ -186,6 +217,52 @@ const ProductList = () => {
           🏠 Back to Home
         </button>
       </div>
+{/* QUANTITY MODAL */}
+{showQtyModal && selectedProduct && (
+  <div className="modal-overlay">
+    <div className="qty-modal">
+      <div className="qty-header">
+        <h3>Select Quantity</h3>
+        <button onClick={() => setShowQtyModal(false)}>✖</button>
+      </div>
+
+      <img
+        src={normalizeImageUrl(selectedProduct.imageUrl)}
+        alt={selectedProduct.name}
+        className="qty-image"
+      />
+
+      <h4>{selectedProduct.name}</h4>
+      <p>{selectedProduct.category}</p>
+      <p>₱{Number(selectedProduct.price).toFixed(2)}</p>
+
+      <div className="qty-controls">
+        <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+        <span>{quantity}</span>
+        <button onClick={() => setQuantity(quantity + 1)}>+</button>
+      </div>
+
+      <div className="summary-box">
+        <p>Unit Price: ₱{selectedProduct.price}</p>
+        <p>Quantity: {quantity} pc</p>
+        <h4>Total: ₱{(quantity * selectedProduct.price).toFixed(2)}</h4>
+      </div>
+
+      <div className="modal-footer">
+        <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+        <button
+          className="confirm"
+          onClick={() => {
+            addToCart(selectedProduct, quantity);
+            setShowQtyModal(false); // 🔙 back to product screen
+          }}
+        >
+          Add ({quantity})
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       <div className="filters">
         <input
@@ -225,15 +302,21 @@ const ProductList = () => {
               const id = product.id || product._id;
               return (
                 <div key={id || Math.random()} className="product-card">
-                  <img
-                    src={normalizeImageUrl(product.imageUrl || product.image || "")}
-                    alt={product.name || "product"}
-                    className="product-image"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = fallbackImage;
-                    }}
-                  />
+                 <img
+  src={normalizeImageUrl(product.imageUrl || product.image || "")}
+  alt={product.name || "product"}
+  className="product-image"
+  onClick={() => {
+    setSelectedProduct(product);
+    setQuantity(1);
+    setShowQtyModal(true);
+  }}
+  onError={(e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = fallbackImage;
+  }}
+/>
+
                   <div className="product-info">
                     <h4>{product.name}</h4>
                     <p>{product.category}</p>
