@@ -195,14 +195,14 @@
   justify-content: center;
   gap: 8px;
   padding: 10px;
-  border-top: 1px solid #0a0a0a;
+  border-top: 1px solid #eee;
   background: #f1f3f5;
   width: 100%;
 }
 
 .card-actions button {
   background: transparent;
-  color: white;
+  color: black;
   border:2px solid #7e96de;
   cursor: pointer;
   font-size: 13px;
