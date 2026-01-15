@@ -213,6 +213,7 @@
 
 .card-actions button:hover {
   background: #023e8a;
+  color: white;
 }
 .empty-cart {
   text-align: center;
