@@ -550,7 +550,7 @@ const cartTotal = cart.reduce(
       </div>
 
       <div className="cart-footer">
-        <h4>Grand Total: ₱{cartTotal.toFixed(2)}</h4>
+        <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>
 
         <div className="cart-buttons">
           <button onClick={() => setShowCartModal(false)}>
