@@ -667,9 +667,12 @@
 }
 .remove-btn {
   background: #fee2e2;
+  border: none;
   border-radius: 8px;
   padding: 6px 8px;
+  cursor: pointer;
 }
+
 
 
 /* ================= MOBILE TWEAKS ONLY ================= */
