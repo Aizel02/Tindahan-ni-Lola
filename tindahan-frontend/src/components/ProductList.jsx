@@ -221,23 +221,30 @@ const cartTotal = cart.reduce(
 
   return (
     <div className="product-list-page">
-      <div className="header-left">
-        <div>
-          <h1>Tindahan ni Lola</h1>
-          <p>Manage your product inventory</p>
-        <div className="header-right">
-          </div>
+      <div className="header">
+  <div className="header-left">
+    <h1>Tindahan ni Lola</h1>
+    <p>Manage your product inventory</p>
+  </div>
+
+  <div className="header-right">
     <button
       className="back-btn"
-      onClick={() => (window.location.href = "/")}>
+      onClick={() => (window.location.href = "/")}
+    >
       🏠 Back to Home
-        </button>
-        <button className="cart-btn" onClick={() => setShowCartModal(true)}>
-  🛒 View Cart
-  {cart.length > 0 && <span className="badge">{cart.length}</span>}
-</button>
+    </button>
+
+    <button
+      className="cart-btn"
+      onClick={() => setShowCartModal(true)}
+    >
+      🛒 View Cart
+      {cart.length > 0 && <span className="badge">{cart.length}</span>}
+    </button>
+  </div>
 </div>
-      </div>
+
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
   <div className="modal-overlay">
