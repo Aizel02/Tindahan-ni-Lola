@@ -214,6 +214,19 @@
 .card-actions button:hover {
   background: #023e8a;
 }
+.empty-cart {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.empty-cart span {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+}
 
 /* Modal Overlay */
 .modal-overlay {
@@ -552,7 +565,7 @@
 }
 
 .cart-btn:hover {
-  background: #1d4ed8;
+  background: #023e8a;
 }
 
 /* ================= CART BUTTONS ================= */

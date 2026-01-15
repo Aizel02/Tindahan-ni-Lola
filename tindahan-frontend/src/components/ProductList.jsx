@@ -516,11 +516,12 @@ const cartTotal = cart.reduce(
         <h3>Shopping Cart</h3>
         <button onClick={() => setShowCartModal(false)}>✖</button>
       </div>
-
-      {cart.length === 0 && (
-        <p className="empty-cart">Your cart is empty.</p>
+      {cart.length === 0 &&(
+        <div className="empty-cart">
+          <strong>Your cart is empty</strong>
+          <span>Click the product images to add items</span> 
+      </div>
       )}
-
       <div className="cart-items">
         {cart.map((item) => (
           <div key={item.id} className="cart-item">
