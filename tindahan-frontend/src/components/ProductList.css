@@ -538,7 +538,7 @@
 /* ================= CART BUTTON ================= */
 .cart-btn {
   position: relative;
-  background: #2563eb;
+  background: #587ff0;
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -577,7 +577,7 @@
 }
 
 .cart-buttons .confirm {
-  background: #515866;
+  background: #2563eb;
   color: white;
 }
 
