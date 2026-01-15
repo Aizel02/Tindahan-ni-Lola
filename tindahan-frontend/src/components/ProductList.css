@@ -201,9 +201,9 @@
 }
 
 .card-actions button {
-  background: #0077b6;
+  background: transparent;
   color: white;
-  border: none;
+  border: #0077b6;
   cursor: pointer;
   font-size: 13px;
   padding: 6px 10px;
@@ -672,9 +672,6 @@
   padding: 6px 8px;
   cursor: pointer;
 }
-
-
-
 /* ================= MOBILE TWEAKS ONLY ================= */
 @media (max-width: 480px) {
   .cart-modal,
