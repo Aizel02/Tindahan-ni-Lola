@@ -534,12 +534,11 @@
 }
 
 /* ================= CART ITEMS ================= */
-.cart-items {
-  flex: 1;                    /* 🔥 fills space */
-  overflow-y: auto;
-  margin: 12px 0;
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-
 /* ================= CART FOOTER ================= */
 .cart-footer {
   border-top: 1px solid #e5e7eb;
@@ -613,6 +612,12 @@
   object-fit: contain;
   border-radius: 8px;
 }
+.remove-btn {
+  background: #fee2e2;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
 
 /* ================= MOBILE TWEAKS ONLY ================= */
 @media (max-width: 480px) {
@@ -624,6 +629,7 @@
 
   .cart-item {
     font-size: 14px;
+    padding:10px;
   }
 
   .qty-header h3 {
