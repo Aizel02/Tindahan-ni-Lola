@@ -202,6 +202,7 @@
 
 .card-actions button {
   background: transparent;
+  color: white;
   border:  2px solid #7e96de;
   cursor: pointer;
   font-size: 13px;
