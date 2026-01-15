@@ -360,7 +360,7 @@ const cartTotal = cart.reduce(
                         setShowEditModal(true);
                       }}
                     >
-                      ✏️ Edit
+                      🖉 Edit
                     </button>
                     <button onClick={() => handleDeleteProduct(id)}>🗑️ Delete</button>
                   </div>

@@ -201,9 +201,9 @@
 }
 
 .card-actions button {
-  background: transparent;
+  background: #0077b6;
   color: white;
-  border: #0077b6;
+  border: none;
   cursor: pointer;
   font-size: 13px;
   padding: 6px 10px;
