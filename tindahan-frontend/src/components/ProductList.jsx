@@ -563,7 +563,7 @@ const cartTotal = cart.reduce(
 
       {/* Sticky Footer */}
       <footer className="footer">
-        <p>© 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez 🎬</p>
+        <p>© 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez</p>
       </footer>
     </div>
   );
