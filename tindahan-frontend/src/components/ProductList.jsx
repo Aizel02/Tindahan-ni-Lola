@@ -525,27 +525,28 @@ const cartTotal = cart.reduce(
       <div className="cart-items">
         {cart.map((item) => (
           <div key={item.id} className="cart-item">
-            <img
-              src={normalizeImageUrl(item.imageUrl)}
-              alt={item.name}
-            />
+  <img
+    className="cart-item-img"
+    src={normalizeImageUrl(item.imageUrl)}
+    alt={item.name}
+  />
 
-            <div className="cart-info">
-              <strong>{item.name}</strong>
-              <p>{item.qty} × ₱{item.price}</p>
-            </div>
+  <div className="cart-item-info">
+    <h4>{item.name}</h4>
+    <p className="cart-qty">Qty: {item.qty} × ₱{item.price}</p>
+  </div>
 
-            <div className="cart-actions">
-              <span>₱{(item.qty * item.price).toFixed(2)}</span>
-              <button
-                className="remove-btn"
-                onClick={() => removeFromCart(item.id)}
-              >
-                🗑️
-              </button>
-              
-            </div>
-          </div>
+  <div className="cart-item-price">
+    ₱{(item.qty * item.price).toFixed(2)}
+    <button
+      className="remove-btn"
+      onClick={() => removeFromCart(item.id)}
+    >
+      🗑️
+    </button>
+  </div>
+</div>
+
         ))}
       </div>
 
