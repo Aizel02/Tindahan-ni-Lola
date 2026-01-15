@@ -27,6 +27,16 @@
   margin: 0;
   font-weight: 600;
 }
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* space between buttons */
+}
 
 .back-btn {
   background: white;
