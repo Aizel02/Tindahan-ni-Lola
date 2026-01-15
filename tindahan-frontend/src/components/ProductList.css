@@ -532,7 +532,15 @@
   position: relative;
   z-index: 2100;
 }
-
+.cart-header {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  padding: 14px 16px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 /* ================= CART ITEMS ================= */
 .cart-item {
   display: flex;
