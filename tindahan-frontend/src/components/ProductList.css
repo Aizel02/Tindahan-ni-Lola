@@ -538,7 +538,7 @@
 /* ================= CART BUTTON ================= */
 .cart-btn {
   position: relative;
-  background: #587ff0;
+  background: transparent;
   color: #fff;
   border: none;
   padding: 8px 16px;
