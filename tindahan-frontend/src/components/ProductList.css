@@ -619,18 +619,17 @@
 
 /* ================= CART BUTTON ================= */
 .cart-btn {
-  position: relative;
-  background: transparent;
-  color: #ffffff;
-  border: 2px solid #7e96de; 
-  padding: 8px 16px;
-  border-radius: 10px;
+  position: relative; /* IMPORTANT */
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  z-index: 1200;
+  gap: 8px;
 }
 .cart-badge {
   position: absolute;
