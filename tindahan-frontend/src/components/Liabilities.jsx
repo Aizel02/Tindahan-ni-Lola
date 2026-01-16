@@ -7,6 +7,26 @@ export default function Liabilities() {
     <div className="liabilities-page">
       <Header subtitle="Track your store liabilities" />
 
+      <div className="page-tabs">
+        <NavLink
+          to="/products"
+          className={({ isActive }) =>
+            isActive ? "tab active" : "tab"
+          }
+        >
+          Products
+        </NavLink>
+      
+        <NavLink
+          to="/liabilities"
+          className={({ isActive }) =>
+            isActive ? "tab active" : "tab"
+          }
+        >
+          Liabilities
+        </NavLink>
+      </div>
+
       <div className="liabilities-section">
         <div className="liabilities-header">
           <input
