@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./ProductList.css";
 import { NavLink } from "react-router-dom";
+import Header from "./Header";
+
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
@@ -224,29 +226,6 @@ const cartTotal = cart.reduce(
 
   return (
     <div className="product-list-page">
-      <div className="header">
-  <div className="header-left">
-    <h1>Tindahan ni Lola</h1>
-    <p>Manage your product inventory</p>
-  </div>
-
-  <div className="header-right">
-    <button
-      className="back-btn"
-      onClick={() => (window.location.href = "/")}
-    >
-      🏠 Back to Home
-    </button>
-
-    <button
-      className="cart-btn"
-      onClick={() => setShowCartModal(true)}
-    >
-      🛒 View Cart
-      {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
-    </button>
-  </div>
-</div>
 <div className="page-tabs">
   <NavLink
     to="/products"

@@ -1,6 +1,8 @@
 import React from "react";
 import "./Liabilities.css";
 import { NavLink } from "react-router-dom";
+import Header from "./Header";
+
 
 
 export default function Liabilities() {
