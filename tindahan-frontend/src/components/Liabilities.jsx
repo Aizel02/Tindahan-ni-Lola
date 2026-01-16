@@ -1,10 +1,10 @@
-import Tabs from "../components/Tabs";
+import React from "react";
+import "./Liabilities.css";
 
 export default function Liabilities() {
   return (
     <div className="liabilities-page">
-      <Header />
-      <Tabs />
+      <h1 className="liabilities-title">Liabilities</h1>
 
       <div className="liabilities-section">
         <div className="liabilities-header">
