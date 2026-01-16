@@ -225,7 +225,7 @@ const cartTotal = cart.reduce(
 
   return (
     <div className="product-list-page">
-      <Header subtitle="Manage your product inventory" />
+      <Header />
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
   <div className="modal-overlay">
