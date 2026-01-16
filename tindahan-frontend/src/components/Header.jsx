@@ -31,6 +31,33 @@ export default function Header({ cartCount = 0, onCartClick }) {
             )}
           </button>
         )}
+        <div className="header-wrapper">
+      <div className="header-content">
+        <h1>Tindahan ni Lola</h1>
+        <p>{subtitle}</p>
+      </div>
+
+      {/* ✅ TABS ALWAYS VISIBLE */}
+      <div className="page-tabs">
+        <NavLink
+          to="/products"
+          className={({ isActive }) =>
+            isActive ? "tab active" : "tab"
+          }
+        >
+          Products
+        </NavLink>
+
+        <NavLink
+          to="/liabilities"
+          className={({ isActive }) =>
+            isActive ? "tab active" : "tab"
+          }
+        >
+          Liabilities
+        </NavLink>
+      </div>
+    </div>
       </div>
     </div>
   );

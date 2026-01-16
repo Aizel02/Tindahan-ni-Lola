@@ -225,7 +225,8 @@ const cartTotal = cart.reduce(
 
   return (
     <div className="product-list-page">
-      <Header
+      <Header subtitle="Manage your product inventory" />
+      {/* <Header
   cartCount={cart.length}
   onCartClick={() => setShowCartModal(true)}
 />
@@ -248,7 +249,7 @@ const cartTotal = cart.reduce(
   >
     Liabilities
   </NavLink>
-</div>
+</div> */}
 
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
