@@ -1,13 +1,11 @@
 import React from "react";
+import Header from "./Header";
 import "./Liabilities.css";
-
-
-
 
 export default function Liabilities() {
   return (
     <div className="liabilities-page">
-      <h1 className="liabilities-title">Liabilities</h1>
+      <Header subtitle="Track your store liabilities" />
 
       <div className="liabilities-section">
         <div className="liabilities-header">
