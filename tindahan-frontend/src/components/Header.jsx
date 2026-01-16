@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
 
 export default function Header({ cartCount = 0, onCartClick }) {
@@ -12,32 +12,31 @@ export default function Header({ cartCount = 0, onCartClick }) {
       : "Manage your product inventory";
 
   return (
-    <div className="header">
-      <div className="header-left">
-        <h1>Tindahan ni Lola</h1>
-        <p>{subtitle}</p>
-      </div>
+    <>
+      {/* ===== TOP HEADER ===== */}
+      <div className="header">
+        <div className="header-left">
+          <h1>Tindahan ni Lola</h1>
+          <p>{subtitle}</p>
+        </div>
 
-      <div className="header-right">
-        <button className="back-btn" onClick={() => navigate("/")}>
-          🏠 Back to Home
-        </button>
-
-        {onCartClick && (
-          <button className="cart-btn" onClick={onCartClick}>
-            🛒 View Cart
-            {cartCount > 0 && (
-              <span className="cart-badge">{cartCount}</span>
-            )}
+        <div className="header-right">
+          <button className="back-btn" onClick={() => navigate("/")}>
+            🏠 Back to Home
           </button>
-        )}
-        <div className="header-wrapper">
-      <div className="header-content">
-        <h1>Tindahan ni Lola</h1>
-        <p>{subtitle}</p>
+
+          {onCartClick && (
+            <button className="cart-btn" onClick={onCartClick}>
+              🛒 View Cart
+              {cartCount > 0 && (
+                <span className="cart-badge">{cartCount}</span>
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* ✅ TABS ALWAYS VISIBLE */}
+      {/* ===== PAGE TABS (ALWAYS VISIBLE) ===== */}
       <div className="page-tabs">
         <NavLink
           to="/products"
@@ -57,8 +56,6 @@ export default function Header({ cartCount = 0, onCartClick }) {
           Liabilities
         </NavLink>
       </div>
-    </div>
-      </div>
-    </div>
+    </>
   );
 }
