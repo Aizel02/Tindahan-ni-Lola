@@ -54,6 +54,7 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
+const [activeTab, setActiveTab] = useState("products");
 
 
 
@@ -244,6 +245,33 @@ const cartTotal = cart.reduce(
     </button>
   </div>
 </div>
+<div className="tabs">
+  <button
+    className={activeTab === "products" ? "tab active" : "tab"}
+    onClick={() => setActiveTab("products")}
+  >
+    Products
+  </button>
+
+  <button
+    className={activeTab === "liabilities" ? "tab active" : "tab"}
+    onClick={() => setActiveTab("liabilities")}
+  >
+    Liabilities
+  </button>
+</div>
+{activeTab === "products" && (
+  <>
+    <div className="filters">
+      {/* search, category, sort, add product */}
+    </div>
+
+    <div className="product-grid">
+      {/* all products */}
+    </div>
+  </>
+)}
+
 
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
