@@ -5,7 +5,7 @@ import "./Liabilities.css";
 export default function Liabilities() {
   return (
     <div className="liabilities-page">
-      {/* <Header subtitle="Track your store liabilities" /> */}
+      <Header />
 
       <div className="liabilities-section">
         <div className="liabilities-header">
@@ -14,7 +14,10 @@ export default function Liabilities() {
             placeholder="Search person who owed..."
             className="liabilities-search"
           />
-          <button className="add-liability-btn">+ Add Liability</button>
+
+          <button className="add-liability-btn">
+            + Add Liability
+          </button>
         </div>
 
         <div className="liabilities-empty">
