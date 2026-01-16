@@ -240,7 +240,7 @@ const cartTotal = cart.reduce(
       onClick={() => setShowCartModal(true)}
     >
       🛒 View Cart
-      {cart.length > 0 && <span className="badge">{cart.length}</span>}
+      {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
     </button>
   </div>
 </div>
