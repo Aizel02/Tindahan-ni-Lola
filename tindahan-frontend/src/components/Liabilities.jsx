@@ -5,27 +5,7 @@ import "./Liabilities.css";
 export default function Liabilities() {
   return (
     <div className="liabilities-page">
-      <Header subtitle="Track your store liabilities" />
-
-      <div className="page-tabs">
-        <NavLink
-          to="/products"
-          className={({ isActive }) =>
-            isActive ? "tab active" : "tab"
-          }
-        >
-          Products
-        </NavLink>
-      
-        <NavLink
-          to="/liabilities"
-          className={({ isActive }) =>
-            isActive ? "tab active" : "tab"
-          }
-        >
-          Liabilities
-        </NavLink>
-      </div>
+      {/* <Header subtitle="Track your store liabilities" /> */}
 
       <div className="liabilities-section">
         <div className="liabilities-header">
