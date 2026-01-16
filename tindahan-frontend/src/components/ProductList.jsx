@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./ProductList.css";
+import { NavLink } from "react-router-dom";
+
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
 const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
@@ -244,6 +246,25 @@ const cartTotal = cart.reduce(
       {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
     </button>
   </div>
+</div>
+<div className="page-tabs">
+  <NavLink
+    to="/products"
+    className={({ isActive }) =>
+      isActive ? "tab active" : "tab"
+    }
+  >
+    Products
+  </NavLink>
+
+  <NavLink
+    to="/liabilities"
+    className={({ isActive }) =>
+      isActive ? "tab active" : "tab"
+    }
+  >
+    Liabilities
+  </NavLink>
 </div>
 
 {/* QUANTITY MODAL */}
