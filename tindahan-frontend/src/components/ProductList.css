@@ -632,6 +632,28 @@
   gap: 6px;
   z-index: 1200;
 }
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  background: #ef4444;   /* red */
+  color: #ffffff;
+
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+
+  border-radius: 999px;  /* bilog */
+  font-size: 12px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
 
 .cart-btn:hover {
   background: #023e8a;
@@ -688,5 +710,12 @@
 
   .qty-header h3 {
     font-size: 16px;
+  }
+}
+@media (max-width: 480px) {
+  .cart-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 11px;
   }
 }
