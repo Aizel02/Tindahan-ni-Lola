@@ -1,0 +1,154 @@
+/* ================= PAGE ================= */
+.liabilities-page {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 24px;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ================= CONTAINER ================= */
+.liabilities-container {
+  background: #ffffff;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= HEADER ================= */
+.liabilities-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.liabilities-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* SEARCH */
+.liabilities-search {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  width: 280px;
+  font-size: 14px;
+}
+
+/* ADD BUTTON */
+.add-liability-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.add-liability-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ================= EMPTY STATE ================= */
+.liabilities-empty {
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 15px;
+}
+
+/* ================= LIST ================= */
+.liabilities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* CARD */
+.liability-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fbff;
+  border: 1px solid #e5edff;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.liability-info strong {
+  font-size: 15px;
+  display: block;
+}
+
+.liability-info span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.liability-amount {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+/* ================= TABLET ================= */
+@media (max-width: 768px) {
+  .liabilities-page {
+    padding: 16px;
+  }
+
+  .liabilities-container {
+    padding: 18px;
+  }
+
+  .liabilities-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .liabilities-search {
+    width: 100%;
+  }
+
+  .add-liability-btn {
+    width: 100%;
+  }
+
+  .liability-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .liability-amount {
+    align-self: flex-end;
+  }
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 480px) {
+  .liabilities-header h2 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .liabilities-empty {
+    font-size: 14px;
+    padding: 30px 16px;
+  }
+
+  .liability-card {
+    padding: 12px;
+  }
+
+  .liability-amount {
+    font-size: 16px;
+  }
+}

@@ -54,7 +54,7 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
-const [activeTab, setActiveTab] = useState("products");
+
 
 
 
@@ -245,138 +245,6 @@ const cartTotal = cart.reduce(
     </button>
   </div>
 </div>
-{/* ================= TABS ================= */}
-<div className="tabs">
-  <button
-    className={activeTab === "products" ? "tab active" : "tab"}
-    onClick={() => setActiveTab("products")}
-  >
-    Products
-  </button>
-
-  <button
-    className={activeTab === "liabilities" ? "tab active" : "tab"}
-    onClick={() => setActiveTab("liabilities")}
-  >
-    Liabilities
-  </button>
-</div>
-
-{/* ================= TAB CONTENT ================= */}
-<div className="tab-content">
-
-  {/* ===== PRODUCTS TAB ===== */}
-  {activeTab === "products" && (
-    <>
-      {/* FILTERS */}
-      <div className="filters">
-        <input
-          type="text"
-          placeholder="🔍 Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="All">All Categories</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="name">Sort by Name</option>
-          <option value="price">Sort by Price</option>
-        </select>
-
-        <button
-          className="add-product-btn"
-          onClick={() => setShowAddModal(true)}
-        >
-          🛒 Add Product
-        </button>
-      </div>
-
-      {/* PRODUCT GRID */}
-      <div className="product-grid">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => {
-            const id = product.id || product._id;
-            return (
-              <div key={id} className="product-card">
-                <img
-                  src={normalizeImageUrl(product.imageUrl || product.image)}
-                  alt={product.name}
-                  onClick={() => {
-                    setSelectedProduct(product);
-                    setQuantity(1);
-                    setShowQtyModal(true);
-                  }}
-                />
-
-                <div className="product-info">
-                  <h4>{product.name}</h4>
-                  <p>{product.category}</p>
-                  <p className="price">
-                    ₱{Number(product.price).toFixed(2)}
-                  </p>
-                </div>
-
-                <div className="card-actions">
-                  <button
-                    onClick={() => {
-                      setEditProduct(product);
-                      setShowEditModal(true);
-                    }}
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button onClick={() => handleDeleteProduct(id)}>
-                    🗑️ Delete
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <p className="no-products">No products found.</p>
-        )}
-      </div>
-    </>
-  )}
-
-  {/* ===== LIABILITIES TAB ===== */}
-  {activeTab === "liabilities" && (
-    <div className="liabilities-section">
-      <div className="liabilities-header">
-        <input
-          type="text"
-          placeholder="Search person who owed..."
-          className="liabilities-search"
-        />
-
-        <button className="add-liability-btn">
-          + Add Liability
-        </button>
-      </div>
-
-      <div className="liabilities-empty">
-        No liabilities recorded. Add one to get started!
-      </div>
-    </div>
-  )}
-
-</div>
-
-
 
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
