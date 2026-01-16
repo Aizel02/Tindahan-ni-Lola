@@ -4,7 +4,6 @@ import { NavLink } from "react-router-dom";
 import Header from "./Header";
 
 
-
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
 const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
 const BACKEND_BASE = "https://tindahan-ni-lola-backend-1.onrender.com";
@@ -226,6 +225,11 @@ const cartTotal = cart.reduce(
 
   return (
     <div className="product-list-page">
+      <Header
+  cartCount={cart.length}
+  onCartClick={() => setShowCartModal(true)}
+/>
+
 <div className="page-tabs">
   <NavLink
     to="/products"
