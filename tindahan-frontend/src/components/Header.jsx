@@ -6,14 +6,15 @@ export default function Header({ cartCount = 0, onCartClick }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const subtitle =
-    location.pathname === "/liabilities"
-      ? "Track your store liabilities"
-      : "Manage your product inventory";
+  const isProductsPage = location.pathname === "/products";
+
+  const subtitle = isProductsPage
+    ? "Manage your product inventory"
+    : "Track your store liabilities";
 
   return (
     <>
-      {/* ===== TOP HEADER ===== */}
+      {/* ===== HEADER ===== */}
       <div className="header">
         <div className="header-left">
           <h1>Tindahan ni Lola</h1>
@@ -25,7 +26,8 @@ export default function Header({ cartCount = 0, onCartClick }) {
             🏠 Back to Home
           </button>
 
-          {onCartClick && (
+          {/* ✅ SHOW ONLY IN PRODUCTS */}
+          {isProductsPage && (
             <button className="cart-btn" onClick={onCartClick}>
               🛒 View Cart
               {cartCount > 0 && (
@@ -36,22 +38,18 @@ export default function Header({ cartCount = 0, onCartClick }) {
         </div>
       </div>
 
-      {/* ===== PAGE TABS (ALWAYS VISIBLE) ===== */}
+      {/* ===== TABS ===== */}
       <div className="page-tabs">
         <NavLink
           to="/products"
-          className={({ isActive }) =>
-            isActive ? "tab active" : "tab"
-          }
+          className={({ isActive }) => (isActive ? "tab active" : "tab")}
         >
           Products
         </NavLink>
 
         <NavLink
           to="/liabilities"
-          className={({ isActive }) =>
-            isActive ? "tab active" : "tab"
-          }
+          className={({ isActive }) => (isActive ? "tab active" : "tab")}
         >
           Liabilities
         </NavLink>

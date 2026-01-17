@@ -225,7 +225,11 @@ const cartTotal = cart.reduce(
 
   return (
     <div className="product-list-page">
-      <Header />
+      <Header
+  cartCount={cart.length}
+  onCartClick={() => setShowCartModal(true)}
+/>
+
 {/* QUANTITY MODAL */}
 {showQtyModal && selectedProduct && (
   <div className="modal-overlay">
