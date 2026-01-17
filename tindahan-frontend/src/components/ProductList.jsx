@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "./ProductList.css";
-import { NavLink } from "react-router-dom";
 import Header from "./Header";
+import "./ProductList.css";
+
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
