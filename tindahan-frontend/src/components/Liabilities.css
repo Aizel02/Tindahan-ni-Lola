@@ -1,154 +1,202 @@
-/* ================= PAGE ================= */
+/* =============================
+   PAGE WRAPPER
+============================= */
 .liabilities-page {
+  padding: 16px;
+  background: #f8fafc;
   min-height: 100vh;
-  background: #f9fafb;
-  padding: 24px;
-  font-family: "Poppins", sans-serif;
 }
 
-/* ================= CONTAINER ================= */
-.liabilities-container {
-  background: #ffffff;
-  max-width: 1000px;
-  margin: 0 auto;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-/* ================= HEADER ================= */
+/* =============================
+   HEADER
+============================= */
 .liabilities-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.liabilities-header h2 {
-  font-size: 22px;
-  font-weight: 600;
-}
-
-/* SEARCH */
 .liabilities-search {
-  padding: 10px 14px;
-  border-radius: 10px;
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid #d1d5db;
-  width: 280px;
+  outline: none;
   font-size: 14px;
 }
 
-/* ADD BUTTON */
 .add-liability-btn {
   background: #2563eb;
-  color: #fff;
+  color: white;
   border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  white-space: nowrap;
+  font-weight: 600;
 }
 
 .add-liability-btn:hover {
   background: #1d4ed8;
 }
 
-/* ================= EMPTY STATE ================= */
+/* =============================
+   EMPTY STATE
+============================= */
 .liabilities-empty {
   text-align: center;
-  padding: 40px 20px;
-  border-radius: 14px;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 15px;
+  color: #6b7280;
+  margin-top: 40px;
+  font-size: 14px;
 }
 
-/* ================= LIST ================= */
-.liabilities-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+/* =============================
+   GROUP (PER PERSON)
+============================= */
+.liability-group {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* CARD */
-.liability-card {
+.group-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9fbff;
-  border: 1px solid #e5edff;
-  border-radius: 14px;
-  padding: 14px 16px;
+  margin-bottom: 10px;
 }
 
-.liability-info strong {
-  font-size: 15px;
-  display: block;
+.group-header h3 {
+  font-size: 16px;
+  font-weight: 600;
 }
 
-.liability-info span {
+.total {
+  font-weight: bold;
+  color: #dc2626;
+}
+
+/* =============================
+   LIABILITY CARD
+============================= */
+.liability-card {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.liability-card p {
+  margin: 2px 0;
   font-size: 13px;
-  color: #64748b;
+  color: #374151;
 }
 
-.liability-amount {
-  font-weight: 700;
-  color: #2563eb;
+.liability-card small {
+  color: #6b7280;
+  font-size: 12px;
 }
 
-/* ================= TABLET ================= */
-@media (max-width: 768px) {
-  .liabilities-page {
-    padding: 16px;
-  }
+/* =============================
+   PAY BUTTON
+============================= */
+.pay-btn {
+  background: #22c55e;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
 
-  .liabilities-container {
-    padding: 18px;
-  }
+.pay-btn:hover {
+  background: #16a34a;
+}
 
+/* =============================
+   MODAL
+============================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal h3 {
+  margin-bottom: 12px;
+}
+
+.modal input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-actions .confirm {
+  background: #2563eb;
+  color: white;
+}
+
+.modal-actions .confirm:hover {
+  background: #1d4ed8;
+}
+
+/* =============================
+   RESPONSIVE
+============================= */
+@media (max-width: 600px) {
   .liabilities-header {
     flex-direction: column;
-    align-items: stretch;
   }
 
-  .liabilities-search {
-    width: 100%;
-  }
-
-  .add-liability-btn {
-    width: 100%;
+  .group-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 
   .liability-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .liability-amount {
-    align-self: flex-end;
-  }
-}
-
-/* ================= MOBILE ================= */
-@media (max-width: 480px) {
-  .liabilities-header h2 {
-    font-size: 18px;
-    text-align: center;
-  }
-
-  .liabilities-empty {
-    font-size: 14px;
-    padding: 30px 16px;
-  }
-
-  .liability-card {
-    padding: 12px;
-  }
-
-  .liability-amount {
-    font-size: 16px;
+  .pay-btn {
+    width: 100%;
   }
 }
