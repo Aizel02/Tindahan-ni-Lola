@@ -120,53 +120,73 @@ export default function Liabilities() {
       )}
 
       {/* ===== MODAL ===== */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Add New Liability</h3>
+ {showModal && (
+  <div className="modal-overlay">
+    <div className="liability-modal">
+      <div className="modal-header">
+        <h3>Add New Liability</h3>
+        <button className="close-btn" onClick={() => setShowModal(false)}>
+          ✕
+        </button>
+      </div>
 
-            <input
-              placeholder="Person Name"
-              value={form.debtorName}
-              onChange={(e) =>
-                setForm({ ...form, debtorName: e.target.value })
-              }
-            />
+      <div className="modal-body">
+        <label>Name of Person Who Borrowed (Debtor)</label>
+        <input
+          type="text"
+          placeholder="e.g., Juan Dela Cruz"
+          value={form.debtorName}
+          onChange={(e) =>
+            setForm({ ...form, debtorName: e.target.value })
+          }
+        />
 
-            <input
-              type="number"
-              placeholder="Amount"
-              value={form.amount}
-              onChange={(e) =>
-                setForm({ ...form, amount: e.target.value })
-              }
-            />
+        <label>Amount Borrowed (₱)</label>
+        <input
+          type="number"
+          placeholder="0.00"
+          value={form.amount}
+          onChange={(e) =>
+            setForm({ ...form, amount: e.target.value })
+          }
+        />
 
-            <input
-              placeholder="Description"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-            />
+        <label>Description / Notes</label>
+        <input
+          type="text"
+          placeholder="e.g. Payment for goods, personal loan"
+          value={form.description}
+          onChange={(e) =>
+            setForm({ ...form, description: e.target.value })
+          }
+        />
 
-            <input
-              type="date"
-              value={form.dueDate}
-              onChange={(e) =>
-                setForm({ ...form, dueDate: e.target.value })
-              }
-            />
+        <label>Due Date (Optional)</label>
+        <input
+          type="date"
+          value={form.dueDate}
+          onChange={(e) =>
+            setForm({ ...form, dueDate: e.target.value })
+          }
+        />
 
-            <div className="modal-actions">
-              <button onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="confirm" onClick={addLiability}>
-                Add Liability
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <label>Status</label>
+        <select disabled>
+          <option>Pending</option>
+        </select>
+      </div>
+
+      <div className="modal-footer">
+        <button className="cancel-btn" onClick={() => setShowModal(false)}>
+          Cancel
+        </button>
+        <button className="confirm-btn" onClick={addLiability}>
+          Add Liability
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
