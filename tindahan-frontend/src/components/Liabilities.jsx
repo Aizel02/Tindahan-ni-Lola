@@ -61,21 +61,24 @@ export default function Liabilities() {
   };
 
   // ✅ MARK PAID
-  const markPaid = async (id) => {
-    const paidDate = new Date().toISOString().split("T")[0];
+const markPaid = async (id) => {
+  const today = new Date().toISOString().split("T")[0];
 
-    await fetch(`${API_URL}/${id}/pay`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paidDate }),
-    });
+  await fetch(`${API_URL}/${id}/pay`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paidDate: today }),
+  });
 
-    setLiabilities((prev) =>
-      prev.map((l) =>
-        l.id === id ? { ...l, status: "Paid", paidDate } : l
-      )
-    );
-  };
+  setLiabilities((prev) =>
+    prev.map((l) =>
+      l.id === id
+        ? { ...l, status: "Paid", paidDate: today }
+        : l
+    )
+  );
+};
+
 
   // ✅ DELETE
   const deleteLiability = async (id) => {
@@ -139,14 +142,28 @@ export default function Liabilities() {
                   </span>
                 </div>
 
-                <div className="debt-list">
+                <div className="debt-list scrollable">
                   {list.map((l) => (
                     <div className="debt-card" key={l.id}>
                       <div>
-                        <strong>{l.description || "Debt"}</strong>
-                        <p>₱{l.amount}</p>
-                        <span className="status">{l.status}</span>
-                      </div>
+  <strong>{l.description || "Debt"}</strong>
+  <p>₱{l.amount}</p>
+
+  <small>
+    Borrowed: {l.dueDate || "—"}
+  </small>
+
+  {l.status === "Paid" && (
+    <small className="paid-date">
+      Paid: {l.paidDate}
+    </small>
+  )}
+
+  <span className={`status ${l.status.toLowerCase()}`}>
+    {l.status}
+  </span>
+</div>
+
 
                       <div className="debt-actions">
                         {l.status !== "Paid" && (
