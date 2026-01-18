@@ -652,47 +652,45 @@
 }
 
 
-/* ================= CART BUTTON ================= */
+/* ===========================
+   CART BUTTON
+=========================== */
+
 .cart-btn {
   position: relative;
   background: transparent;
-  color: #ffffff;
+  color: white;
   border: 2px solid #7e96de; 
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
-  z-index: 1200;
+  transition: 0.2s ease;
 }
+
+.cart-btn:hover {
+    background: #023e8a;
+}
+
+/* 🧾 CART COUNT BADGE */
 .cart-badge {
   position: absolute;
   top: -6px;
   right: -6px;
-
-  background: #ef4444;   /* red */
-  color: #ffffff;
-
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-
-  border-radius: 999px;  /* bilog */
-  font-size: 12px;
-  font-weight: 700;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1;
 }
 
-.cart-btn:hover {
-  background: #023e8a;
-}
 
 /* ================= CART BUTTONS ================= */
 .cart-buttons {
