@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-
+import { Pencil, Trash2 } from "lucide-react";
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
@@ -345,9 +345,9 @@ const cartTotal = cart.reduce(
                         setShowEditModal(true);
                       }}
                     >
-                      🖉 Edit
+                      <Pencil size={16} /> Edit
                     </button>
-                    <button onClick={() => handleDeleteProduct(id)}>🗑️ Delete</button>
+                    <button onClick={() => handleDeleteProduct(id)}><Trash2 size={16} /> Delete</button>
                   </div>
                 </div>
               );

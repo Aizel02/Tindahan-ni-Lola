@@ -193,8 +193,7 @@ const markPaid = async (id) => {
                         <button
                           className="delete"
                           onClick={() => deleteLiability(l.id)}
-                        >
-                          🗑️
+                        ><Trash2 size={16} />
                         </button>
                       </div>
                     </div>

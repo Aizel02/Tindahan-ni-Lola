@@ -288,6 +288,41 @@
   font-size: 20px;
   cursor: pointer;
 }
+/* ===========================
+   ICON BUTTONS (EDIT / DELETE)
+=========================== */
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+/* ✏️ Edit */
+.icon-btn.edit {
+  color: #2563eb;
+}
+
+.icon-btn.edit:hover {
+  background: #e0e7ff;
+  color: #1d4ed8;
+}
+
+/* 🗑️ Delete */
+.icon-btn.delete {
+  color: #dc2626;
+}
+
+.icon-btn.delete:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
 
 /* Modal Body */
 .modal-body {
@@ -792,7 +827,21 @@
   color: #6b7280;
   font-size: 15px;
 }
+.edit {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.edit:hover {
+  background: #4f46e5;
+}
 /* ================= MOBILE ================= */
 @media (max-width: 640px) {
   .liabilities-header {

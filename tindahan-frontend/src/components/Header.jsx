@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
-
+import { Home } from "lucide-react";
 export default function Header({ cartCount = 0, onCartClick }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,7 +23,7 @@ export default function Header({ cartCount = 0, onCartClick }) {
 
         <div className="header-right">
           <button className="back-btn" onClick={() => navigate("/")}>
-            🏠 Back to Home
+            <Home size={16} /> Back to Home
           </button>
 
           {/* ✅ SHOW ONLY IN PRODUCTS */}
