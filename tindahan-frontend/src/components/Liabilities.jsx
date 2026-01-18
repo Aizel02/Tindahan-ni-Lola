@@ -188,7 +188,7 @@ const markPaid = async (id) => {
                             setShowModal(true);
                           }}
                         >
-                          ✏️
+                          <Pencil />
                         </button>
                         <button
                           className="delete"
