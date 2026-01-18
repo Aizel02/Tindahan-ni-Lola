@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./Liabilities.css";
-
+import { Pencil } from 'lucide-react';
 const API_URL =
   "https://tindahan-ni-lola-backend-1.onrender.com/api/liabilities";
 
@@ -188,8 +188,8 @@ const markPaid = async (id) => {
                             setShowModal(true);
                           }}
                         >
-                          <Pencil />
-                        </button>
+                    <Pencil size={16} />
+                             </button>
                         <button
                           className="delete"
                           onClick={() => deleteLiability(l.id)}

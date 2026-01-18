@@ -242,6 +242,22 @@
   background: #ef4444;
   color: white;
 }
+.edit {
+  background: #6366f1;
+  border: none;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit:hover {
+  background: #4f46e5;
+}
+
 
 /* ================================
    ADD DEBT BUTTON
