@@ -187,6 +187,9 @@ export default function Liabilities() {
     </div>
   </div>
 )}
+ <footer className="footer">
+        <p>© 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez</p>
+      </footer>
     </div>
   );
 }
