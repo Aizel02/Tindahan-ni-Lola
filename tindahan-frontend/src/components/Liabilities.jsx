@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./Liabilities.css";
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 const API_URL =
   "https://tindahan-ni-lola-backend-1.onrender.com/api/liabilities";
 
