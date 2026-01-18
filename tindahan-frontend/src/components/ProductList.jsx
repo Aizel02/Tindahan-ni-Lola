@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, ShoppingCart, Trash2 } from "lucide-react";
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
@@ -300,7 +300,7 @@ const cartTotal = cart.reduce(
           <option value="price">Sort by Price</option>
         </select>
         <button className="add-product-btn" onClick={() => setShowAddModal(true)}>
-          🛒 Add Product
+          <ShoppingCart size={16} /> Add Product
         </button>
       </div>
 
