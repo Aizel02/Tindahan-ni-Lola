@@ -24,6 +24,17 @@
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+.person-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.person-total {
+  color: red;
+  font-weight: bold;
+}
 
 .add-liability-btn {
   background: #4f46e5;
@@ -41,6 +52,13 @@
 /* ================================
    GROUP CARD
 ================================ */
+.liability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
 .liability-group {
   background: white;
   margin: 15px;
@@ -99,16 +117,33 @@
 /* ================================
    ADD MORE BUTTON
 ================================ */
-.add-debt-btn {
-  margin-top: 10px;
-  background: transparent;
-  border: 1px dashed #6366f1;
-  color: #6366f1;
+.debt-card {
+  background: #fff7ed;
+  border-radius: 6px;
   padding: 8px;
-  width: 100%;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  background: #fde68a;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.add-debt-btn {
+  margin-top: auto;
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 8px;
   border-radius: 6px;
   cursor: pointer;
 }
+
 
 .add-debt-btn:hover {
   background: #eef2ff;
@@ -194,3 +229,9 @@
     width: 100%;
   }
 }
+@media (max-width: 600px) {
+  .liability-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
