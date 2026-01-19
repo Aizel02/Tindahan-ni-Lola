@@ -578,14 +578,23 @@ const cartTotal = cart.reduce(
 
   <button
   className="print-btn"
-  onClick={() => window.print()}
+  onClick={() => {
+    window.print();
+
+    // optional delay so print dialog finishes first
+    setTimeout(() => {
+      // keep modal open after printing
+    }, 300);
+  }}
 >
   🖨 Print Receipt
 </button>
+
   <button
     className="confirm"
     onClick={() => {
       setCart([]);
+      setShowReceipt(false);
       setShowCartModal(false);
     }}
   >
