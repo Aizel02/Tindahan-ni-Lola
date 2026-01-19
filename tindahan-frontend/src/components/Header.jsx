@@ -23,13 +23,13 @@ export default function Header({ cartCount = 0, onCartClick }) {
 
         <div className="header-right">
           <button className="back-btn" onClick={() => navigate("/")}>
-            <Home size={16} /> Back to Home
+            <Home size={12} /> Back to Home
           </button>
 
           {/* ✅ SHOW ONLY IN PRODUCTS */}
           {isProductsPage && (
             <button className="cart-btn" onClick={onCartClick}>
-              <ShoppingCart sizesize={16} /> View Cart
+              <ShoppingCart sizesize={12} /> View Cart
               {cartCount > 0 && (
                 <span className="cart-badge">{cartCount}</span>
               )}
