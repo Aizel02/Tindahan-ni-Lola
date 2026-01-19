@@ -30,55 +30,53 @@
   position: relative;
   background: transparent;
   color: white;
-  border: 2px solid #7e96de; 
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+  border: 1.5px solid #7e96de;
+  padding: 6px 12px;        /* smaller */
+  border-radius: 6px;       /* slightly tighter */
+  font-size: 13px;          /* smaller text */
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: 0.2s ease;
 }
+
 .back-btn:hover {
-    background: #023e8a;
+  background: #023e8a;
 }
-
-
 .cart-btn {
   position: relative;
   background: transparent;
   color: white;
-  border: 2px solid #7e96de; 
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+  border: 1.5px solid #7e96de;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: 0.2s ease;
 }
 
 .cart-btn:hover {
-    background: #023e8a;
+  background: #023e8a;
 }
-
-/* 🧾 CART COUNT BADGE */
 .cart-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -5px;
+  right: -5px;
   background: #ef4444;
   color: white;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: 50%;
-  min-width: 18px;
+  min-width: 16px;
   text-align: center;
   line-height: 1;
 }
+
 /* Responsive */
 @media (max-width: 768px) {
   .header {
