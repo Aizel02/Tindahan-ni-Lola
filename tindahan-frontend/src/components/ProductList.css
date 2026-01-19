@@ -408,7 +408,7 @@
 }
 
 /* ✅ Sticky Footer */
-.footer {
+/* .footer {
   margin-top: auto;
   text-align: center;
   background-color: #f8f9fa;
@@ -417,6 +417,22 @@
   font-size: 0.9rem;
   border-top: 1px solid #ddd;
   width: 100%;
+} */
+/* ==============================
+   FOOTER (FIXED PROPERLY)
+============================== */
+
+.app-footer {
+  width: 100%;
+  background: #fff;
+  color: white;
+  text-align: center;
+  padding: 14px 10px;
+  font-size: 14px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Responsive Design */
