@@ -538,27 +538,24 @@ const cartTotal = cart.reduce(
       </div>
       {/* RECEIPT (PRINT AREA) */}
 <div id="receipt" style={{ display: showReceipt ? "block" : "none" }}>
-  <h2 style={{ textAlign: "center" }}>TINDAHAN NI LOLA</h2>
-  <p style={{ textAlign: "center" }}>Receipt of Sale</p>
-  <p style={{ textAlign: "center" }}>
-    {new Date().toLocaleString()}
-  </p>
+ <div className="receipt-print">
+  <h3>TINDAHAN NI LOLA</h3>
+  <p>Receipt of Sale</p>
+  <p>{new Date().toLocaleString()}</p>
 
   <hr />
 
-  {cart.map((item, index) => (
-    <div key={index} className="receipt-row">
+  {cart.map((item) => (
+    <div key={item.id} className="receipt-row">
       <span>{item.name} × {item.qty}</span>
       <span>₱{(item.qty * item.price).toFixed(2)}</span>
     </div>
   ))}
 
   <hr />
+  <strong>Total: ₱{cartTotal.toFixed(2)}</strong>
+</div>
 
-  <div className="receipt-total">
-    <strong>TOTAL:</strong>
-    <strong>₱{cartTotal.toFixed(2)}</strong>
-  </div>
 
   <p className="receipt-footer">
     Thank you for your purchase!<br />
@@ -576,15 +573,11 @@ const cartTotal = cart.reduce(
   </button>
 
   <button
-    className="print-btn"
-    onClick={() => {
-      setShowReceipt(true);
-      setTimeout(() => window.print(), 200);
-    }}
-  >
-    🖨 Print Receipt
-  </button>
-
+  className="print-btn"
+  onClick={() => window.print()}
+>
+  🖨 Print Receipt
+</button>
   <button
     className="confirm"
     onClick={() => {
