@@ -545,28 +545,35 @@ const cartTotal = cart.reduce(
         ))}
       </div>
       {/* RECEIPT (PRINT AREA) */}
-<div className="receipt-print-area">
-  <h2>TINDAHAN NI LOLA</h2>
-  <p>Receipt of Sale</p>
-  <p>{new Date().toLocaleString()}</p>
+<div id="receipt" className="receipt-print">
+  <h2 className="receipt-title">TINDAHAN NI LOLA</h2>
+  <p className="receipt-sub">Receipt of Sale</p>
+  <p className="receipt-date">
+    {new Date().toLocaleString()}
+  </p>
 
   <hr />
 
   {cart.map((item) => (
-    <div key={item.id} className="receipt-row">
-      <span>{item.name} × {item.qty}</span>
+    <div className="receipt-row" key={item.id}>
+      <span>{item.name} x {item.qty}</span>
       <span>₱{(item.qty * item.price).toFixed(2)}</span>
     </div>
   ))}
 
   <hr />
 
-  <strong>Total: ₱{cartTotal.toFixed(2)}</strong>
+  <div className="receipt-total">
+    <strong>TOTAL</strong>
+    <strong>₱{cartTotal.toFixed(2)}</strong>
+  </div>
 
   <p className="receipt-footer">
-    Thank you for your purchase!
+    Thank you for your purchase! <br />
+    Visit us again ❤️
   </p>
 </div>
+
 
       <div className="cart-footer">
         <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>
@@ -576,19 +583,13 @@ const cartTotal = cart.reduce(
     Continue Shopping
   </button>
 
-  <button
+<button
   className="print-btn"
-  onClick={() => {
-    window.print();
-
-    // optional delay so print dialog finishes first
-    setTimeout(() => {
-      // keep modal open after printing
-    }, 300);
-  }}
+  onClick={() => window.print()}
 >
   🖨 Print Receipt
 </button>
+
 
   <button
     className="confirm"

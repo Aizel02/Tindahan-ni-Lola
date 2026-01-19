@@ -980,27 +980,69 @@
     display: none !important;
   }
 }
+/* ===========================
+   THERMAL RECEIPT PRINT STYLE
+=========================== */
+
 @media print {
   body * {
     visibility: hidden;
   }
 
-  .receipt-print-area,
-  .receipt-print-area * {
+  #receipt,
+  #receipt * {
     visibility: visible;
   }
 
-  .receipt-print-area {
+  #receipt {
     position: absolute;
     left: 0;
     top: 0;
     width: 80mm;
     padding: 10px;
     font-family: monospace;
+    font-size: 12px;
   }
 
-  @page {
-    size: 80mm auto;
-    margin: 0;
+  .receipt-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .receipt-sub,
+  .receipt-date {
+    text-align: center;
+    font-size: 11px;
+  }
+
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+  }
+
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .receipt-footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 11px;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px dashed #000;
+    margin: 6px 0;
+  }
+
+  /* Hide buttons when printing */
+  button {
+    display: none !important;
   }
 }
