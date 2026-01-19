@@ -1,5 +1,5 @@
 import React from "react";
-import "./receipt.css";
+import "./Receipt.css";
 
 export default function Receipt({ cart, total }) {
   const date = new Date().toLocaleString();
