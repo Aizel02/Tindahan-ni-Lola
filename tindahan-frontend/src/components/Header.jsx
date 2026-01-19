@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
-import { Home } from "lucide-react";
+import { Home, ShoppingCart } from "lucide-react";
 export default function Header({ cartCount = 0, onCartClick }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,7 +29,7 @@ export default function Header({ cartCount = 0, onCartClick }) {
           {/* ✅ SHOW ONLY IN PRODUCTS */}
           {isProductsPage && (
             <button className="cart-btn" onClick={onCartClick}>
-              🛒 View Cart
+              <ShoppingCart sizesize={16}> View Cart
               {cartCount > 0 && (
                 <span className="cart-badge">{cartCount}</span>
               )}
