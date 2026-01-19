@@ -25,6 +25,77 @@ const CATEGORIES = [
   "Shampoo",
   "Others..",
 ];
+const printReceipt = () => {
+  const printWindow = window.open("", "", "width=300,height=600");
+
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Receipt</title>
+        <style>
+          body {
+            font-family: monospace;
+            width: 80mm;
+            margin: 0;
+            padding: 10px;
+          }
+          h2, h3 {
+            text-align: center;
+            margin: 5px 0;
+          }
+          .row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+          }
+          .total {
+            border-top: 1px dashed #000;
+            margin-top: 8px;
+            padding-top: 6px;
+            font-weight: bold;
+          }
+          .center {
+            text-align: center;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>TINDAHAN NI LOLA</h2>
+        <div class="center">Receipt of Sale</div>
+        <div class="center">${new Date().toLocaleString()}</div>
+        <hr/>
+
+        ${cart
+          .map(
+            (item) => `
+              <div class="row">
+                <span>${item.name} x ${item.qty}</span>
+                <span>₱${(item.qty * item.price).toFixed(2)}</span>
+              </div>
+            `
+          )
+          .join("")}
+
+        <div class="total">
+          TOTAL: ₱${cartTotal.toFixed(2)}
+        </div>
+
+        <br/>
+        <div class="center">Thank you for your purchase!</div>
+        <div class="center">Visit us again ❤️</div>
+
+        <script>
+          window.onload = () => {
+            window.print();
+            window.close();
+          };
+        </script>
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+};
 
 const normalizeImageUrl = (imageUrl) => {
   if (!imageUrl || typeof imageUrl !== "string") return fallbackImage;
@@ -546,10 +617,6 @@ const cartTotal = cart.reduce(
         ))}
       </div>
       {/* RECEIPT (PRINT AREA) */}
-{/* PRINT RECEIPT (HIDDEN ON SCREEN) */}
-<div id="print-receipt">
-  <Receipt cart={cart} total={cartTotal} />
-</div>
 
       <div className="cart-footer">
         <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>
@@ -559,12 +626,10 @@ const cartTotal = cart.reduce(
     Continue Shopping
   </button>
 
-<button
-  className="print-btn"
-  onClick={() => window.print()}
->
+<button className="print-btn" onClick={printReceipt}>
   🖨 Print Receipt
 </button>
+
 
 
   <button
