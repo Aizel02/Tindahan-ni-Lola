@@ -586,7 +586,6 @@ const cartTotal = cart.reduce(
     className="confirm"
     onClick={() => {
       setCart([]);
-      setShowReceipt(false);
       setShowCartModal(false);
     }}
   >
