@@ -311,16 +311,15 @@
 
 .icon-btn.edit:hover {
   background: #e0e7ff;
-  color: #1d4ed8;
+  color: #4f46e5;
 }
 
 /* 🗑️ Delete */
 .icon-btn.delete {
-  color: #dc2626;
+  color: #c7132e ;
 }
 
 .icon-btn.delete:hover {
-  background: #fee2e2;
   color: #b91c1c;
 }
 
