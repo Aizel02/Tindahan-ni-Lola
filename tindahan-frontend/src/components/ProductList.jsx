@@ -57,6 +57,8 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
+const [showReceipt, setShowReceipt] = useState(false);
+
 
 
 
@@ -534,25 +536,67 @@ const cartTotal = cart.reduce(
 
         ))}
       </div>
+      {/* RECEIPT (PRINT AREA) */}
+<div id="receipt" style={{ display: showReceipt ? "block" : "none" }}>
+  <h2 style={{ textAlign: "center" }}>TINDAHAN NI LOLA</h2>
+  <p style={{ textAlign: "center" }}>Receipt of Sale</p>
+  <p style={{ textAlign: "center" }}>
+    {new Date().toLocaleString()}
+  </p>
+
+  <hr />
+
+  {cart.map((item, index) => (
+    <div key={index} className="receipt-row">
+      <span>{item.name} × {item.qty}</span>
+      <span>₱{(item.qty * item.price).toFixed(2)}</span>
+    </div>
+  ))}
+
+  <hr />
+
+  <div className="receipt-total">
+    <strong>TOTAL:</strong>
+    <strong>₱{cartTotal.toFixed(2)}</strong>
+  </div>
+
+  <p className="receipt-footer">
+    Thank you for your purchase!<br />
+    Visit us again 💙
+  </p>
+</div>
+
 
       <div className="cart-footer">
         <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>
 
         <div className="cart-buttons">
-          <button onClick={() => setShowCartModal(false)}>
-            Continue Shopping
-          </button>
-          <button
-            className="confirm"
-            onClick={() => {
-              alert(`Total Bill: ₱${cartTotal.toFixed(2)}`);
-              setCart([]);
-              setShowCartModal(false);
-            }}
-          >
-            OK – Confirm & Reset
-          </button>
-        </div>
+  <button onClick={() => setShowCartModal(false)}>
+    Continue Shopping
+  </button>
+
+  <button
+    className="print-btn"
+    onClick={() => {
+      setShowReceipt(true);
+      setTimeout(() => window.print(), 200);
+    }}
+  >
+    🖨 Print Receipt
+  </button>
+
+  <button
+    className="confirm"
+    onClick={() => {
+      setCart([]);
+      setShowReceipt(false);
+      setShowCartModal(false);
+    }}
+  >
+    OK – Confirm & Reset
+  </button>
+</div>
+
       </div>
     </div>
   </div>
