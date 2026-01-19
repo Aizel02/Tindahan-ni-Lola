@@ -57,7 +57,7 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
-const [showReceipt, setShowReceipt] = useState(false);
+
 
 
 
@@ -594,7 +594,6 @@ const cartTotal = cart.reduce(
     className="confirm"
     onClick={() => {
       setCart([]);
-      setShowReceipt(false);
       setShowCartModal(false);
     }}
   >
