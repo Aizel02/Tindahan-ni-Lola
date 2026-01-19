@@ -29,7 +29,7 @@ export default function Header({ cartCount = 0, onCartClick }) {
           {/* ✅ SHOW ONLY IN PRODUCTS */}
           {isProductsPage && (
             <button className="cart-btn" onClick={onCartClick}>
-              <ShoppingCart sizesize={16}> View Cart
+              <ShoppingCart sizesize={16} /> View Cart
               {cartCount > 0 && (
                 <span className="cart-badge">{cartCount}</span>
               )}
