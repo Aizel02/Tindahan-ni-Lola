@@ -25,10 +25,15 @@ const CATEGORIES = [
   "Shampoo",
   "Others..",
 ];
-const printReceipt = () => {
-  const printWindow = window.open("", "", "width=300,height=600");
 
-  printWindow.document.write(`
+const normalizeImageUrl = (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== "string") return fallbackImage;
+
+  if (imageUrl.startsWith("http")) return imageUrl;
+const printReceipt = () => {
+  const receiptWindow = window.open("", "_blank", "width=350,height=600");
+
+  receiptWindow.document.write(`
     <html>
       <head>
         <title>Receipt</title>
@@ -48,11 +53,13 @@ const printReceipt = () => {
             justify-content: space-between;
             margin: 4px 0;
           }
-          .total {
+          .line {
             border-top: 1px dashed #000;
-            margin-top: 8px;
-            padding-top: 6px;
+            margin: 8px 0;
+          }
+          .total {
             font-weight: bold;
+            margin-top: 8px;
           }
           .center {
             text-align: center;
@@ -63,7 +70,8 @@ const printReceipt = () => {
         <h2>TINDAHAN NI LOLA</h2>
         <div class="center">Receipt of Sale</div>
         <div class="center">${new Date().toLocaleString()}</div>
-        <hr/>
+
+        <div class="line"></div>
 
         ${cart
           .map(
@@ -76,8 +84,11 @@ const printReceipt = () => {
           )
           .join("")}
 
-        <div class="total">
-          TOTAL: ₱${cartTotal.toFixed(2)}
+        <div class="line"></div>
+
+        <div class="row total">
+          <span>TOTAL</span>
+          <span>₱${cartTotal.toFixed(2)}</span>
         </div>
 
         <br/>
@@ -94,13 +105,8 @@ const printReceipt = () => {
     </html>
   `);
 
-  printWindow.document.close();
+  receiptWindow.document.close();
 };
-
-const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl || typeof imageUrl !== "string") return fallbackImage;
-
-  if (imageUrl.startsWith("http")) return imageUrl;
 
   // backend sends /uploads/filename.jpg
   return `${BACKEND_BASE}${imageUrl}`;
