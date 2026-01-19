@@ -235,12 +235,12 @@
 
 .debt-actions .edit {
   background: transparent;
-  color: white;
+  color: black;
 }
 
 .debt-actions .delete {
   background: transparent;
-  color: white;
+  color: black;
 }
 .edit {
   background: transparent;
@@ -255,7 +255,7 @@
 }
 
 .edit:hover {
-  background: #4f46e5;
+  color: #4f46e5;
 }
 
 
