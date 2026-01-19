@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import Receipt from "./Receipt";
 import { Pencil, ShoppingCart, Trash2 } from "lucide-react";
 
 
@@ -26,10 +25,6 @@ const CATEGORIES = [
   "Others..",
 ];
 
-const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl || typeof imageUrl !== "string") return fallbackImage;
-
-  if (imageUrl.startsWith("http")) return imageUrl;
 const printReceipt = () => {
   const receiptWindow = window.open("", "_blank", "width=350,height=600");
 
@@ -44,7 +39,7 @@ const printReceipt = () => {
             margin: 0;
             padding: 10px;
           }
-          h2, h3 {
+          h2 {
             text-align: center;
             margin: 5px 0;
           }
@@ -73,16 +68,12 @@ const printReceipt = () => {
 
         <div class="line"></div>
 
-        ${cart
-          .map(
-            (item) => `
-              <div class="row">
-                <span>${item.name} x ${item.qty}</span>
-                <span>₱${(item.qty * item.price).toFixed(2)}</span>
-              </div>
-            `
-          )
-          .join("")}
+        ${cart.map(item => `
+          <div class="row">
+            <span>${item.name} x ${item.qty}</span>
+            <span>₱${(item.qty * item.price).toFixed(2)}</span>
+          </div>
+        `).join("")}
 
         <div class="line"></div>
 
@@ -106,7 +97,6 @@ const printReceipt = () => {
   `);
 
   receiptWindow.document.close();
-};
 
   // backend sends /uploads/filename.jpg
   return `${BACKEND_BASE}${imageUrl}`;
@@ -631,12 +621,9 @@ const cartTotal = cart.reduce(
   <button onClick={() => setShowCartModal(false)}>
     Continue Shopping
   </button>
-
 <button className="print-btn" onClick={printReceipt}>
   🖨 Print Receipt
 </button>
-
-
 
   <button
     className="confirm"
