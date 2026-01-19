@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
+import Receipt from "./Receipt";
 import { Pencil, ShoppingCart, Trash2 } from "lucide-react";
 
 
@@ -545,36 +546,7 @@ const cartTotal = cart.reduce(
         ))}
       </div>
       {/* RECEIPT (PRINT AREA) */}
-<div id="receipt" className="receipt-print">
-  <h2 className="receipt-title">TINDAHAN NI LOLA</h2>
-  <p className="receipt-sub">Receipt of Sale</p>
-  <p className="receipt-date">
-    {new Date().toLocaleString()}
-  </p>
-
-  <hr />
-
-  {cart.map((item) => (
-    <div className="receipt-row" key={item.id}>
-      <span>{item.name} x {item.qty}</span>
-      <span>₱{(item.qty * item.price).toFixed(2)}</span>
-    </div>
-  ))}
-
-  <hr />
-
-  <div className="receipt-total">
-    <strong>TOTAL</strong>
-    <strong>₱{cartTotal.toFixed(2)}</strong>
-  </div>
-
-  <p className="receipt-footer">
-    Thank you for your purchase! <br />
-    Visit us again ❤️
-  </p>
-</div>
-
-
+<Receipt cart={cart} total={cartTotal} />
       <div className="cart-footer">
         <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>
 
