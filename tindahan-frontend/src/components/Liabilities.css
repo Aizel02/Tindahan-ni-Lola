@@ -127,7 +127,7 @@
 }
 
 .debt-card {
-  background: #fff7ed;
+  background: #d5d2ce;
   padding: 10px;
   border-radius: 8px;
   display: flex;
@@ -229,8 +229,8 @@
 }
 
 .debt-actions .pay {
-  background: #22c55e;
-  color: white;
+  background: transparent;
+  color: black;
 }
 
 .debt-actions .edit {
