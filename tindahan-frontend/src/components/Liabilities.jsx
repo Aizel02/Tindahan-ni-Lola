@@ -284,9 +284,9 @@ const markPaid = async (id) => {
         </div>
       )}
 
-      <footer className="footer">
-        © 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez
-      </footer>
+     <footer className="app-footer">
+    © 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez
+  </footer>
     </div>
   );
 }

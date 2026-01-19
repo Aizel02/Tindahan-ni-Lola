@@ -559,9 +559,9 @@ const cartTotal = cart.reduce(
 )}
 
       {/* Sticky Footer */}
-      <footer className="footer">
-        <p>© 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez</p>
-      </footer>
+    <footer className="app-footer">
+  © 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez
+</footer>
     </div>
   );
 };
