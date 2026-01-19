@@ -546,7 +546,11 @@ const cartTotal = cart.reduce(
         ))}
       </div>
       {/* RECEIPT (PRINT AREA) */}
-<Receipt cart={cart} total={cartTotal} />
+{/* PRINT RECEIPT (HIDDEN ON SCREEN) */}
+<div id="print-receipt">
+  <Receipt cart={cart} total={cartTotal} />
+</div>
+
       <div className="cart-footer">
         <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>
 

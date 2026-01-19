@@ -110,3 +110,34 @@
     margin: 0;
   }
 }
+/* Hide on screen */
+#print-receipt {
+  display: none;
+}
+
+/* Show ONLY when printing */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #print-receipt,
+  #print-receipt * {
+    visibility: visible;
+  }
+
+  #print-receipt {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}
