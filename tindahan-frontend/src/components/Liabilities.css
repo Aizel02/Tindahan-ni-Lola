@@ -232,10 +232,6 @@
   background: transparent;
   color: black;
 }
-.debt-actions .pay hover {
-color: #059669;
-}
-
 .debt-actions .edit {
   background: transparent;
   color: black;
@@ -245,8 +241,35 @@ color: #059669;
   background: transparent;
   color: black;
 }
-.debt-actions .delete hover {
-color: #a32929;
+.delete {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deletet:hover {
+  color: #c7132e;
+}
+.pay {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pay:hover {
+  color: #059669;
 }
 .edit {
   background: transparent;
