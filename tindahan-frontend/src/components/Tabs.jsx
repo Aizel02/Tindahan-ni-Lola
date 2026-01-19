@@ -15,7 +15,7 @@ export default function Tabs() {
         to="/liabilities"
         className={({ isActive }) => isActive ? "tab active" : "tab"}
       >
-        Liabilities
+        Debt/Utang
       </NavLink>
     </div>
   );

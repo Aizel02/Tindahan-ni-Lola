@@ -78,7 +78,7 @@
 
 .person-total {
   font-weight: bold;
-  color: #dc2626;
+  color: #dfe0eb;
 }
 
 /* ================================
@@ -234,12 +234,12 @@
 }
 
 .debt-actions .edit {
-  background: #6366f1;
+  background: transparent;
   color: white;
 }
 
 .debt-actions .delete {
-  background: #ef4444;
+  background: transparent;
   color: white;
 }
 .edit {
