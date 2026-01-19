@@ -547,13 +547,13 @@ const cartTotal = cart.reduce(
       {/* RECEIPT (PRINT AREA) */}
 <div className="receipt-print-area">
   <h2>TINDAHAN NI LOLA</h2>
-  <p className="receipt-sub">Receipt of Sale</p>
-  <p className="receipt-date">{new Date().toLocaleString()}</p>
+  <p>Receipt of Sale</p>
+  <p>{new Date().toLocaleString()}</p>
 
   <hr />
 
   {cart.map((item) => (
-    <div className="receipt-row" key={item.id}>
+    <div key={item.id} className="receipt-row">
       <span>{item.name} × {item.qty}</span>
       <span>₱{(item.qty * item.price).toFixed(2)}</span>
     </div>
@@ -561,18 +561,12 @@ const cartTotal = cart.reduce(
 
   <hr />
 
-  <div className="receipt-total">
-    <strong>Total</strong>
-    <strong>₱{cartTotal.toFixed(2)}</strong>
-  </div>
+  <strong>Total: ₱{cartTotal.toFixed(2)}</strong>
 
   <p className="receipt-footer">
-    Thank you for your purchase!<br />
-    Visit us again 😊
+    Thank you for your purchase!
   </p>
 </div>
-
-
 
       <div className="cart-footer">
         <h4>Grand Total: <span>₱{cartTotal.toFixed(2)}</span></h4>

@@ -943,3 +943,64 @@
   margin-top: 15px;
   font-size: 13px;
 }
+/* ================================
+   PRINT RECEIPT STYLES
+================================ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-print-area,
+  .receipt-print-area * {
+    visibility: visible;
+  }
+
+  .receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    padding: 10px;
+    font-family: monospace;
+  }
+
+  /* Remove margins */
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}
+@media print {
+  .cart-modal,
+  .cart-header,
+  .cart-footer,
+  .cart-buttons,
+  button {
+    display: none !important;
+  }
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-print-area,
+  .receipt-print-area * {
+    visibility: visible;
+  }
+
+  .receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    padding: 10px;
+    font-family: monospace;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}
