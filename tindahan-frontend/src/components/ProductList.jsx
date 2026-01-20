@@ -9,6 +9,12 @@ const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
 const BACKEND_BASE = "https://tindahan-ni-lola-backend-1.onrender.com";
 const fallbackImage = "/no-image.png";
 
+const normalizeImageUrl = (imageUrl) => {
+  if (!imageUrl) return fallbackImage;
+  if (imageUrl.startsWith("http")) return imageUrl;
+  return `${BACKEND_BASE}${imageUrl}`;
+};
+
 const CATEGORIES = [
   "Biscuits",
   "Canned Goods",
@@ -24,58 +30,6 @@ const CATEGORIES = [
   "Shampoo",
   "Others..",
 ];
-
-const cartTotal = cart.reduce(
-  (sum, item) => sum + item.qty * item.price,
-  0
-);
-
-const printReceipt = () => {
-  const win = window.open("", "_blank", "width=350,height=600");
-
-  win.document.write(`
-    <html>
-      <head>
-        <style>
-          body { font-family: monospace; width: 80mm; margin: 0; padding: 10px; }
-          .row { display: flex; justify-content: space-between; }
-          .line { border-top: 1px dashed #000; margin: 8px 0; }
-        </style>
-      </head>
-      <body>
-        <h3 style="text-align:center">TINDAHAN NI LOLA</h3>
-        <p style="text-align:center">${new Date().toLocaleString()}</p>
-
-        <div class="line"></div>
-
-        ${cart.map(item => `
-          <div class="row">
-            <span>${item.name} x ${item.qty}</span>
-            <span>₱${(item.qty * item.price).toFixed(2)}</span>
-          </div>
-        `).join("")}
-
-        <div class="line"></div>
-
-        <div class="row">
-          <strong>TOTAL</strong>
-          <strong>₱${cartTotal.toFixed(2)}</strong>
-        </div>
-
-        <p style="text-align:center">Thank you!</p>
-
-        <script>
-          window.onload = () => {
-            window.print();
-            window.close();
-          }
-        </script>
-      </body>
-    </html>
-  `);
-
-  win.document.close();
-};
 
 
 const ProductList = () => {
@@ -101,11 +55,43 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
+  // ✅ correct place
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + item.qty * item.price,
+    0
+  );
 
+  const printReceipt = () => {
+    const win = window.open("", "_blank", "width=350,height=600");
 
+    win.document.write(`
+      <html>
+        <body style="font-family: monospace; width: 80mm;">
+          <h3 style="text-align:center">TINDAHAN NI LOLA</h3>
+          <p>${new Date().toLocaleString()}</p>
 
+          ${cart.map(item => `
+            <div style="display:flex; justify-content:space-between;">
+              <span>${item.name} x ${item.qty}</span>
+              <span>₱${(item.qty * item.price).toFixed(2)}</span>
+            </div>
+          `).join("")}
 
+          <hr />
+          <strong>Total: ₱${cartTotal.toFixed(2)}</strong>
 
+          <script>
+            window.onload = () => {
+              window.print();
+              window.close();
+            }
+          </script>
+        </body>
+      </html>
+    `);
+
+    win.document.close();
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -249,10 +235,10 @@ const removeFromCart = (id) => {
   setCart((prev) => prev.filter((item) => item.id !== id));
 };
 // 💰 CART TOTAL
-const cartTotal = cart.reduce(
-  (sum, item) => sum + item.qty * item.price,
-  0
-);
+// const cartTotal = cart.reduce(
+//   (sum, item) => sum + item.qty * item.price,
+//   0
+// );
 
   const filteredProducts = products
     .filter((p) => {
