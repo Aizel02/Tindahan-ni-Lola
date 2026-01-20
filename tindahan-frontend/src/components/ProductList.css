@@ -586,8 +586,8 @@
   z-index: 2100;
 }
 .cart-header {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
+  background: transparent;
+  color: black;
   padding: 14px 16px;
   border-radius: 14px;
   display: flex;
@@ -759,7 +759,11 @@
 }
 /* ================= MOBILE TWEAKS ONLY ================= */
 @media (max-width: 480px) {
-  .cart-modal,
+  .cart-modal{
+    width: 95%;
+    padding: 14px;
+    max-height: 90vh;
+  }
   .qty-modal {
     width: 95%;
     padding: 14px;
@@ -768,7 +772,10 @@
   .cart-item {
     font-size: 14px;
     padding:10px;
+    max-height: 60vh;
+    
   }
+  
 
   .qty-header h3 {
     font-size: 16px;
