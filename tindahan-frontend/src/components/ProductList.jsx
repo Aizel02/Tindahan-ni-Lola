@@ -591,47 +591,40 @@ const removeFromCart = (id) => {
         <h3>Shopping Cart</h3>
         <button onClick={() => setShowCartModal(false)}>✖</button>
       </div>
-        {/* ✅ SCROLLABLE AREA */}
-  {/* <div className="cart-items">
-    {cart.map((item) => (
-      <div key={item.id} className="cart-item">
-        ...
+        {/* SCROLLABLE ITEMS */}
+  <div className="cart-items">
+    {cart.length === 0 ? (
+      <div className="empty-cart">
+        <strong>Your cart is empty</strong>
+        <span>Click the product images to add items</span>
       </div>
-    ))}
-  </div> */}
-      {cart.length === 0 &&(
-        <div className="empty-cart">
-          <strong>Your cart is empty</strong>
-          <span>Click the product images to add items</span> 
-      </div>
-      )}
-      <div className="cart-items">
-        {cart.map((item) => (
-          <div key={item.id} className="cart-item">
-  <img
-    className="cart-item-img"
-    src={normalizeImageUrl(item.imageUrl)}
-    alt={item.name}
-  />
+    ) : (
+      cart.map((item) => (
+        <div key={item.id} className="cart-item">
+          <img
+            className="cart-item-img"
+            src={normalizeImageUrl(item.imageUrl)}
+            alt={item.name}
+          />
 
-  <div className="cart-item-info">
-    <h4>{item.name}</h4>
-    <p className="cart-qty">Qty: {item.qty} × ₱{item.price}</p>
+          <div className="cart-item-info">
+            <h4>{item.name}</h4>
+            <p>Qty: {item.qty} × ₱{item.price}</p>
+          </div>
+
+          <div className="cart-item-price">
+            ₱{(item.qty * item.price).toFixed(2)}
+            <button
+              className="remove-btn"
+              onClick={() => removeFromCart(item.id)}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      ))
+    )}
   </div>
-
-  <div className="cart-item-price">
-    ₱{(item.qty * item.price).toFixed(2)}
-    <button
-      className="remove-btn"
-      onClick={() => removeFromCart(item.id)}
-    >
-      <Trash2 size={16} />
-    </button>
-  </div>
-</div>
-
-        ))}
-      </div>
       {/* RECEIPT (PRINT AREA) */}
 
       <div className="cart-footer">
