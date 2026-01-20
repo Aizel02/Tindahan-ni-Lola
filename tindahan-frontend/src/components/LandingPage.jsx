@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
+import { BarChart3, CheckSquare, User, Users, Zap } from "lucide-react";
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -29,22 +30,22 @@ function LandingPage() {
 
       <section className="features">
         <div className="feature-card">
-          <h3>🧾 Easy Inventory</h3>
+          <h3><CheckSquare size={16} /> Easy Inventory</h3>
           <p>Add, edit, and organize your products in seconds.</p>
         </div>
 
         <div className="feature-card">
-          <h3>⚡ Quick Search</h3>
+          <h3><Zap size={16} /> Quick Search</h3>
           <p>Find products instantly with powerful search and filters.</p>
         </div>
 
         <div className="feature-card">
-          <h3>📊 Price Management</h3>
+          <h3><BarChart3 size={16} /> Price Management</h3>
           <p>Update prices and track your product catalog effortlessly.</p>
         </div>
 
         <div className="feature-card">
-          <h3>👥 For Everyone</h3>
+          <h3><Users size={16} /> For Everyone</h3>
           <p>Simple interface designed for all skill levels.</p>
         </div>
       </section>
