@@ -96,8 +96,8 @@
   width: 6px;
 }
 .debt-list::-webkit-scrollbar-thumb {
-  background: #c7c7c7;
-  border-radius: 6px;
+  background:  #c7d2fe;;
+  border-radius: 4px;
 }
 
 /* Status colors */
