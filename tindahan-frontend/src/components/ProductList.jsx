@@ -25,65 +25,45 @@ const CATEGORIES = [
   "Others..",
 ];
 
-  const receiptWindow = window.open("", "_blank", "width=350,height=600");
-const [cart, setCart] = useState([]);
-const [showCartModal, setShowCartModal] = useState(false);
-const printReceipt = () => {
-  const receiptWindow = window.open("", "_blank", "width=350,height=600");
+const cartTotal = cart.reduce(
+  (sum, item) => sum + item.qty * item.price,
+  0
+);
 
-  const receiptHTML = `
+const printReceipt = () => {
+  const win = window.open("", "_blank", "width=350,height=600");
+
+  win.document.write(`
     <html>
       <head>
         <title>Receipt</title>
         <style>
-          body {
-            font-family: monospace;
-            width: 80mm;
-            margin: 0;
-            padding: 10px;
-          }
-          h2 { text-align: center; margin: 5px 0; }
-          .row {
-            display: flex;
-            justify-content: space-between;
-            margin: 4px 0;
-          }
-          .line {
-            border-top: 1px dashed #000;
-            margin: 8px 0;
-          }
-          .total {
-            font-weight: bold;
-            margin-top: 8px;
-          }
-          .center {
-            text-align: center;
-          }
+          body { font-family: monospace; width: 80mm; margin: 0; padding: 10px; }
+          .row { display: flex; justify-content: space-between; }
+          .line { border-top: 1px dashed #000; margin: 8px 0; }
         </style>
       </head>
       <body>
-        <h2>TINDAHAN NI LOLA</h2>
-        <div class="center">Receipt</div>
-        <div class="center">${new Date().toLocaleString()}</div>
+        <h3 style="text-align:center">TINDAHAN NI LOLA</h3>
+        <p style="text-align:center">${new Date().toLocaleString()}</p>
 
         <div class="line"></div>
 
-        ${cart.map(item => `
+        ${cart.map(i => `
           <div class="row">
-            <span>${item.name} x ${item.qty}</span>
-            <span>₱${(item.qty * item.price).toFixed(2)}</span>
+            <span>${i.name} x ${i.qty}</span>
+            <span>₱${(i.qty * i.price).toFixed(2)}</span>
           </div>
         `).join("")}
 
         <div class="line"></div>
 
-        <div class="row total">
-          <span>TOTAL</span>
-          <span>₱${cartTotal.toFixed(2)}</span>
+        <div class="row">
+          <strong>TOTAL</strong>
+          <strong>₱${cartTotal.toFixed(2)}</strong>
         </div>
 
-        <br/>
-        <div class="center">Thank you for your purchase!</div>
+        <p style="text-align:center">Thank you!</p>
 
         <script>
           window.onload = () => {
@@ -93,11 +73,15 @@ const printReceipt = () => {
         </script>
       </body>
     </html>
-  `;
+  `);
 
-  receiptWindow.document.write(receiptHTML);
-  receiptWindow.document.close();
+  win.document.close();
 };
+const normalizeImageUrl = (url) => {
+  if (!url) return fallbackImage;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${BACKEND_BASE}/${url.replace(/^\/+/, "")}`;
+}
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
