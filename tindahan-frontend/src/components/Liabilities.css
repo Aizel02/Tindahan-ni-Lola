@@ -11,7 +11,13 @@
    HEADER
 ================================ */
 .liabilities-header {
-    display: flex;
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+.header {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   background: #0077b6;
