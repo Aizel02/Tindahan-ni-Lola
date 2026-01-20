@@ -769,7 +769,8 @@
   background: #1d4ed8;
 }
 .remove-btn {
-  background: #fee2e2;
+  background: transparent;
+  color: #dc2626;
   border: none;
   border-radius: 8px;
   padding: 6px 8px;
