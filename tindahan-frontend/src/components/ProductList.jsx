@@ -77,11 +77,6 @@ const printReceipt = () => {
 
   win.document.close();
 };
-const normalizeImageUrl = (url) => {
-  if (!url) return fallbackImage;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${BACKEND_BASE}/${url.replace(/^\/+/, "")}`;
-}
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
