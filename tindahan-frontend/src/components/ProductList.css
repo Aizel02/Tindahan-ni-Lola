@@ -770,11 +770,14 @@
 }
 .remove-btn {
   background: transparent;
-  color: #dc2626;
+  color: black;
   border: none;
   border-radius: 8px;
   padding: 6px 8px;
   cursor: pointer;
+}
+.remove-btn:hover {
+  color: #b91c1c;
 }
 /* ================= MOBILE TWEAKS ONLY ================= */
 @media (max-width: 480px) {
