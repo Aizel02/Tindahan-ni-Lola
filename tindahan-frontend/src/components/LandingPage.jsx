@@ -30,22 +30,22 @@ function LandingPage() {
 
       <section className="features">
         <div className="feature-card">
-          <h3><CheckSquare size={16} /> Easy Inventory</h3>
+          <h3><CheckSquare size={18} /> Easy Inventory</h3>
           <p>Add, edit, and organize your products in seconds.</p>
         </div>
 
         <div className="feature-card">
-          <h3><Zap size={16} /> Quick Search</h3>
+          <h3><Zap size={18} /> Quick Search</h3>
           <p>Find products instantly with powerful search and filters.</p>
         </div>
 
         <div className="feature-card">
-          <h3><BarChart3 size={16} /> Price Management</h3>
+          <h3><BarChart3 size={18} /> Price Management</h3>
           <p>Update prices and track your product catalog effortlessly.</p>
         </div>
 
         <div className="feature-card">
-          <h3><Users size={16} /> For Everyone</h3>
+          <h3><Users size={18} /> For Everyone</h3>
           <p>Simple interface designed for all skill levels.</p>
         </div>
       </section>
