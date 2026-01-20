@@ -25,6 +25,11 @@ const CATEGORIES = [
   "Others..",
 ];
 
+const normalizeImageUrl = (imageUrl) => {
+  if (!imageUrl) return fallbackImage;
+  if (imageUrl.startsWith("http")) return imageUrl;
+  return `${BACKEND_BASE}${imageUrl}`;
+};
 const cartTotal = cart.reduce(
   (sum, item) => sum + item.qty * item.price,
   0
@@ -36,7 +41,6 @@ const printReceipt = () => {
   win.document.write(`
     <html>
       <head>
-        <title>Receipt</title>
         <style>
           body { font-family: monospace; width: 80mm; margin: 0; padding: 10px; }
           .row { display: flex; justify-content: space-between; }
@@ -49,10 +53,10 @@ const printReceipt = () => {
 
         <div class="line"></div>
 
-        ${cart.map(i => `
+        ${cart.map(item => `
           <div class="row">
-            <span>${i.name} x ${i.qty}</span>
-            <span>₱${(i.qty * i.price).toFixed(2)}</span>
+            <span>${item.name} x ${item.qty}</span>
+            <span>₱${(item.qty * item.price).toFixed(2)}</span>
           </div>
         `).join("")}
 
@@ -77,6 +81,7 @@ const printReceipt = () => {
 
   win.document.close();
 };
+
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
