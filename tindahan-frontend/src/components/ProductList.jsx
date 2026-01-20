@@ -25,10 +25,13 @@ const CATEGORIES = [
   "Others..",
 ];
 
+  const receiptWindow = window.open("", "_blank", "width=350,height=600");
+const [cart, setCart] = useState([]);
+const [showCartModal, setShowCartModal] = useState(false);
 const printReceipt = () => {
   const receiptWindow = window.open("", "_blank", "width=350,height=600");
 
-  receiptWindow.document.write(`
+  const receiptHTML = `
     <html>
       <head>
         <title>Receipt</title>
@@ -39,10 +42,7 @@ const printReceipt = () => {
             margin: 0;
             padding: 10px;
           }
-          h2 {
-            text-align: center;
-            margin: 5px 0;
-          }
+          h2 { text-align: center; margin: 5px 0; }
           .row {
             display: flex;
             justify-content: space-between;
@@ -63,7 +63,7 @@ const printReceipt = () => {
       </head>
       <body>
         <h2>TINDAHAN NI LOLA</h2>
-        <div class="center">Receipt of Sale</div>
+        <div class="center">Receipt</div>
         <div class="center">${new Date().toLocaleString()}</div>
 
         <div class="line"></div>
@@ -84,22 +84,19 @@ const printReceipt = () => {
 
         <br/>
         <div class="center">Thank you for your purchase!</div>
-        <div class="center">Visit us again ❤️</div>
 
         <script>
           window.onload = () => {
             window.print();
             window.close();
-          };
+          }
         </script>
       </body>
     </html>
-  `);
+  `;
 
+  receiptWindow.document.write(receiptHTML);
   receiptWindow.document.close();
-
-  // backend sends /uploads/filename.jpg
-  return `${BACKEND_BASE}${imageUrl}`;
 };
 
 const ProductList = () => {
