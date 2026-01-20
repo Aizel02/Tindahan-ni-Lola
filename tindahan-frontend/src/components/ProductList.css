@@ -580,6 +580,7 @@
   max-height: 85vh;
   display: flex;              /* 🔥 REQUIRED */
   flex-direction: column;     /* 🔥 REQUIRED */
+  max-height: 85vh;
 
   position: relative;
   z-index: 2100;
@@ -665,6 +666,7 @@
   padding-top: 12px;
   margin-top: auto;           /* 🔥 pushes footer down */
   background: #fff;
+  margin-top: auto;
 }
 .cart-footer h4 {
   display: flex;
@@ -943,51 +945,11 @@
   margin-top: 15px;
   font-size: 13px;
 }
-/* ================================
-   PRINT RECEIPT STYLES
-================================ */
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .receipt-print-area,
-  .receipt-print-area * {
-    visibility: visible;
-  }
-
-  .receipt-print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 80mm;
-    padding: 10px;
-    font-family: monospace;
-  }
-
-  /* Remove margins */
-  @page {
-    size: 80mm auto;
-    margin: 0;
-  }
-}
-@media print {
-  .cart-modal,
-  .cart-header,
-  .cart-footer,
-  .cart-buttons,
-  button {
-    display: none !important;
-  }
-}
 /* ===========================
    THERMAL RECEIPT PRINT STYLE
 =========================== */
 
 @media print {
-  body * {
-    visibility: hidden;
-  }
 
   #receipt,
   #receipt * {

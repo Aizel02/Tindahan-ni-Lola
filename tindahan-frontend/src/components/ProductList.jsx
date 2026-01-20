@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import { Pencil, ShoppingCart, Trash2, Printer } from "lucide-react";
+import { Pencil, ShoppingCart, Trash2, Printer, Loader } from "lucide-react";
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
@@ -395,7 +395,7 @@ const removeFromCart = (id) => {
       </div>
 
       {loading ? (
-        <p className="status-text">⏳ Loading products...</p>
+        <p className="status-text"><Loader size={16} /> Loading products...</p>
       ) : error ? (
         <p className="error-text">{error}</p>
       ) : (
