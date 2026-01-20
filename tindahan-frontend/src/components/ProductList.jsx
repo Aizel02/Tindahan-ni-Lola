@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import { Pencil, ShoppingCart, Trash2 } from "lucide-react";
+import { Pencil, ShoppingCart, Trash2, Printer } from "lucide-react";
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
@@ -642,7 +642,7 @@ const removeFromCart = (id) => {
     Continue Shopping
   </button>
 <button className="print-btn" onClick={printReceipt}>
-  🖨 Print Receipt
+  <Printer size={16} /> Print Receipt
 </button>
 
   <button
