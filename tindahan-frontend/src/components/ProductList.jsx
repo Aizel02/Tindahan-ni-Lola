@@ -25,11 +25,6 @@ const CATEGORIES = [
   "Others..",
 ];
 
-const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl) return fallbackImage;
-  if (imageUrl.startsWith("http")) return imageUrl;
-  return `${BACKEND_BASE}${imageUrl}`;
-};
 const cartTotal = cart.reduce(
   (sum, item) => sum + item.qty * item.price,
   0
