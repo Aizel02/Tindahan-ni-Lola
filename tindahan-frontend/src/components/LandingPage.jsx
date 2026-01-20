@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
-import { BarChart3, CheckSquare, User, Users, Zap } from "lucide-react";
+import { BarChart3, CheckSquare, Users, Zap } from "lucide-react";
 
 function LandingPage() {
   const navigate = useNavigate();
