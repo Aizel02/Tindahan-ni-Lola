@@ -80,54 +80,54 @@ body {
   display: flex;
   justify-content: center;
 }
-.feature-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 20px 18px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.features {
+  width: 100%;
+  max-width: 1100px;
+  margin: 40px auto 0;
+  padding: 0 16px;
 
-  text-align: center;
-
-  transition: all 0.25s ease;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
-/* Cards */
+
+/* Card */
 .feature-card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transition: all 0.25s ease;
+  padding: 16px 14px; /* 👈 smaller */
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  text-align: center;
+  transition: all 0.2s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-  border-color: #3b82f6;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
 }
 
 /* Icon */
-.feature-icon {
-  color: #2563eb;
-  margin-bottom: 10px;
-}
-
 .feature-icon svg {
-  width: 28px;
-  height: 28px;
+  width: 22px;   /* 👈 smaller */
+  height: 22px;
+  color: #2563eb;
+  margin-bottom: 8px;
 }
 
+/* Title */
 .feature-card h3 {
-  font-size: 1rem;
+  font-size: 0.95rem;   /* 👈 smaller */
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
+/* Description */
 .feature-card p {
-  font-size: 0.9rem;
-  color: #555;
+  font-size: 0.82rem;   /* 👈 smaller */
   line-height: 1.4;
+  color: #555;
 }
-
 @media (max-width: 1024px) {
   .features {
     grid-template-columns: repeat(2, 1fr);
