@@ -4,35 +4,15 @@
 .liabilities-page {
   min-height: 100vh;
   background: #faf7f2;
-  padding: 32px 16px 80px;
+  padding: 40px 20px 80px;
   display: flex;
   justify-content: center;
 }
 
-/* Main container */
 /* .liabilities-container {
   width: 100%;
   max-width: 1200px;
 } */
-
-/* Tablets */
-@media (max-width: 1024px) {
-  .liabilities-page {
-    padding: 28px 16px 70px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .liabilities-page {
-    padding: 20px 14px 60px;
-  }
-
-  .liabilities-container {
-    max-width: 100%;
-  }
-}
-
 
 /* ================================
    HEADER
