@@ -12,26 +12,73 @@
 ================================ */
 .liabilities-header {
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 12px;
   padding: 20px;
   flex-wrap: wrap;
 }
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
+/* Search wrapper */
+.search-wrapper {
+  position: relative;
+  width: 260px;
+}
+
+/* Icon */
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+/* Input */
+.liabilities-search {
+  width: 100%;
+  height: 42px;
+  padding: 10px 12px 10px 38px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.liabilities-search:focus {
+  border-color: #0077b6;
+  outline: none;
+}
+
+/* Button */
+.add-liability-btn {
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: none;
   background: #0077b6;
   color: white;
-  padding: 15px 25px;
-  border-radius: 10px;
-  margin-bottom: 25px;
+  font-weight: 500;
+  cursor: pointer;
 }
-.liabilities-search {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+
+.add-liability-btn:hover {
+  background: #005f8e;
 }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .liabilities-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrapper,
+  .add-liability-btn {
+    width: 100%;
+  }
+}
+
 
 .add-liability-btn {
   background: #6366f1;
@@ -422,39 +469,5 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
-  }
-}
-.search-box {
-  position: relative;
-  width: 100%;
-  max-width: 260px;
-}
-
-.search-box input {
-  width: 100%;
-  height: 42px;
-  padding: 10px 12px 10px 40px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-  outline: none;
-}
-
-.search-box input:focus {
-  border-color: #2563eb;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
-  pointer-events: none;
-  font-size: 16px;
-}
-@media (max-width: 768px) {
-  .search-box {
-    max-width: 100%;
   }
 }

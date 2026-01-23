@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./Liabilities.css";
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Search } from 'lucide-react';
 const API_URL =
   "https://tindahan-ni-lola-backend-1.onrender.com/api/liabilities";
 
@@ -104,21 +104,24 @@ const markPaid = async (id) => {
     <div className="liabilities-page">
       <Header />
 
-      <div className="liabilities-header">
-        <Search size={16} className="search-icon" />
-  <input
-    type="text"
-    placeholder="Search products..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
-        <button
-          className="add-liability-btn"
-          onClick={() => setShowModal(true)}
-        >
-          + Add Liability
-        </button>
-      </div>
+<div className="liabilities-header">
+  <div className="search-wrapper">
+    <Search size={16} className="search-icon" />
+    <input
+      type="text"
+      placeholder="Search person who owed..."
+      className="liabilities-search"
+    />
+  </div>
+
+  <button
+    className="add-liability-btn"
+    onClick={() => setShowModal(true)}
+  >
+    + Add Liability
+  </button>
+</div>
+
 
       {/* ===== GRID ===== */}
       {Object.keys(grouped).length === 0 ? (
