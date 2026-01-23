@@ -10,9 +10,13 @@ function LandingPage() {
     <div className="landing-container">
       <nav className="navbar">
         <div className="logo">🏪Tindahan ni Lola</div>
-        <button className="get-started" onClick={() => navigate("/products")}>
-          Login / Register
-        </button>
+        <button
+  className="login-register"
+  onClick={() => navigate("/auth")}
+>
+  Login / Register
+</button>
+
       </nav>
 
       <section className="hero">

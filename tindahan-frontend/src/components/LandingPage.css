@@ -31,9 +31,9 @@ body {
   font-weight: bold;
 }
 
-.get-started {
-  background-color: transparent;
-  color: #0077b6;;
+.login-register {
+  background-color: #0077b6;
+  color: white;
   border: none;
   padding: 8px 18px;
   border-radius: 8px;
