@@ -80,18 +80,16 @@ body {
   display: flex;
   justify-content: center;
 }
-.features {
-  width: 100%;
-  max-width: 1280px;   /* IMPORTANT */
-  margin: 80px auto;
-  padding: 0 24px;
+.feature-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  text-align: center;
+
+  transition: all 0.25s ease;
 }
-
-
 /* Cards */
 .feature-card {
   background: #ffffff;
