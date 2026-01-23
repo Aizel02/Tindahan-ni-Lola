@@ -1,18 +1,27 @@
 /* ================================
    PAGE LAYOUT
 ================================ */
-.liabilities-page {
+.product-list-page {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
   min-height: 100vh;
-  background: #faf7f2;
-  padding: 40px 20px 80px;
+  padding: 30px;
+  color: #333;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
 }
 
-/* .liabilities-container {
-  width: 100%;
-  max-width: 1200px;
-} */
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0077b6;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
 
 /* ================================
    HEADER
