@@ -105,11 +105,13 @@ const markPaid = async (id) => {
       <Header />
 
       <div className="liabilities-header">
-        <input
-          type="text"
-          placeholder="Search person who owed..."
-          className="liabilities-search"
-        />
+        <Search size={16} className="search-icon" />
+  <input
+    type="text"
+    placeholder="Search products..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
         <button
           className="add-liability-btn"
           onClick={() => setShowModal(true)}
