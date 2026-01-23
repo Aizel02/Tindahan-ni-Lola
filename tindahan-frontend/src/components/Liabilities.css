@@ -1,57 +1,22 @@
 /* ================================
    PAGE LAYOUT
 ================================ */
-.product-list-page {
-  font-family: "Poppins", sans-serif;
-  background-color: #f9fafb;
+.liabilities-page {
   min-height: 100vh;
-  padding: 24px 16px;
-  color: #333;
+  background: #faf7f2;
+  padding-bottom: 80px;
+}
 
-  display: flex;
-  justify-content: center;
-}
-.product-container {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0077b6;
-  color: white;
-  padding: 16px 24px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+/* ================================
+   HEADER
+================================ */
 .liabilities-header {
   display: flex;
-  justify-content: center;
+  justify-content: center;   /* ← THIS centers it */
   align-items: center;
   gap: 12px;
-  padding: 24px 0;
+  padding: 30px 20px;
   flex-wrap: wrap;
-}
-@media (max-width: 768px) {
-  .product-list-page {
-    padding: 16px 12px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .liabilities-header {
-    flex-direction: column;
-    width: 100%;
-  }
 }
 
 
