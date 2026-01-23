@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import "./Auth.css";
 
 export default function Auth() {
-  const navigate = useNavigate();
-
   const [isLogin, setIsLogin] = useState(true);
   const [storeName, setStoreName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,15 +10,7 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // =====================
-  // REGISTER
-  // =====================
   const handleRegister = async () => {
-    if (!storeName || !email || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
-
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
@@ -28,7 +18,6 @@ export default function Auth() {
 
     setLoading(true);
 
-    // 1️⃣ Create Supabase account
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -40,7 +29,6 @@ export default function Auth() {
       return;
     }
 
-    // 2️⃣ Create store in backend
     await fetch("http://localhost:8080/api/auth/register", {
       method: "POST",
       headers: {
@@ -55,9 +43,6 @@ export default function Auth() {
     setLoading(false);
   };
 
-  // =====================
-  // LOGIN
-  // =====================
   const handleLogin = async () => {
     setLoading(true);
 
@@ -72,73 +57,73 @@ export default function Auth() {
       return;
     }
 
-    // Save token
     localStorage.setItem("token", data.session.access_token);
-
-    // Redirect to dashboard
-    navigate("/dashboard");
+    window.location.href = "/products";
   };
 
   return (
-    <div className="auth-container">
-      <h2>{isLogin ? "Login" : "Register"}</h2>
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <h2 className="brand">🛍️ Tindahan ni Lola</h2>
+        <p className="subtitle">Your Personal Store Management</p>
 
-      {/* Tabs */}
-      <div className="tabs">
-        <button
-          className={isLogin ? "active" : ""}
-          onClick={() => setIsLogin(true)}
-        >
-          Login
-        </button>
-        <button
-          className={!isLogin ? "active" : ""}
-          onClick={() => setIsLogin(false)}
-        >
-          Register
-        </button>
-      </div>
+        <div className="tabs">
+          <button
+            className={isLogin ? "active" : ""}
+            onClick={() => setIsLogin(true)}
+          >
+            Login
+          </button>
+          <button
+            className={!isLogin ? "active" : ""}
+            onClick={() => setIsLogin(false)}
+          >
+            Register
+          </button>
+        </div>
 
-      {/* Register only */}
-      {!isLogin && (
+        {!isLogin && (
+          <input
+            type="text"
+            placeholder="Store Name"
+            value={storeName}
+            onChange={(e) => setStoreName(e.target.value)}
+          />
+        )}
+
         <input
-          type="text"
-          placeholder="Store Name"
-          value={storeName}
-          onChange={(e) => setStoreName(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
-      )}
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      {!isLogin && (
         <input
           type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
-      )}
 
-      <button onClick={isLogin ? handleLogin : handleRegister}>
-        {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
-      </button>
+        {!isLogin && (
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        )}
 
-      <p className="back-home" onClick={() => navigate("/")}>
-        Back to Home
-      </p>
+        <button className="primary-btn" onClick={isLogin ? handleLogin : handleRegister}>
+          {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
+        </button>
+
+        <p className="back-home" onClick={() => (window.location.href = "/")}>
+          ← Back to Home
+        </p>
+      </div>
+
+      <footer>© 2025 Tindahan ni Lola. Your store, your way.</footer>
     </div>
   );
 }
