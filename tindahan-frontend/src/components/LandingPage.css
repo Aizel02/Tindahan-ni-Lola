@@ -130,25 +130,33 @@ body {
   line-height: 1.4;
   color: #555;
 }
-@media (max-width: 1024px) {
+/* Desktop */
+@media (min-width: 1024px) {
+  .features {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1200px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
   .features {
     grid-template-columns: repeat(2, 1fr);
+    max-width: 900px;
   }
 }
 
-@media (min-width: 768px) {
-  @media (min-width: 768px) {
+/* Mobile */
+@media (max-width: 767px) {
   .features {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1000px;
-    margin: 40px auto;
+    grid-template-columns: 1fr;
   }
-}
 
   .hero p {
-    max-width: 600px;
+    max-width: 100%;
   }
 }
+
 
 
 
