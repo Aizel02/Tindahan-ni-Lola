@@ -78,13 +78,14 @@ body {
 .features {
   width: 100%;
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 60px auto;
   padding: 0 20px;
 
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
+
 .feature-card {
   background: #f9f9f9;
   border-radius: 12px;
@@ -108,11 +109,13 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 480px) {
   .features {
     grid-template-columns: 1fr;
   }
 }
+
 .cta {
   background-color: #0077b6;
   color: white;
