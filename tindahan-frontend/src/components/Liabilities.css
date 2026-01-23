@@ -12,12 +12,13 @@
 ================================ */
 .liabilities-header {
   display: flex;
+  justify-content: center;   /* ← THIS centers it */
   align-items: center;
-  justify-content: flex-end;
   gap: 12px;
-  padding: 20px;
+  padding: 30px 20px;
   flex-wrap: wrap;
 }
+
 
 /* Search wrapper */
 .search-wrapper {
