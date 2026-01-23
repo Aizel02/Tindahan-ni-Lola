@@ -4,20 +4,30 @@
 .liabilities-page {
   min-height: 100vh;
   background: #faf7f2;
-  padding-bottom: 80px;
+  padding: 24px 16px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* ================================
-   HEADER
-================================ */
+/* Centered content */
 .liabilities-header {
+  width: 100%;
+  max-width: 1200px;
   display: flex;
-  justify-content: center;   /* ← THIS centers it */
+  justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: 30px 20px;
+  margin: 24px 0;
   flex-wrap: wrap;
 }
+@media (max-width: 768px) {
+  .liabilities-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 
 
 /* Search wrapper */
