@@ -31,7 +31,7 @@ function LandingPage() {
       <section className="features">
   <div className="feature-card">
     <div className="feature-icon">
-      <ShoppingBag size={28} />
+      <CheckSquare size={28} />
     </div>
     <h3>Easy Inventory</h3>
     <p>Add, edit, and organize your products in seconds.</p>
