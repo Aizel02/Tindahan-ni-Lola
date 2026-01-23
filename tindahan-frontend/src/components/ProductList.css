@@ -1036,10 +1036,10 @@
 }
 
 .search-box input {
-  width: 100%;
-  padding: 10px 12px 10px 38px; /* space for icon */
-  border-radius: 8px;
+ adding: 10px 14px;
   border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
   font-size: 14px;
 }
 
