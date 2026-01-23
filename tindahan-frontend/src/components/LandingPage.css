@@ -79,6 +79,7 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+
 }
 .features {
   width: 100%;
@@ -105,6 +106,7 @@ body {
 .feature-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    border-color: #3b82f6;
 }
 
 /* Icon */
@@ -134,11 +136,12 @@ body {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .features {
     grid-template-columns: 1fr;
   }
 }
+
 
 
 .cta {
