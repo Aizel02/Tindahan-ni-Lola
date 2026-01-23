@@ -367,7 +367,7 @@ const removeFromCart = (id) => {
   </div>
 )}
 
-      <div className="filters-rows">
+      <div className="filters">
         <div className="search-box">
   <Search size={16} className="search-icon" />
   <input
