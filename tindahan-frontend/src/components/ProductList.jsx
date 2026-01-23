@@ -368,12 +368,15 @@ const removeFromCart = (id) => {
 )}
 
       <div className="filters">
-        <input
-          type="text"
-          placeholder="🔍 Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="search-box">
+  <Search size={16} className="search-icon" />
+  <input
+    type="text"
+    placeholder="Search products..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+</div>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
