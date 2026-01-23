@@ -11,12 +11,13 @@
    HEADER
 ================================ */
 .liabilities-header {
+ font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  padding: 30px;
+  color: #333;
   display: flex;
-  justify-content: center;   /* ← THIS centers it */
-  align-items: center;
-  gap: 12px;
-  padding: 30px 20px;
-  flex-wrap: wrap;
+  flex-direction: column;
 }
 
 
