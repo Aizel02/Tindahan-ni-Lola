@@ -5,34 +5,53 @@
   font-family: "Poppins", sans-serif;
   background-color: #f9fafb;
   min-height: 100vh;
-  padding: 30px;
+  padding: 24px 16px;
   color: #333;
+
+  display: flex;
+  justify-content: center;
+}
+.product-container {
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
 }
-
-/* Header */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: #0077b6;
   color: white;
-  padding: 15px 25px;
+  padding: 16px 24px;
   border-radius: 10px;
   margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
-
-/* ================================
-   HEADER
-================================ */
 .liabilities-header {
   display: flex;
-  justify-content: center;   /* ← THIS centers it */
+  justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: 30px 20px;
+  padding: 24px 0;
   flex-wrap: wrap;
+}
+@media (max-width: 768px) {
+  .product-list-page {
+    padding: 16px 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .liabilities-header {
+    flex-direction: column;
+    width: 100%;
+  }
 }
 
 
