@@ -11,7 +11,7 @@ function LandingPage() {
       <nav className="navbar">
         <div className="logo">🏪Tindahan ni Lola</div>
         <button className="get-started" onClick={() => navigate("/products")}>
-          Get Started
+          Login / Register
         </button>
       </nav>
 
