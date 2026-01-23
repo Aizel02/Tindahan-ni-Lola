@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import { Pencil, ShoppingCart, Trash2, Printer, Loader } from "lucide-react";
+import { Pencil, ShoppingCart, Trash2, Printer, Loader, Search } from "lucide-react";
 
 
 // Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
