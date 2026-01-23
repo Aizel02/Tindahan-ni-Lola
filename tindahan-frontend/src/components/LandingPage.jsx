@@ -28,7 +28,7 @@ function LandingPage() {
         </button>
       </section>
 
-      <section className="features">
+      <section className="features-wrapper">
   <div className="feature-card">
     <div className="feature-icon">
       <CheckSquare size={28} />

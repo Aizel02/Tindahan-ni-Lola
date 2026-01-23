@@ -74,7 +74,12 @@ body {
   font-size: 1rem;
   cursor: pointer;
 }
-
+/* FULL WIDTH WRAPPER */
+.features-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .features {
   width: 100%;
   max-width: 1280px;   /* IMPORTANT */
