@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
 import { Pencil, ShoppingCart, Trash2, Printer, Loader, Search } from "lucide-react";
-import { supabase } from "../supabaseClient";
 
+
+// Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
+const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
 const BACKEND_BASE = "https://tindahan-ni-lola-backend-1.onrender.com";
 const fallbackImage = "/no-image.png";
 
@@ -29,33 +31,129 @@ const CATEGORIES = [
   "Others..",
 ];
 
-function ProductList() {
 
+const ProductList = async () => {
   const [products, setProducts] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
-
+  const [sortBy, setSortBy] = useState("name");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
     price: "",
     description: "",
+    imageFile: null,
   });
-
   const [editProduct, setEditProduct] = useState(null);
+  // 🛒 CART + QUANTITY MODAL STATES
+const [cart, setCart] = useState([]);
+const [showQtyModal, setShowQtyModal] = useState(false);
+const [selectedProduct, setSelectedProduct] = useState(null);
+const [quantity, setQuantity] = useState(1);
+const [showCartModal, setShowCartModal] = useState(false);
+const [user, setUser] = useState(null);
 
-  const [cart, setCart] = useState([]);
-  const [showCartModal, setShowCartModal] = useState(false);
 
-  /* =============================
-     LOAD USER + PRODUCTS
-  ============================= */
+  // ✅ correct place
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + item.qty * item.price,
+    0
+  );
+
+ const printReceipt = () => {
+  const win = window.open("", "_blank", "width=350,height=600");
+
+  const receipt = `
+  <html>
+    <head>
+      <style>
+        body {
+          font-family: monospace;
+          width: 80mm;
+          margin: 0;
+          padding: 10px;
+        }
+        .center { text-align: center; }
+        .line { border-top: 1px dashed #000; margin: 6px 0; }
+        .row {
+          display: flex;
+          justify-content: space-between;
+        }
+        .small { font-size: 12px; }
+      </style>
+    </head>
+    <body>
+
+      <div class="center">
+        ==============================<br/>
+        <strong>TINDAHAN NI LOLA</strong><br/>
+        Receipt of Sale<br/>
+        ==============================
+      </div>
+
+      <br/>
+      <div class="center">${new Date().toLocaleString()}</div>
+      <br/>
+
+      <div class="row small">
+        <strong>ITEM</strong>
+        <strong>QTY&nbsp;&nbsp;TOTAL</strong>
+      </div>
+      <div class="line"></div>
+
+      ${cart.map(item => `
+        <div class="row small">
+          <span>${item.name}</span>
+          <span>${item.qty}  ₱${(item.qty * item.price).toFixed(2)}</span>
+        </div>
+      `).join("")}
+
+      <div class="line"></div>
+
+      <div class="row small">
+        <span>Items:</span>
+        <span>${cart.length}</span>
+      </div>
+
+      <div class="row small">
+        <span>Subtotal:</span>
+        <span>₱${cartTotal.toFixed(2)}</span>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="row">
+        <strong>TOTAL:</strong>
+        <strong>₱${cartTotal.toFixed(2)}</strong>
+      </div>
+
+      <br/>
+      <div class="center">
+        ==============================<br/>
+        Thank you for your purchase!<br/>
+        Visit us again!<br/>
+        ==============================
+      </div>
+
+      <script>
+        window.onload = () => {
+          window.print();
+          window.close();
+        };
+      </script>
+
+    </body>
+  </html>
+  `;
+
+  win.document.write(receipt);
+  win.document.close();
+};
+ // ✅ FIXED: auth + fetch inside useEffect
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getSession();
@@ -64,169 +162,65 @@ function ProductList() {
       if (!currentUser) return;
 
       setUser(currentUser);
-      fetchProducts(currentUser.id);
+      fetchProducts();
     };
 
     init();
   }, []);
 
-  const fetchProducts = async (userId) => {
+  const fetchProducts = async () => {
     setLoading(true);
-
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("user_id", userId);
-
-    if (!error) setProducts(data);
-    setLoading(false);
+    setError("");
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      setProducts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load products.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /* =============================
-     ADD PRODUCT
-  ============================= */
+
   const handleAddProduct = async () => {
     if (!newProduct.name || !newProduct.price) {
       alert("Fill all fields");
       return;
     }
 
-    const { error } = await supabase.from("products").insert([
-      {
-        name: newProduct.name,
-        category: newProduct.category,
-        price: newProduct.price,
-        description: newProduct.description,
-        user_id: user.id,
-      },
-    ]);
+    const formData = new FormData();
+    formData.append("name", newProduct.name);
+    formData.append("category", newProduct.category);
+    formData.append("price", newProduct.price);
+    formData.append("description", newProduct.description || "");
 
-    if (!error) {
+    if (newProduct.imageFile)
+      formData.append("image", newProduct.imageFile);
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      fetchProducts();
+      setShowAddModal(false);
       setNewProduct({
         name: "",
         category: "",
         price: "",
         description: "",
+        imageFile: null,
       });
-
-      fetchProducts(user.id);
-      setShowAddModal(false);
     }
   };
 
-  /* =============================
-     UPDATE PRODUCT
-  ============================= */
-  const handleUpdateProduct = async () => {
-    if (!editProduct) return;
-
-    await supabase
-      .from("products")
-      .update({
-        name: editProduct.name,
-        category: editProduct.category,
-        price: editProduct.price,
-        description: editProduct.description,
-      })
-      .eq("id", editProduct.id);
-
-    setShowEditModal(false);
-    fetchProducts(user.id);
-  };
-
-  /* =============================
-     DELETE PRODUCT
-  ============================= */
   const handleDeleteProduct = async (id) => {
-    await supabase.from("products").delete().eq("id", id);
-    fetchProducts(user.id);
+    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    fetchProducts();
   };
-
-  /* =============================
-     CART
-  ============================= */
-  const cartTotal = cart.reduce(
-    (sum, item) => sum + item.qty * item.price,
-    0
-  );
-
-  /* =============================
-     FILTER
-  ============================= */
-  const filteredProducts = products.filter((p) => {
-    const matchName = p.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
-    const matchCategory =
-      categoryFilter === "All" || p.category === categoryFilter;
-
-    return matchName && matchCategory;
-  });
-
-  /* =============================
-     UI
-  ============================= */
-  return (
-    <div className="product-list-page">
-      <Header
-        cartCount={cart.length}
-        onCartClick={() => setShowCartModal(true)}
-      />
-
-      <div className="filters">
-        <input
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="All">All</option>
-          {CATEGORIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-
-        <button onClick={() => setShowAddModal(true)}>
-          <ShoppingCart size={16} /> Add Product
-        </button>
-      </div>
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="product-grid">
-          {filteredProducts.map((p) => (
-            <div key={p.id} className="product-card">
-              <img
-                src={normalizeImageUrl(p.image)}
-                alt={p.name}
-              />
-              <h4>{p.name}</h4>
-              <p>₱{p.price}</p>
-
-              <button onClick={() => {
-                setEditProduct(p);
-                setShowEditModal(true);
-              }}>
-                <Pencil size={14} />
-              </button>
-
-              <button onClick={() => handleDeleteProduct(p.id)}>
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 
 // ➕ ADD TO CART
 // ➕ ADD TO CART
@@ -632,6 +626,6 @@ const removeFromCart = (id) => {
 </footer>
     </div>
   );
-
+};
 
 export default ProductList;
