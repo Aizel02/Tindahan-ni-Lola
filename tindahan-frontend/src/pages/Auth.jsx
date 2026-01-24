@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import "./Auth.css";
 
 export default function Auth() {
+  const navigate = useNavigate();
+
   const [isLogin, setIsLogin] = useState(true);
-  const [storeName, setStoreName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -32,7 +34,7 @@ export default function Auth() {
 
       if (error) throw error;
 
-      alert("📧 Check your email to verify your account.");
+      alert("📩 Please check your email to verify your account.");
       setIsLogin(true);
     } catch (err) {
       alert(err.message);
@@ -55,8 +57,14 @@ export default function Auth() {
 
       if (error) throw error;
 
+      // ❗ Prevent unverified login
+      if (!data.user.email_confirmed_at) {
+        alert("Please verify your email first.");
+        return;
+      }
+
       localStorage.setItem("token", data.session.access_token);
-      window.location.href = "/products";
+      navigate("/products");
     } catch (err) {
       alert(err.message);
     } finally {
@@ -84,15 +92,6 @@ export default function Auth() {
             Register
           </button>
         </div>
-
-        {!isLogin && (
-          <input
-            type="text"
-            placeholder="Store Name"
-            value={storeName}
-            onChange={(e) => setStoreName(e.target.value)}
-          />
-        )}
 
         <input
           type="email"
@@ -125,7 +124,7 @@ export default function Auth() {
           {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
         </button>
 
-        <p className="back-home" onClick={() => (window.location.href = "/")}>
+        <p className="back-home" onClick={() => navigate("/")}>
           ← Back to Home
         </p>
       </div>
