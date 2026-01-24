@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
 import { Pencil, ShoppingCart, Trash2, Printer, Loader, Search } from "lucide-react";
+import { supabase } from "../supabaseClient";
 
-
-// Priority: NEXT_PUBLIC_API_URL (Next) -> REACT_APP_API_URL (CRA) -> deployed Render URL -> localhost
-const API_URL = "https://tindahan-ni-lola-backend-1.onrender.com/api/products";
 const BACKEND_BASE = "https://tindahan-ni-lola-backend-1.onrender.com";
 const fallbackImage = "/no-image.png";
 
@@ -31,276 +29,205 @@ const CATEGORIES = [
   "Others..",
 ];
 
+function ProductList() {
 
-const ProductList = async () => {
   const [products, setProducts] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [sortBy, setSortBy] = useState("name");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
     price: "",
     description: "",
-    imageFile: null,
   });
+
   const [editProduct, setEditProduct] = useState(null);
-  // 🛒 CART + QUANTITY MODAL STATES
-const [cart, setCart] = useState([]);
-const [showQtyModal, setShowQtyModal] = useState(false);
-const [selectedProduct, setSelectedProduct] = useState(null);
-const [quantity, setQuantity] = useState(1);
-const [showCartModal, setShowCartModal] = useState(false);
-const session = await supabase.auth.getSession();
-const token = session.data.session.access_token;
 
+  const [cart, setCart] = useState([]);
+  const [showCartModal, setShowCartModal] = useState(false);
 
-  // ✅ correct place
+  /* =============================
+     LOAD USER + PRODUCTS
+  ============================= */
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentUser = data?.session?.user;
+
+      if (!currentUser) return;
+
+      setUser(currentUser);
+      fetchProducts(currentUser.id);
+    };
+
+    init();
+  }, []);
+
+  const fetchProducts = async (userId) => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (!error) setProducts(data);
+    setLoading(false);
+  };
+
+  /* =============================
+     ADD PRODUCT
+  ============================= */
+  const handleAddProduct = async () => {
+    if (!newProduct.name || !newProduct.price) {
+      alert("Fill all fields");
+      return;
+    }
+
+    const { error } = await supabase.from("products").insert([
+      {
+        name: newProduct.name,
+        category: newProduct.category,
+        price: newProduct.price,
+        description: newProduct.description,
+        user_id: user.id,
+      },
+    ]);
+
+    if (!error) {
+      setNewProduct({
+        name: "",
+        category: "",
+        price: "",
+        description: "",
+      });
+
+      fetchProducts(user.id);
+      setShowAddModal(false);
+    }
+  };
+
+  /* =============================
+     UPDATE PRODUCT
+  ============================= */
+  const handleUpdateProduct = async () => {
+    if (!editProduct) return;
+
+    await supabase
+      .from("products")
+      .update({
+        name: editProduct.name,
+        category: editProduct.category,
+        price: editProduct.price,
+        description: editProduct.description,
+      })
+      .eq("id", editProduct.id);
+
+    setShowEditModal(false);
+    fetchProducts(user.id);
+  };
+
+  /* =============================
+     DELETE PRODUCT
+  ============================= */
+  const handleDeleteProduct = async (id) => {
+    await supabase.from("products").delete().eq("id", id);
+    fetchProducts(user.id);
+  };
+
+  /* =============================
+     CART
+  ============================= */
   const cartTotal = cart.reduce(
     (sum, item) => sum + item.qty * item.price,
     0
   );
 
- const printReceipt = () => {
-  const win = window.open("", "_blank", "width=350,height=600");
+  /* =============================
+     FILTER
+  ============================= */
+  const filteredProducts = products.filter((p) => {
+    const matchName = p.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
-  const receipt = `
-  <html>
-    <head>
-      <style>
-        body {
-          font-family: monospace;
-          width: 80mm;
-          margin: 0;
-          padding: 10px;
-        }
-        .center { text-align: center; }
-        .line { border-top: 1px dashed #000; margin: 6px 0; }
-        .row {
-          display: flex;
-          justify-content: space-between;
-        }
-        .small { font-size: 12px; }
-      </style>
-    </head>
-    <body>
+    const matchCategory =
+      categoryFilter === "All" || p.category === categoryFilter;
 
-      <div class="center">
-        ==============================<br/>
-        <strong>TINDAHAN NI LOLA</strong><br/>
-        Receipt of Sale<br/>
-        ==============================
+    return matchName && matchCategory;
+  });
+
+  /* =============================
+     UI
+  ============================= */
+  return (
+    <div className="product-list-page">
+      <Header
+        cartCount={cart.length}
+        onCartClick={() => setShowCartModal(true)}
+      />
+
+      <div className="filters">
+        <input
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="All">All</option>
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </select>
+
+        <button onClick={() => setShowAddModal(true)}>
+          <ShoppingCart size={16} /> Add Product
+        </button>
       </div>
 
-      <br/>
-      <div class="center">${new Date().toLocaleString()}</div>
-      <br/>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="product-grid">
+          {filteredProducts.map((p) => (
+            <div key={p.id} className="product-card">
+              <img
+                src={normalizeImageUrl(p.image)}
+                alt={p.name}
+              />
+              <h4>{p.name}</h4>
+              <p>₱{p.price}</p>
 
-      <div class="row small">
-        <strong>ITEM</strong>
-        <strong>QTY&nbsp;&nbsp;TOTAL</strong>
-      </div>
-      <div class="line"></div>
+              <button onClick={() => {
+                setEditProduct(p);
+                setShowEditModal(true);
+              }}>
+                <Pencil size={14} />
+              </button>
 
-      ${cart.map(item => `
-        <div class="row small">
-          <span>${item.name}</span>
-          <span>${item.qty}  ₱${(item.qty * item.price).toFixed(2)}</span>
+              <button onClick={() => handleDeleteProduct(p.id)}>
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
         </div>
-      `).join("")}
-
-      <div class="line"></div>
-
-      <div class="row small">
-        <span>Items:</span>
-        <span>${cart.length}</span>
-      </div>
-
-      <div class="row small">
-        <span>Subtotal:</span>
-        <span>₱${cartTotal.toFixed(2)}</span>
-      </div>
-
-      <div class="line"></div>
-
-      <div class="row">
-        <strong>TOTAL:</strong>
-        <strong>₱${cartTotal.toFixed(2)}</strong>
-      </div>
-
-      <br/>
-      <div class="center">
-        ==============================<br/>
-        Thank you for your purchase!<br/>
-        Visit us again!<br/>
-        ==============================
-      </div>
-
-      <script>
-        window.onload = () => {
-          window.print();
-          window.close();
-        };
-      </script>
-
-    </body>
-  </html>
-  `;
-
-  win.document.write(receipt);
-  win.document.close();
-};
-
-  // states
-
-const [name, setName] = useState("");
-const [price, setPrice] = useState("");
-
-// fetch products
-
-// auto load
-useEffect(() => {
-  fetchProducts();
-}, []);
-
-
-const fetchProducts = async () => {
-  try {
-    setLoading(true);
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const user = sessionData?.session?.user;
-
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("user_id", user.id);
-
-    if (!error) setProducts(data);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
-const addProduct = async () => {
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
-
-  if (!user) {
-    alert("You must be logged in");
-    return;
-  }
-
-  const { error } = await supabase.from("products").insert([
-    {
-      name,
-      price,
-      user_id: user.id,
-    },
-  ]);
-
-  if (!error) {
-    setName("");
-    setPrice("");
-    fetchProducts(); // refresh list
-  }
-};
-
-
-  const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.category || !newProduct.price) {
-      alert("Please fill out all required fields!");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", newProduct.name);
-    formData.append("category", newProduct.category);
-    formData.append("price", newProduct.price);
-    formData.append("description", newProduct.description || "");
-    if (newProduct.imageFile instanceof File) {
-  formData.append("image", newProduct.imageFile);
+      )}
+    </div>
+  );
 }
 
-    try {
-      const res = await fetch(API_URL, { method: "POST", body: formData });
-      if (res.ok) {
-        await fetchProducts();
-        setShowAddModal(false);
-        setNewProduct({
-          name: "",
-          category: "",
-          price: "",
-          description: "",
-          imageFile: null,
-        });
-      } else {
-        const text = await res.text().catch(() => "");
-        alert(`Failed to add product. ${text}`);
-      }
-    } catch (err) {
-      console.error("Error adding product:", err);
-      alert("Network error while adding product.");
-    }
-  };
 
-  const handleUpdateProduct = async () => {
-    if (!editProduct) return;
-
-    const id = editProduct.id || editProduct._id;
-    if (!id) {
-      alert("Invalid product id.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", editProduct.name);
-    formData.append("category", editProduct.category);
-    formData.append("price", editProduct.price);
-    formData.append("description", editProduct.description || "");
-    if (editProduct.imageFile) formData.append("image", editProduct.imageFile);
-
-    try {
-      const res = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (res.ok) {
-        await fetchProducts();
-        setShowEditModal(false);
-        setEditProduct(null);
-      } else {
-        const text = await res.text().catch(() => "");
-        alert(`Failed to update product. ${text}`);
-      }
-    } catch (err) {
-      console.error("Error updating product:", err);
-      alert("Network error while updating product.");
-    }
-  };
-
-  const handleDeleteProduct = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-    try {
-      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-      if (res.ok) await fetchProducts();
-      else {
-        const text = await res.text().catch(() => "");
-        alert(`Failed to delete product. ${text}`);
-      }
-    } catch (err) {
-      console.error("Error deleting product:", err);
-      alert("Network error while deleting product.");
-    }
-  };
 // ➕ ADD TO CART
 // ➕ ADD TO CART
 const addToCart = (product, qty) => {
@@ -705,6 +632,6 @@ const removeFromCart = (id) => {
 </footer>
     </div>
   );
-};
+
 
 export default ProductList;
