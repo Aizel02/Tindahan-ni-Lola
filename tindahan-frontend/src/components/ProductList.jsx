@@ -32,7 +32,7 @@ const CATEGORIES = [
 ];
 
 
-const ProductList = () => {
+const ProductList = async () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -55,6 +55,10 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
+const session = await supabase.auth.getSession();
+const token = session.data.session.access_token;
+
+
   // ✅ correct place
   const cartTotal = cart.reduce(
     (sum, item) => sum + item.qty * item.price,
@@ -151,28 +155,64 @@ const [showCartModal, setShowCartModal] = useState(false);
   win.document.close();
 };
 
-  useEffect(() => {
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // states
 
-  const fetchProducts = async () => {
+const [name, setName] = useState("");
+const [price, setPrice] = useState("");
+
+// fetch products
+
+// auto load
+useEffect(() => {
+  fetchProducts();
+}, []);
+
+
+const fetchProducts = async () => {
+  try {
     setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      setError(
-        "Failed to load products. Please check the backend connection or environment variable."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData?.session?.user;
+
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("user_id", user.id);
+
+    if (!error) setProducts(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+const addProduct = async () => {
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user;
+
+  if (!user) {
+    alert("You must be logged in");
+    return;
+  }
+
+  const { error } = await supabase.from("products").insert([
+    {
+      name,
+      price,
+      user_id: user.id,
+    },
+  ]);
+
+  if (!error) {
+    setName("");
+    setPrice("");
+    fetchProducts(); // refresh list
+  }
+};
+
 
   const handleAddProduct = async () => {
     if (!newProduct.name || !newProduct.category || !newProduct.price) {
