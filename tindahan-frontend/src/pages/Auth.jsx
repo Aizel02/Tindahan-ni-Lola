@@ -10,7 +10,9 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ REGISTER
+  // =========================
+  // REGISTER
+  // =========================
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match");
@@ -20,7 +22,7 @@ export default function Auth() {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -30,7 +32,7 @@ export default function Auth() {
 
       if (error) throw error;
 
-      alert("Check your email to verify your account.");
+      alert("📧 Check your email to verify your account.");
       setIsLogin(true);
     } catch (err) {
       alert(err.message);
@@ -39,7 +41,9 @@ export default function Auth() {
     }
   };
 
-  // ✅ LOGIN
+  // =========================
+  // LOGIN
+  // =========================
   const handleLogin = async () => {
     try {
       setLoading(true);
