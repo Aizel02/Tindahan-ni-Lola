@@ -10,55 +10,54 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ REGISTER
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-    if (error) {
-      alert(error.message);
+      if (error) throw error;
+
+      alert("Check your email to verify your account.");
+      setIsLogin(true);
+    } catch (err) {
+      alert(err.message);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    await fetch("http://localhost:8080/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${data.session.access_token}`,
-      },
-      body: JSON.stringify({ storeName }),
-    });
-
-    alert("Account created successfully!");
-    setIsLogin(true);
-    setLoading(false);
   };
 
+  // ✅ LOGIN
   const handleLogin = async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      alert(error.message);
+      if (error) throw error;
+
+      localStorage.setItem("token", data.session.access_token);
+      window.location.href = "/products";
+    } catch (err) {
+      alert(err.message);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    localStorage.setItem("token", data.session.access_token);
-    window.location.href = "/products";
   };
 
   return (
@@ -114,7 +113,11 @@ export default function Auth() {
           />
         )}
 
-        <button className="primary-btn" onClick={isLogin ? handleLogin : handleRegister}>
+        <button
+          className="primary-btn"
+          onClick={isLogin ? handleLogin : handleRegister}
+          disabled={loading}
+        >
           {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
         </button>
 
