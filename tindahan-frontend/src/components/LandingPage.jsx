@@ -73,7 +73,7 @@ function LandingPage() {
           Join thousands of sari-sari store owners who trust Tindahan ni Lola to
           manage their inventory.
         </p>
-        <button className="secondary-btn" onClick={() => navigate("/products")}>
+        <button className="secondary-btn" onClick={() => navigate("/auth")}>
           Enter Your Store
         </button>
       </section>
