@@ -27,7 +27,7 @@ function LandingPage() {
           Keep track of your inventory, manage prices, and grow your business
           with our simple and powerful store management tool.
         </p>
-        <button className="primary-btn" onClick={() => navigate("/products")}>
+        <button className="primary-btn" onClick={() => navigate("/auth")}>
           Start Managing Now
         </button>
       </section>
