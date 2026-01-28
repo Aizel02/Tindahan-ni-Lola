@@ -33,7 +33,7 @@ const CATEGORIES = [
 ];
 
 
-const ProductList = async () => {
+const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -56,7 +56,6 @@ const [showQtyModal, setShowQtyModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);
 const [quantity, setQuantity] = useState(1);
 const [showCartModal, setShowCartModal] = useState(false);
-const [user, setUser] = useState(null);
 
 
   // ✅ correct place
@@ -155,19 +154,10 @@ const [user, setUser] = useState(null);
   win.document.close();
 };
  // ✅ FIXED: auth + fetch inside useEffect
-  useEffect(() => {
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentUser = data?.session?.user;
+useEffect(() => {
+  fetchProducts();
+}, []);
 
-      if (!currentUser) return;
-
-      setUser(currentUser);
-      fetchProducts();
-    };
-
-    init();
-  }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
