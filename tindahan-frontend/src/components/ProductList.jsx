@@ -221,6 +221,31 @@ const [user, setUser] = useState(null);
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     fetchProducts();
   };
+const handleUpdateProduct = async () => {
+  if (!editProduct) return;
+
+  try {
+    const formData = new FormData();
+    formData.append("name", editProduct.name);
+    formData.append("category", editProduct.category);
+    formData.append("price", editProduct.price);
+    formData.append("description", editProduct.description || "");
+
+    if (editProduct.imageFile) {
+      formData.append("image", editProduct.imageFile);
+    }
+
+    await fetch(`${API_URL}/${editProduct.id}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    setShowEditModal(false);
+    fetchProducts(); // refresh list
+  } catch (err) {
+    console.error("Update failed", err);
+  }
+};
 
 // ➕ ADD TO CART
 // ➕ ADD TO CART
