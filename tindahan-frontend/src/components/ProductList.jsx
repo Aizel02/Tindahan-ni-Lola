@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import { supabase } from "../supabaseClient";
 import { Pencil, ShoppingCart, Trash2, Printer, Loader, Search } from "lucide-react";
 
 
