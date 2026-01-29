@@ -66,9 +66,9 @@ body {
 
 
 .primary-btn {
-  background-color: #0077b6;;
+  background-color: transparent;
   color: white;
-  border: none;
+  border: 2px #0077b6 solid;
   padding: 12px 25px;
   border-radius: 10px;
   font-size: 1rem;
