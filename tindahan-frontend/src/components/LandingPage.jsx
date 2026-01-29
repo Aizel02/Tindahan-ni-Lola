@@ -70,8 +70,7 @@ function LandingPage() {
       <section className="cta">
         <h2>Ready to grow your business?</h2>
         <p>
-          Join thousands of sari-sari store owners who trust Tindahan ni Lola to
-          manage their inventory.
+          Built to help sari-sari stores manage inventory with ease.
         </p>
         <button className="secondary-btn" onClick={() => navigate("/auth")}>
           Enter Your Store
