@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./ProductList.css";
 import {
-  Pencil,
   ShoppingCart,
   Trash2,
   Printer,
-  Loader,
-  Search,
+  Loader
+
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
