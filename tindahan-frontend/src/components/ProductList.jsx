@@ -55,7 +55,6 @@ export default function ProductList() {
   const [editProduct, setEditProduct] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-
   const [cart, setCart] = useState([]);
 
   const cartTotal = cart.reduce(
@@ -68,28 +67,13 @@ export default function ProductList() {
   // =========================
   const fetchProducts = async () => {
     setLoading(true);
-    setError("");
-
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setError("Not authenticated");
-        return;
-      }
-
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("products")
         .select("*")
         .order("name");
-
-      if (error) throw error;
-
       setProducts(data || []);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Failed to load products");
     } finally {
       setLoading(false);
@@ -104,21 +88,14 @@ export default function ProductList() {
   // ADD PRODUCT
   // =========================
   const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.price) return;
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     await supabase.from("products").insert([
       {
         user_id: user.id,
-        name: newProduct.name,
-        category: newProduct.category,
+        ...newProduct,
         price: Number(newProduct.price),
-        description: newProduct.description,
       },
     ]);
 
@@ -131,8 +108,6 @@ export default function ProductList() {
   // UPDATE PRODUCT
   // =========================
   const handleUpdateProduct = async () => {
-    if (!editProduct) return;
-
     await supabase
       .from("products")
       .update({
@@ -160,8 +135,8 @@ export default function ProductList() {
   // =========================
   const addToCart = (product, qty) => {
     setCart((prev) => {
-      const existing = prev.find((i) => i.id === product.id);
-      if (existing) {
+      const found = prev.find((i) => i.id === product.id);
+      if (found) {
         return prev.map((i) =>
           i.id === product.id ? { ...i, qty: i.qty + qty } : i
         );
@@ -170,33 +145,27 @@ export default function ProductList() {
     });
   };
 
-  const removeFromCart = (id) => {
+  const removeFromCart = (id) =>
     setCart((prev) => prev.filter((i) => i.id !== id));
-  };
 
   // =========================
-  // THERMAL PRINT
+  // PRINT RECEIPT
   // =========================
   const printReceipt = () => {
     const win = window.open("", "_blank", "width=350,height=600");
-
     win.document.write(`
-      <pre style="font-family: monospace; width:80mm">
+      <pre style="font-family:monospace;width:80mm">
 TINDAHAN NI LOLA
-------------------------------
-${cart.map(
-  (i) => `${i.name} x${i.qty}  ₱${(i.qty * i.price).toFixed(2)}`
-).join("\n")}
-------------------------------
+------------------
+${cart.map(i => `${i.name} x${i.qty} ₱${(i.qty*i.price).toFixed(2)}`).join("\n")}
+------------------
 TOTAL: ₱${cartTotal.toFixed(2)}
-------------------------------
 THANK YOU!
       </pre>
       <script>
-        window.onload = () => { window.print(); window.close(); }
+        window.onload=()=>{window.print();window.close();}
       </script>
     `);
-
     win.document.close();
   };
 
@@ -208,60 +177,38 @@ THANK YOU!
       p.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .filter(
-      (p) =>
-        categoryFilter === "All" ||
-        p.category === categoryFilter
+      (p) => categoryFilter === "All" || p.category === categoryFilter
     )
     .sort((a, b) =>
-      sortBy === "price"
-        ? a.price - b.price
-        : a.name.localeCompare(b.name)
+      sortBy === "price" ? a.price - b.price : a.name.localeCompare(b.name)
     );
 
-  // =========================
-  // UI
-  // =========================
   return (
     <div className="product-list-page">
-      <Header
-        cartCount={cart.length}
-        onCartClick={() => setShowCartModal(true)}
-      />
+      <Header cartCount={cart.length} onCartClick={() => setShowCartModal(true)} />
 
+      {/* FILTERS */}
       <div className="filters">
-        <div className="search-box">
-          <Search size={16} />
-          <input
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="All">All Categories</option>
+        <Search size={16} />
+        <input
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <select onChange={(e) => setCategoryFilter(e.target.value)}>
+          <option>All</option>
           {CATEGORIES.map((c) => (
             <option key={c}>{c}</option>
           ))}
         </select>
-
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="name">Sort by Name</option>
-          <option value="price">Sort by Price</option>
-        </select>
-
         <button onClick={() => setShowAddModal(true)}>
           <ShoppingCart size={16} /> Add Product
         </button>
       </div>
 
+      {/* PRODUCTS */}
       {loading ? (
-        <p><Loader size={16} /> Loading...</p>
-      ) : error ? (
-        <p>{error}</p>
+        <Loader />
       ) : (
         <div className="product-grid">
           {filteredProducts.map((p) => (
@@ -276,8 +223,7 @@ THANK YOU!
                 }}
               />
               <h4>{p.name}</h4>
-              <p>₱{p.price.toFixed(2)}</p>
-
+              <p>₱{p.price}</p>
               <button onClick={() => { setEditProduct(p); setShowEditModal(true); }}>
                 <Pencil size={14} />
               </button>
@@ -289,44 +235,37 @@ THANK YOU!
         </div>
       )}
 
-      {showQtyModal && selectedProduct && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>{selectedProduct.name}</h3>
-            <button onClick={() => setQuantity(quantity - 1)}>-</button>
-            <span>{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)}>+</button>
-            <button onClick={() => {
-              addToCart(selectedProduct, quantity);
-              setShowQtyModal(false);
-            }}>
-              Add to Cart
-            </button>
-          </div>
+      {/* ADD MODAL */}
+      {showAddModal && (
+        <div className="modal">
+          <input placeholder="Name" onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
+          <input placeholder="Price" onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
+          <button onClick={handleAddProduct}>Save</button>
         </div>
       )}
 
+      {/* EDIT MODAL */}
+      {showEditModal && editProduct && (
+        <div className="modal">
+          <input value={editProduct.name} onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })} />
+          <button onClick={handleUpdateProduct}>Update</button>
+        </div>
+      )}
+
+      {/* CART MODAL */}
       {showCartModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Cart</h3>
-            {cart.map((i) => (
-              <div key={i.id}>
-                {i.name} x{i.qty}
-                <button onClick={() => removeFromCart(i.id)}>x</button>
-              </div>
-            ))}
-            <h4>Total: ₱{cartTotal.toFixed(2)}</h4>
-            <button onClick={printReceipt}>
-              <Printer size={16} /> Print Receipt
-            </button>
-          </div>
+        <div className="modal">
+          {cart.map((i) => (
+            <div key={i.id}>
+              {i.name} x{i.qty}
+              <button onClick={() => removeFromCart(i.id)}>x</button>
+            </div>
+          ))}
+          <button onClick={printReceipt}>
+            <Printer size={16} /> Print
+          </button>
         </div>
       )}
-
-      <footer className="app-footer">
-        © 2025 Tindahan ni Lola
-      </footer>
     </div>
   );
 }
