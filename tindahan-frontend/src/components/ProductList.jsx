@@ -29,7 +29,10 @@ const CATEGORIES = [
   "Others..",
 ];
 
-const ProductList = () => {
+export default function ProductList() {
+  // =========================
+  // STATES
+  // =========================
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -39,6 +42,8 @@ const ProductList = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showQtyModal, setShowQtyModal] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -48,13 +53,10 @@ const ProductList = () => {
   });
 
   const [editProduct, setEditProduct] = useState(null);
-
-  // 🛒 CART + MODALS
-  const [cart, setCart] = useState([]);
-  const [showQtyModal, setShowQtyModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [showCartModal, setShowCartModal] = useState(false);
+
+  const [cart, setCart] = useState([]);
 
   const cartTotal = cart.reduce(
     (sum, item) => sum + item.qty * item.price,
@@ -62,101 +64,7 @@ const ProductList = () => {
   );
 
   // =========================
-  // THERMAL RECEIPT PRINT
-  // =========================
-  const printReceipt = () => {
-    const win = window.open("", "_blank", "width=350,height=600");
-
-    const receipt = `
-    <html>
-      <head>
-        <style>
-          body {
-            font-family: monospace;
-            width: 80mm;
-            margin: 0;
-            padding: 10px;
-          }
-          .center { text-align: center; }
-          .line { border-top: 1px dashed #000; margin: 6px 0; }
-          .row { display: flex; justify-content: space-between; }
-          .small { font-size: 12px; }
-        </style>
-      </head>
-      <body>
-
-        <div class="center">
-          ==============================<br/>
-          <strong>TINDAHAN NI LOLA</strong><br/>
-          Receipt of Sale<br/>
-          ==============================
-        </div>
-
-        <br/>
-        <div class="center">${new Date().toLocaleString()}</div>
-        <br/>
-
-        <div class="row small">
-          <strong>ITEM</strong>
-          <strong>QTY&nbsp;&nbsp;TOTAL</strong>
-        </div>
-        <div class="line"></div>
-
-        ${cart
-          .map(
-            (item) => `
-          <div class="row small">
-            <span>${item.name}</span>
-            <span>${item.qty}  ₱${(item.qty * item.price).toFixed(2)}</span>
-          </div>
-        `
-          )
-          .join("")}
-
-        <div class="line"></div>
-
-        <div class="row small">
-          <span>Items:</span>
-          <span>${cart.length}</span>
-        </div>
-
-        <div class="row small">
-          <span>Subtotal:</span>
-          <span>₱${cartTotal.toFixed(2)}</span>
-        </div>
-
-        <div class="line"></div>
-
-        <div class="row">
-          <strong>TOTAL:</strong>
-          <strong>₱${cartTotal.toFixed(2)}</strong>
-        </div>
-
-        <br/>
-        <div class="center">
-          ==============================<br/>
-          Thank you for your purchase!<br/>
-          Visit us again!<br/>
-          ==============================
-        </div>
-
-        <script>
-          window.onload = () => {
-            window.print();
-            window.close();
-          };
-        </script>
-
-      </body>
-    </html>
-    `;
-
-    win.document.write(receipt);
-    win.document.close();
-  };
-
-  // =========================
-  // FETCH PRODUCTS (SUPABASE)
+  // FETCH PRODUCTS
   // =========================
   const fetchProducts = async () => {
     setLoading(true);
@@ -196,42 +104,27 @@ const ProductList = () => {
   // ADD PRODUCT
   // =========================
   const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.price) {
-      alert("Fill all fields");
-      return;
-    }
+    if (!newProduct.name || !newProduct.price) return;
 
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      if (!user) return;
+    if (!user) return;
 
-      const { error } = await supabase.from("products").insert([
-        {
-          user_id: user.id,
-          name: newProduct.name,
-          category: newProduct.category,
-          price: Number(newProduct.price),
-          description: newProduct.description || "",
-        },
-      ]);
+    await supabase.from("products").insert([
+      {
+        user_id: user.id,
+        name: newProduct.name,
+        category: newProduct.category,
+        price: Number(newProduct.price),
+        description: newProduct.description,
+      },
+    ]);
 
-      if (error) throw error;
-
-      setShowAddModal(false);
-      setNewProduct({
-        name: "",
-        category: "",
-        price: "",
-        description: "",
-      });
-
-      fetchProducts();
-    } catch (err) {
-      alert(err.message);
-    }
+    setShowAddModal(false);
+    setNewProduct({ name: "", category: "", price: "", description: "" });
+    fetchProducts();
   };
 
   // =========================
@@ -263,7 +156,7 @@ const ProductList = () => {
   };
 
   // =========================
-  // CART LOGIC
+  // CART
   // =========================
   const addToCart = (product, qty) => {
     setCart((prev) => {
@@ -282,27 +175,59 @@ const ProductList = () => {
   };
 
   // =========================
+  // THERMAL PRINT
+  // =========================
+  const printReceipt = () => {
+    const win = window.open("", "_blank", "width=350,height=600");
+
+    win.document.write(`
+      <pre style="font-family: monospace; width:80mm">
+TINDAHAN NI LOLA
+------------------------------
+${cart.map(
+  (i) => `${i.name} x${i.qty}  ₱${(i.qty * i.price).toFixed(2)}`
+).join("\n")}
+------------------------------
+TOTAL: ₱${cartTotal.toFixed(2)}
+------------------------------
+THANK YOU!
+      </pre>
+      <script>
+        window.onload = () => { window.print(); window.close(); }
+      </script>
+    `);
+
+    win.document.close();
+  };
+
+  // =========================
   // FILTER
   // =========================
   const filteredProducts = products
-    .filter((p) => {
-      const nameMatch = p.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const catMatch =
+    .filter((p) =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter(
+      (p) =>
         categoryFilter === "All" ||
-        p.category?.toLowerCase() === categoryFilter.toLowerCase();
-      return nameMatch && catMatch;
-    })
+        p.category === categoryFilter
+    )
     .sort((a, b) =>
-      sortBy === "price" ? a.price - b.price : a.name.localeCompare(b.name)
+      sortBy === "price"
+        ? a.price - b.price
+        : a.name.localeCompare(b.name)
     );
 
+  // =========================
+  // UI
+  // =========================
   return (
     <div className="product-list-page">
-      <Header cartCount={cart.length} onCartClick={() => setShowCartModal(true)} />
+      <Header
+        cartCount={cart.length}
+        onCartClick={() => setShowCartModal(true)}
+      />
 
-      {/* FILTERS */}
       <div className="filters">
         <div className="search-box">
           <Search size={16} />
@@ -318,8 +243,8 @@ const ProductList = () => {
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="All">All Categories</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat}>{cat}</option>
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
           ))}
         </select>
 
@@ -328,18 +253,15 @@ const ProductList = () => {
           <option value="price">Sort by Price</option>
         </select>
 
-        <button className="add-product-btn" onClick={() => setShowAddModal(true)}>
+        <button onClick={() => setShowAddModal(true)}>
           <ShoppingCart size={16} /> Add Product
         </button>
       </div>
 
-      {/* PRODUCTS */}
       {loading ? (
-        <p className="status-text">
-          <Loader size={16} /> Loading products...
-        </p>
+        <p><Loader size={16} /> Loading...</p>
       ) : error ? (
-        <p className="error-text">{error}</p>
+        <p>{error}</p>
       ) : (
         <div className="product-grid">
           {filteredProducts.map((p) => (
@@ -347,49 +269,54 @@ const ProductList = () => {
               <img
                 src={fallbackImage}
                 alt={p.name}
-                className="product-image"
                 onClick={() => {
                   setSelectedProduct(p);
                   setQuantity(1);
                   setShowQtyModal(true);
                 }}
               />
+              <h4>{p.name}</h4>
+              <p>₱{p.price.toFixed(2)}</p>
 
-              <div className="product-info">
-                <h4>{p.name}</h4>
-                <p>{p.category}</p>
-                <p className="desc">{p.description}</p>
-                <p className="price">₱{p.price.toFixed(2)}</p>
-              </div>
-
-              <div className="card-actions">
-                <button onClick={() => { setEditProduct(p); setShowEditModal(true); }}>
-                  <Pencil size={16} /> Edit
-                </button>
-                <button onClick={() => handleDeleteProduct(p.id)}>
-                  <Trash2 size={16} /> Delete
-                </button>
-              </div>
+              <button onClick={() => { setEditProduct(p); setShowEditModal(true); }}>
+                <Pencil size={14} />
+              </button>
+              <button onClick={() => handleDeleteProduct(p.id)}>
+                <Trash2 size={14} />
+              </button>
             </div>
           ))}
         </div>
       )}
 
-      {/* CART MODAL */}
+      {showQtyModal && selectedProduct && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{selectedProduct.name}</h3>
+            <button onClick={() => setQuantity(quantity - 1)}>-</button>
+            <span>{quantity}</span>
+            <button onClick={() => setQuantity(quantity + 1)}>+</button>
+            <button onClick={() => {
+              addToCart(selectedProduct, quantity);
+              setShowQtyModal(false);
+            }}>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      )}
+
       {showCartModal && (
         <div className="modal-overlay">
-          <div className="cart-modal">
-            <h3>Shopping Cart</h3>
-
-            {cart.map((item) => (
-              <div key={item.id}>
-                {item.name} × {item.qty}
-                <button onClick={() => removeFromCart(item.id)}>X</button>
+          <div className="modal">
+            <h3>Cart</h3>
+            {cart.map((i) => (
+              <div key={i.id}>
+                {i.name} x{i.qty}
+                <button onClick={() => removeFromCart(i.id)}>x</button>
               </div>
             ))}
-
             <h4>Total: ₱{cartTotal.toFixed(2)}</h4>
-
             <button onClick={printReceipt}>
               <Printer size={16} /> Print Receipt
             </button>
@@ -398,10 +325,8 @@ const ProductList = () => {
       )}
 
       <footer className="app-footer">
-        © 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez
+        © 2025 Tindahan ni Lola
       </footer>
     </div>
   );
-};
-
-export default ProductList;
+}
