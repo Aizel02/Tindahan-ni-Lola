@@ -31,18 +31,15 @@ const CATEGORIES = [
 
 export default function ProductList() {
   // =========================
-  // STATES
+  // STATES (ONLY WHAT IS USED)
   // =========================
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showQtyModal, setShowQtyModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
 
   const [newProduct, setNewProduct] = useState({
@@ -53,8 +50,6 @@ export default function ProductList() {
   });
 
   const [editProduct, setEditProduct] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState([]);
 
   const cartTotal = cart.reduce(
@@ -67,17 +62,14 @@ export default function ProductList() {
   // =========================
   const fetchProducts = async () => {
     setLoading(true);
-    try {
-      const { data } = await supabase
-        .from("products")
-        .select("*")
-        .order("name");
-      setProducts(data || []);
-    } catch {
-      setError("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
+
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .order("name");
+
+    setProducts(data || []);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -88,14 +80,19 @@ export default function ProductList() {
   // ADD PRODUCT
   // =========================
   const handleAddProduct = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) return;
 
     await supabase.from("products").insert([
       {
         user_id: user.id,
-        ...newProduct,
+        name: newProduct.name,
+        category: newProduct.category,
         price: Number(newProduct.price),
+        description: newProduct.description,
       },
     ]);
 
@@ -108,6 +105,8 @@ export default function ProductList() {
   // UPDATE PRODUCT
   // =========================
   const handleUpdateProduct = async () => {
+    if (!editProduct) return;
+
     await supabase
       .from("products")
       .update({
@@ -133,15 +132,15 @@ export default function ProductList() {
   // =========================
   // CART
   // =========================
-  const addToCart = (product, qty) => {
+  const addToCart = (product) => {
     setCart((prev) => {
       const found = prev.find((i) => i.id === product.id);
       if (found) {
         return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + qty } : i
+          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
         );
       }
-      return [...prev, { ...product, qty }];
+      return [...prev, { ...product, qty: 1 }];
     });
   };
 
@@ -149,21 +148,25 @@ export default function ProductList() {
     setCart((prev) => prev.filter((i) => i.id !== id));
 
   // =========================
-  // PRINT RECEIPT
+  // THERMAL PRINT
   // =========================
   const printReceipt = () => {
     const win = window.open("", "_blank", "width=350,height=600");
     win.document.write(`
       <pre style="font-family:monospace;width:80mm">
 TINDAHAN NI LOLA
-------------------
-${cart.map(i => `${i.name} x${i.qty} ₱${(i.qty*i.price).toFixed(2)}`).join("\n")}
-------------------
+--------------------------
+${cart
+  .map(
+    (i) => `${i.name} x${i.qty} ₱${(i.qty * i.price).toFixed(2)}`
+  )
+  .join("\n")}
+--------------------------
 TOTAL: ₱${cartTotal.toFixed(2)}
 THANK YOU!
       </pre>
       <script>
-        window.onload=()=>{window.print();window.close();}
+        window.onload = () => { window.print(); window.close(); }
       </script>
     `);
     win.document.close();
@@ -172,20 +175,24 @@ THANK YOU!
   // =========================
   // FILTER
   // =========================
-  const filteredProducts = products
-    .filter((p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter(
-      (p) => categoryFilter === "All" || p.category === categoryFilter
-    )
-    .sort((a, b) =>
-      sortBy === "price" ? a.price - b.price : a.name.localeCompare(b.name)
-    );
+  const filteredProducts = products.filter((p) => {
+    const nameMatch = p.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const catMatch =
+      categoryFilter === "All" || p.category === categoryFilter;
+    return nameMatch && catMatch;
+  });
 
+  // =========================
+  // UI
+  // =========================
   return (
     <div className="product-list-page">
-      <Header cartCount={cart.length} onCartClick={() => setShowCartModal(true)} />
+      <Header
+        cartCount={cart.length}
+        onCartClick={() => setShowCartModal(true)}
+      />
 
       {/* FILTERS */}
       <div className="filters">
@@ -195,12 +202,17 @@ THANK YOU!
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select onChange={(e) => setCategoryFilter(e.target.value)}>
-          <option>All</option>
+
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="All">All</option>
           {CATEGORIES.map((c) => (
             <option key={c}>{c}</option>
           ))}
         </select>
+
         <button onClick={() => setShowAddModal(true)}>
           <ShoppingCart size={16} /> Add Product
         </button>
@@ -213,20 +225,23 @@ THANK YOU!
         <div className="product-grid">
           {filteredProducts.map((p) => (
             <div key={p.id} className="product-card">
-              <img
-                src={fallbackImage}
-                alt={p.name}
-                onClick={() => {
-                  setSelectedProduct(p);
-                  setQuantity(1);
-                  setShowQtyModal(true);
-                }}
-              />
+              <img src={fallbackImage} alt={p.name} />
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
-              <button onClick={() => { setEditProduct(p); setShowEditModal(true); }}>
+
+              <button onClick={() => addToCart(p)}>
+                <ShoppingCart size={14} />
+              </button>
+
+              <button
+                onClick={() => {
+                  setEditProduct(p);
+                  setShowEditModal(true);
+                }}
+              >
                 <Pencil size={14} />
               </button>
+
               <button onClick={() => handleDeleteProduct(p.id)}>
                 <Trash2 size={14} />
               </button>
@@ -238,8 +253,20 @@ THANK YOU!
       {/* ADD MODAL */}
       {showAddModal && (
         <div className="modal">
-          <input placeholder="Name" onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
-          <input placeholder="Price" onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
+          <input
+            placeholder="Name"
+            value={newProduct.name}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, name: e.target.value })
+            }
+          />
+          <input
+            placeholder="Price"
+            value={newProduct.price}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, price: e.target.value })
+            }
+          />
           <button onClick={handleAddProduct}>Save</button>
         </div>
       )}
@@ -247,7 +274,12 @@ THANK YOU!
       {/* EDIT MODAL */}
       {showEditModal && editProduct && (
         <div className="modal">
-          <input value={editProduct.name} onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })} />
+          <input
+            value={editProduct.name}
+            onChange={(e) =>
+              setEditProduct({ ...editProduct, name: e.target.value })
+            }
+          />
           <button onClick={handleUpdateProduct}>Update</button>
         </div>
       )}
@@ -262,10 +294,14 @@ THANK YOU!
             </div>
           ))}
           <button onClick={printReceipt}>
-            <Printer size={16} /> Print
+            <Printer size={16} /> Print Receipt
           </button>
         </div>
       )}
+
+      <footer className="app-footer">
+        © 2025 Tindahan ni Lola
+      </footer>
     </div>
   );
 }
