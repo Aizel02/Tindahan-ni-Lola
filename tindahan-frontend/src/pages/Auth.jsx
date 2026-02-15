@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import "./Auth.css";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,6 +10,9 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // =========================
   // REGISTER
@@ -22,15 +26,20 @@ export default function Auth() {
     try {
       setLoading(true);
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
       });
 
       if (error) throw error;
+
+      // ✅ SAVE STORE NAME PER USER
+      await supabase.from("profiles").insert([
+        {
+          id: data.user.id,
+          store_name: storeName,
+        },
+      ]);
 
       alert("📧 Check your email to verify your account.");
       setIsLogin(true);
@@ -55,7 +64,10 @@ export default function Auth() {
 
       if (error) throw error;
 
+      // ✅ SAVE USER INFO
       localStorage.setItem("token", data.session.access_token);
+      localStorage.setItem("userId", data.user.id);
+
       window.location.href = "/products";
     } catch (err) {
       alert(err.message);
@@ -101,20 +113,44 @@ export default function Auth() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        {!isLogin && (
+        {/* PASSWORD */}
+        <div className="password-wrapper">
           <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
+          <span
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </span>
+        </div>
+
+        {/* CONFIRM PASSWORD */}
+        {!isLogin && (
+          <div className="password-wrapper">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <span
+              className="toggle-password"
+              onClick={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+            >
+              {showConfirmPassword ? (
+                <EyeOff size={18} />
+              ) : (
+                <Eye size={18} />
+              )}
+            </span>
+          </div>
         )}
 
         <button
