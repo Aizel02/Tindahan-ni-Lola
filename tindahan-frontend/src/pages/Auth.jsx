@@ -33,13 +33,20 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // ✅ SAVE STORE NAME PER USER
-      await supabase.from("profiles").insert([
-        {
-          id: data.user.id,
+      // 🔑 SAFETY CHECK
+      if (!data.user) {
+        throw new Error("User not created");
+      }
+
+      // ✅ SAVE STORE NAME (RLS SAFE)
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: data.user.id,          // must match auth.uid()
           store_name: storeName,
-        },
-      ]);
+        });
+
+      if (profileError) throw profileError;
 
       alert("📧 Check your email to verify your account.");
       setIsLogin(true);
@@ -64,7 +71,7 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // ✅ SAVE USER INFO
+      // ✅ STORE SESSION INFO (OPTIONAL BUT OK)
       localStorage.setItem("token", data.session.access_token);
       localStorage.setItem("userId", data.user.id);
 
