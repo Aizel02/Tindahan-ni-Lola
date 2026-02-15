@@ -41,11 +41,12 @@ export default function ProductList() {
   const [showPrintConfirm, setShowPrintConfirm] = useState(false);
 
   const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    price: "",
-    description: "",
-  });
+  name: "",
+  category: "",
+  price: "",
+  description: "",
+  imageFile: null,
+});
 
   const [editProduct, setEditProduct] = useState(null);
   const [cart, setCart] = useState([]);
@@ -263,29 +264,45 @@ Thank you!
 
       {/* ADD MODAL */}
       {showAddModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Add Product</h3>
-            <input
-              placeholder="Name"
-              value={newProduct.name}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, name: e.target.value })
-              }
-            />
-            <input
-              placeholder="Price"
-              type="number"
-              value={newProduct.price}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, price: e.target.value })
-              }
-            />
-            <button onClick={handleAddProduct}>Save</button>
-            <button onClick={() => setShowAddModal(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
+  <div className="modal-overlay">
+    <div className="modal">
+      <h3>Add Product</h3>
+
+      {/* IMAGE UPLOAD */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) =>
+          setNewProduct({
+            ...newProduct,
+            imageFile: e.target.files[0],
+          })
+        }
+      />
+
+      <input
+        placeholder="Name"
+        value={newProduct.name}
+        onChange={(e) =>
+          setNewProduct({ ...newProduct, name: e.target.value })
+        }
+      />
+
+      <input
+        type="number"
+        placeholder="Price"
+        value={newProduct.price}
+        onChange={(e) =>
+          setNewProduct({ ...newProduct, price: e.target.value })
+        }
+      />
+
+      <button onClick={handleAddProduct}>Save</button>
+      <button onClick={() => setShowAddModal(false)}>Cancel</button>
+    </div>
+  </div>
+)}
+
 
       {/* EDIT MODAL */}
       {showEditModal && editProduct && (
