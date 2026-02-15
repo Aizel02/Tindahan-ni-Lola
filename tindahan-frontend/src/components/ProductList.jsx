@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./ProductList.css";
 import {
@@ -11,159 +11,148 @@ import {
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
-const fallbackImage = "/no-image.png";
-
-const CATEGORIES = [
-  "Biscuits",
-  "Canned Goods",
-  "Cigarettes",
-  "Coffee and Sugar",
-  "Condiments",
-  "Drinks",
-  "Juice",
-  "Liquor",
-  "Rice",
-  "Snacks",
-  "Soap and Downy",
-  "Shampoo",
-  "Others..",
-];
-
 export default function ProductList() {
-  // =========================
-  // STATES (ONLY WHAT IS USED)
-  // =========================
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
-    category: "",
     price: "",
+    category: "",
     description: "",
   });
 
-  const [editProduct, setEditProduct] = useState(null);
-  const [cart, setCart] = useState([]);
+  /* =========================
+     INIT USER + STORE
+  ========================= */
+  useEffect(() => {
+    const init = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-  const cartTotal = cart.reduce(
-    (sum, item) => sum + item.qty * item.price,
-    0
-  );
+      if (!session?.user) return;
 
-  // =========================
-  // FETCH PRODUCTS
-  // =========================
-  const fetchProducts = async () => {
+      setUser(session.user);
+
+      // 🏪 AUTO CREATE STORE
+      await supabase.from("stores").upsert({
+        user_id: session.user.id,
+        store_name: "My Store",
+      });
+
+      fetchProducts(session.user.id);
+    };
+
+    init();
+  }, []);
+
+  /* =========================
+     FETCH PRODUCTS (PER USER)
+  ========================= */
+  const fetchProducts = async (userId) => {
     setLoading(true);
 
     const { data } = await supabase
       .from("products")
       .select("*")
+      .eq("user_id", userId)
       .order("name");
 
     setProducts(data || []);
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  // =========================
-  // ADD PRODUCT
-  // =========================
+  /* =========================
+     ADD PRODUCT
+  ========================= */
   const handleAddProduct = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return;
-
-    await supabase.from("products").insert([
-      {
-        user_id: user.id,
-        name: newProduct.name,
-        category: newProduct.category,
-        price: Number(newProduct.price),
-        description: newProduct.description,
-      },
-    ]);
+    await supabase.from("products").insert({
+      ...newProduct,
+      price: Number(newProduct.price),
+      user_id: user.id,
+    });
 
     setShowAddModal(false);
-    setNewProduct({ name: "", category: "", price: "", description: "" });
-    fetchProducts();
+    setNewProduct({ name: "", price: "", category: "", description: "" });
+    fetchProducts(user.id);
   };
 
-  // =========================
-  // UPDATE PRODUCT
-  // =========================
-  const handleUpdateProduct = async () => {
-    if (!editProduct) return;
-
-    await supabase
-      .from("products")
-      .update({
-        name: editProduct.name,
-        category: editProduct.category,
-        price: Number(editProduct.price),
-        description: editProduct.description,
-      })
-      .eq("id", editProduct.id);
-
-    setShowEditModal(false);
-    fetchProducts();
-  };
-
-  // =========================
-  // DELETE PRODUCT
-  // =========================
+  /* =========================
+     DELETE (WITH CONFIRM)
+  ========================= */
   const handleDeleteProduct = async (id) => {
+    const ok = window.confirm("Delete this product?");
+    if (!ok) return;
+
     await supabase.from("products").delete().eq("id", id);
-    fetchProducts();
+    fetchProducts(user.id);
   };
 
-  // =========================
-  // CART
-  // =========================
+  /* =========================
+     CART
+  ========================= */
   const addToCart = (product) => {
     setCart((prev) => {
       const found = prev.find((i) => i.id === product.id);
-      if (found) {
+      if (found)
         return prev.map((i) =>
           i.id === product.id ? { ...i, qty: i.qty + 1 } : i
         );
-      }
+
       return [...prev, { ...product, qty: 1 }];
     });
   };
 
-  const removeFromCart = (id) =>
-    setCart((prev) => prev.filter((i) => i.id !== id));
+  const cartTotal = cart.reduce(
+    (sum, i) => sum + i.qty * i.price,
+    0
+  );
 
-  // =========================
-  // THERMAL PRINT
-  // =========================
-  const printReceipt = () => {
+  /* =========================
+     SAVE SALE + RECEIPT
+  ========================= */
+  const confirmSale = async () => {
+    const { data: sale } = await supabase
+      .from("sales")
+      .insert({
+        user_id: user.id,
+        total: cartTotal,
+      })
+      .select()
+      .single();
+
+    const receiptText = cart
+      .map((i) => `${i.name} x${i.qty} ₱${i.qty * i.price}`)
+      .join("\n");
+
+    await supabase.from("receipts").insert({
+      sale_id: sale.id,
+      content: receiptText,
+    });
+
+    printReceipt(receiptText);
+    setCart([]);
+    setShowCartModal(false);
+  };
+
+  /* =========================
+     PRINT
+  ========================= */
+  const printReceipt = (text) => {
     const win = window.open("", "_blank", "width=350,height=600");
     win.document.write(`
-      <pre style="font-family:monospace;width:80mm">
+      <pre style="font-family:Courier New;width:80mm">
 TINDAHAN NI LOLA
---------------------------
-${cart
-  .map(
-    (i) => `${i.name} x${i.qty} ₱${(i.qty * i.price).toFixed(2)}`
-  )
-  .join("\n")}
---------------------------
-TOTAL: ₱${cartTotal.toFixed(2)}
-THANK YOU!
+------------------
+${text}
+------------------
+TOTAL: ₱${cartTotal}
       </pre>
       <script>
         window.onload = () => { window.print(); window.close(); }
@@ -172,21 +161,9 @@ THANK YOU!
     win.document.close();
   };
 
-  // =========================
-  // FILTER
-  // =========================
-  const filteredProducts = products.filter((p) => {
-    const nameMatch = p.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const catMatch =
-      categoryFilter === "All" || p.category === categoryFilter;
-    return nameMatch && catMatch;
-  });
-
-  // =========================
-  // UI
-  // =========================
+  /* =========================
+     UI
+  ========================= */
   return (
     <div className="product-list-page">
       <Header
@@ -194,52 +171,17 @@ THANK YOU!
         onCartClick={() => setShowCartModal(true)}
       />
 
-      {/* FILTERS */}
-      <div className="filters">
-        <Search size={16} />
-        <input
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="All">All</option>
-          {CATEGORIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-
-        <button onClick={() => setShowAddModal(true)}>
-          <ShoppingCart size={16} /> Add Product
-        </button>
-      </div>
-
-      {/* PRODUCTS */}
       {loading ? (
         <Loader />
       ) : (
         <div className="product-grid">
-          {filteredProducts.map((p) => (
+          {products.map((p) => (
             <div key={p.id} className="product-card">
-              <img src={fallbackImage} alt={p.name} />
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
               <button onClick={() => addToCart(p)}>
                 <ShoppingCart size={14} />
-              </button>
-
-              <button
-                onClick={() => {
-                  setEditProduct(p);
-                  setShowEditModal(true);
-                }}
-              >
-                <Pencil size={14} />
               </button>
 
               <button onClick={() => handleDeleteProduct(p.id)}>
@@ -250,7 +192,6 @@ THANK YOU!
         </div>
       )}
 
-      {/* ADD MODAL */}
       {showAddModal && (
         <div className="modal">
           <input
@@ -271,30 +212,11 @@ THANK YOU!
         </div>
       )}
 
-      {/* EDIT MODAL */}
-      {showEditModal && editProduct && (
-        <div className="modal">
-          <input
-            value={editProduct.name}
-            onChange={(e) =>
-              setEditProduct({ ...editProduct, name: e.target.value })
-            }
-          />
-          <button onClick={handleUpdateProduct}>Update</button>
-        </div>
-      )}
-
-      {/* CART MODAL */}
       {showCartModal && (
         <div className="modal">
-          {cart.map((i) => (
-            <div key={i.id}>
-              {i.name} x{i.qty}
-              <button onClick={() => removeFromCart(i.id)}>x</button>
-            </div>
-          ))}
-          <button onClick={printReceipt}>
-            <Printer size={16} /> Print Receipt
+          <p>Total: ₱{cartTotal}</p>
+          <button onClick={confirmSale}>
+            <Printer size={16} /> Print & Save
           </button>
         </div>
       )}
