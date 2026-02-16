@@ -75,103 +75,160 @@
 .filters {
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  padding: 12px 16px;
-  margin-bottom: 12px;
-
-  /* keep it from stretching too much */
-  max-width: 1100px;
-  margin-inline: auto;
-}
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  background: #ffffff;
-  padding: 6px 10px;
-
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-
-  width: 260px;
+  gap: 12px;
+  padding: 16px 24px;
+  max-width: 1200px;
+  margin: 0 auto 24px;
 }
 
-.search-box svg {
+.filters svg {
   color: #6b7280;
-  flex-shrink: 0;
 }
 
-.search-box input {
-  border: none;
-  outline: none;
-  width: 100%;
-
-  font-size: 13px;
-}
-.filters select {
-  height: 34px;
-  padding: 0 10px;
-
-  font-size: 13px;
-
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-}
-.add-product-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  height: 34px;
-  padding: 0 14px;
-
-  background: #0b73b8;
-  color: #ffffff;
-
-  border: none;
-  border-radius: 8px;
-
-  font-size: 13px;
-  font-weight: 500;
-
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.add-product-btn svg {
-  flex-shrink: 0;
-}
-
-.add-product-btn:hover {
-  background: #095f99;
-}
-
-.add-product-btn:active {
-  transform: scale(0.96);
-}
-.no-products {
-  text-align: center;
-  padding: 80px 0;
-  color: #6b7280;
+.filters input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
   font-size: 14px;
 }
-@media (max-width: 640px) {
-  .filters {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
 
-  .search-box {
-    width: 100%;
-  }
+.filters select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 14px;
+}
 
-  .filters select,
-  .add-product-btn {
-    width: 100%;
+.filters button {
+  background: #7c83f7;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filters button:hover {
+  background: #6a70e6;
+}
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  background: #f9fafb;
+}
+
+.product-card h4 {
+  margin: 12px 14px 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.product-card p {
+  margin: 0 14px 12px;
+  color: #7c83f7;
+  font-size: 18px;
+  font-weight: 700;
+}
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  margin-top: auto;
+}
+
+.card-actions button {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-actions button:hover {
+  background: #f3f4f6;
+}
+
+.card-actions button:last-child {
+  color: #ef4444;
+  border-color: #fecaca;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  width: 360px;
+  animation: scaleFade 0.25s ease;
+}
+
+@keyframes scaleFade {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.delete-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn.danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.btn {
+  background: #f3f4f6;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
 }
 
 /* =========================
