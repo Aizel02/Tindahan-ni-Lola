@@ -68,21 +68,57 @@ export default function ProductList() {
 
   /* ================= ADD ================= */
   const handleAddProduct = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
-    await supabase.from("products").insert([{
+  let imageUrl = null;
+
+  // 1️⃣ Upload image if exists
+  if (newProduct.imageFile) {
+    const fileExt = newProduct.imageFile.name.split(".").pop();
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, newProduct.imageFile);
+
+    if (uploadError) {
+      alert("Image upload failed");
+      return;
+    }
+
+    // 2️⃣ Get public URL
+    const { data } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+
+    imageUrl = data.publicUrl;
+  }
+
+  // 3️⃣ Insert product with image_url
+  await supabase.from("products").insert([
+    {
       user_id: user.id,
       name: newProduct.name,
       category: newProduct.category,
       price: Number(newProduct.price),
       description: newProduct.description,
-    }]);
+      image_url: imageUrl,
+    },
+  ]);
 
-    setShowAddModal(false);
-    setNewProduct({ name: "", category: "", price: "", description: "" });
-    fetchProducts();
-  };
+  setShowAddModal(false);
+  setNewProduct({
+    name: "",
+    category: "",
+    price: "",
+    description: "",
+    imageFile: null,
+  });
+
+  fetchProducts();
+};
+
 
   /* ================= UPDATE ================= */
   const handleUpdateProduct = async () => {
@@ -193,7 +229,11 @@ window.onload = () => { window.print(); window.close(); }
         <div className="product-grid">
           {filteredProducts.map((p) => (
             <div key={p.id} className="product-card">
-              <img src={fallbackImage} alt={p.name} />
+              <img
+  src={p.image_url || fallbackImage}
+  alt={p.name}
+/>
+
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
