@@ -87,11 +87,12 @@ const uploadToCloudinary = async (file) => {
 
   const data = await res.json();
 
-  if (!data.secure_url) {
-    throw new Error("Cloudinary upload failed");
+  if (!res.ok) {
+    console.error("Cloudinary error:", data);
+    throw new Error("Image upload failed");
   }
 
-  return data.secure_url; // ✅ PERFECT IMAGE URL
+  return data.secure_url; // 👈 use THIS in <img src="">
 };
 
   /* ===================== ADD PRODUCT ===================== */
@@ -104,35 +105,31 @@ const uploadToCloudinary = async (file) => {
 
   let imageUrl = null;
 
-  try {
-    if (newProduct.imageFile) {
-      imageUrl = await uploadToCloudinary(newProduct.imageFile);
-    }
-
-    await supabase.from("products").insert([
-      {
-        user_id: user.id,
-        name: newProduct.name,
-        category: newProduct.category,
-        price: Number(newProduct.price),
-        image_url: imageUrl, // ✅ Cloudinary URL
-      },
-    ]);
-
-    setShowAddModal(false);
-    setNewProduct({
-      name: "",
-      category: "",
-      price: "",
-      imageFile: null,
-    });
-
-    fetchProducts();
-  } catch (err) {
-    console.error(err);
-    alert("Image upload failed");
+  if (newProduct.imageFile) {
+    imageUrl = await uploadToCloudinary(newProduct.imageFile);
   }
+
+  await supabase.from("products").insert([
+    {
+      user_id: user.id,
+      name: newProduct.name,
+      category: newProduct.category,
+      price: Number(newProduct.price),
+      image_url: imageUrl,
+    },
+  ]);
+
+  setShowAddModal(false);
+  setNewProduct({
+    name: "",
+    category: "",
+    price: "",
+    imageFile: null,
+  });
+
+  fetchProducts();
 };
+
 
 
   /* ===================== UPDATE PRODUCT ===================== */
