@@ -74,73 +74,58 @@
 ========================= */
 .filters {
   display: flex;
-  align-items: center; /* ✅ makes all same height */
+  align-items: center;
+  justify-content: center;
   gap: 12px;
   max-width: 1200px;
   margin: 0 auto 24px;
   padding: 16px 24px;
 }
-
-/* 🔍 SEARCH BOX */
 .search-box {
   display: flex;
-  align-items: center;           /* ✅ center vertically */
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
+
+  height: 42px;
+  padding: 0 14px;
+
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  padding: 0 14px;               /* ❌ wag vertical padding */
-  height: 42px;                  /* ✅ fixed height */
-  box-sizing: border-box;
 }
 
 .search-icon {
   color: #9ca3af;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
 }
 
-/* INPUT */
 .search-box input {
+  flex: 1;
+  height: 100%;
   border: none;
   outline: none;
   font-size: 14px;
-  height: 100%;                  /* ✅ match parent */
-  line-height: 1;
-  flex: 1;
   background: transparent;
-  padding: 0;                    /* ❌ alisin default padding */
 }
-
-/* FOCUS STATE */
-.search-box:focus-within {
-  border-color: #7c83f7;
-  box-shadow: 0 0 0 2px rgba(124, 131, 247, 0.15);
-}
-
-
-/* 🔽 SELECT */
 .filters select {
-  height: 42px; /* ✅ SAME HEIGHT */
+  height: 42px;
   padding: 0 14px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   background: #fff;
   font-size: 14px;
 }
-
-/* ➕ ADD PRODUCT BUTTON */
 .add-product-btn {
-  height: 42px; /* ✅ SAME HEIGHT */
-  background: #7c83f7;
-  color: white;
-  border: none;
+  height: 42px;
   padding: 0 18px;
-  border-radius: 10px;
+
   display: flex;
   align-items: center;
   gap: 8px;
+
+  background: #7c83f7;
+  color: white;
+  border: none;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -148,8 +133,7 @@
 .add-product-btn:hover {
   background: #6a70e6;
 }
-
-/* .product-grid {
+.product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
@@ -157,14 +141,14 @@
   margin: 0 auto;
   padding: 0 24px 40px;
 }
+
 .product-card {
   background: #fff;
   border-radius: 16px;
-  overflow: hidden;
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
-} */
+}
 
 .product-card img {
   width: 100%;
@@ -185,12 +169,7 @@
   font-size: 18px;
   font-weight: 700;
 }
-.card-actions {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  margin-top: auto;
-}
+
 
 @keyframes scaleFade {
   from {
@@ -417,41 +396,36 @@
   background: #2563eb;
   color: white;
 }
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  margin-top: auto;
+}
+
 .card-actions button {
+  flex: 1;
+  height: 36px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 32px;
-  height: 32px;
-
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 10px;
   cursor: pointer;
-  pointer-events: auto;
-
-  transition: background 0.2s ease, transform 0.1s ease;
 }
+
 .card-actions button:hover {
   background: #f3f4f6;
 }
 
-.card-actions button:active {
-  transform: scale(0.95);
-}
-.card-actions button:nth-child(1):hover {
-  background: #e0f2fe; /* add to cart */
+.card-actions button:last-child {
+  color: #ef4444;
+  border-color: #fecaca;
 }
 
-.card-actions button:nth-child(2):hover {
-  background: #fef3c7; /* edit */
-}
-
-.card-actions button:nth-child(3):hover {
-  background: #fee2e2; /* delete */
-}
 
  /* Overlay fade */
 .modal-overlay {
