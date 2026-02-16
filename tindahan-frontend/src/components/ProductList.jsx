@@ -33,12 +33,6 @@ export default function ProductList() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
-  const [showQtyModal, setShowQtyModal] = useState(false);
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-
-  const [cart, setCart] = useState([]);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -48,6 +42,7 @@ export default function ProductList() {
   });
 
   const [editProduct, setEditProduct] = useState(null);
+  const [cart, setCart] = useState([]);
 
   /* ===================== FETCH ===================== */
   const fetchProducts = async () => {
@@ -75,18 +70,16 @@ export default function ProductList() {
 
   /* ===================== IMAGE UPLOAD ===================== */
   const uploadImage = async (file, userId) => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${userId}/${Date.now()}.${fileExt}`;
+    const ext = file.name.split(".").pop();
+    const path = `${userId}/${Date.now()}.${ext}`;
 
-    const { error } = await supabase.storage
+    await supabase.storage
       .from("product-images")
-      .upload(fileName, file);
-
-    if (error) throw error;
+      .upload(path, file);
 
     const { data } = supabase.storage
       .from("product-images")
-      .getPublicUrl(fileName);
+      .getPublicUrl(path);
 
     return data.publicUrl;
   };
@@ -100,7 +93,6 @@ export default function ProductList() {
     if (!user) return;
 
     let imageUrl = null;
-
     if (newProduct.imageFile) {
       imageUrl = await uploadImage(newProduct.imageFile, user.id);
     }
@@ -142,26 +134,20 @@ export default function ProductList() {
       .eq("id", editProduct.id);
 
     setShowEditModal(false);
-    fetchProducts();
-  };
-
-  /* ===================== DELETE ===================== */
-  const handleDeleteProduct = async (id) => {
-    if (!window.confirm("Delete this product?")) return;
-    await supabase.from("products").delete().eq("id", id);
+    setEditProduct(null);
     fetchProducts();
   };
 
   /* ===================== CART ===================== */
-  const addToCart = (product, qty) => {
+  const addToCart = (product) => {
     setCart((prev) => {
       const found = prev.find((i) => i.id === product.id);
       if (found) {
         return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + qty } : i
+          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
         );
       }
-      return [...prev, { ...product, qty }];
+      return [...prev, { ...product, qty: 1 }];
     });
   };
 
@@ -208,7 +194,7 @@ export default function ProductList() {
         </select>
 
         <button onClick={() => setShowAddModal(true)}>
-          Add Product
+          <ShoppingCart size={16} /> Add Product
         </button>
       </div>
 
@@ -222,17 +208,16 @@ export default function ProductList() {
               <img
                 src={p.image_url || fallbackImage}
                 alt={p.name}
-                onClick={() => {
-                  setSelectedProduct(p);
-                  setQuantity(1);
-                  setShowQtyModal(true);
-                }}
               />
 
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
               <div className="card-actions">
+                <button onClick={() => addToCart(p)}>
+                  <ShoppingCart size={14} />
+                </button>
+
                 <button
                   onClick={() => {
                     setEditProduct(p);
@@ -242,7 +227,7 @@ export default function ProductList() {
                   <Pencil size={14} />
                 </button>
 
-                <button onClick={() => handleDeleteProduct(p.id)}>
+                <button>
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -255,7 +240,7 @@ export default function ProductList() {
       {showAddModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Add New Product</h3>
+            <h3>Add Product</h3>
 
             <input
               type="file"
@@ -300,7 +285,7 @@ export default function ProductList() {
               }
             />
 
-            <button onClick={handleAddProduct}>Add Product</button>
+            <button onClick={handleAddProduct}>Add</button>
             <button onClick={() => setShowAddModal(false)}>
               Cancel
             </button>
@@ -308,26 +293,52 @@ export default function ProductList() {
         </div>
       )}
 
-      {/* QTY MODAL */}
-      {showQtyModal && selectedProduct && (
+      {/* EDIT MODAL (THIS FIXES ESLINT) */}
+      {showEditModal && editProduct && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>{selectedProduct.name}</h3>
-            <p>₱{selectedProduct.price}</p>
+            <h3>Edit Product</h3>
 
-            <div className="qty-controls">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-              <span>{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
-            </div>
+            <input
+              value={editProduct.name}
+              onChange={(e) =>
+                setEditProduct({
+                  ...editProduct,
+                  name: e.target.value,
+                })
+              }
+            />
 
-            <button
-              onClick={() => {
-                addToCart(selectedProduct, quantity);
-                setShowQtyModal(false);
-              }}
+            <select
+              value={editProduct.category}
+              onChange={(e) =>
+                setEditProduct({
+                  ...editProduct,
+                  category: e.target.value,
+                })
+              }
             >
-              Add to Cart
+              {CATEGORIES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              value={editProduct.price}
+              onChange={(e) =>
+                setEditProduct({
+                  ...editProduct,
+                  price: e.target.value,
+                })
+              }
+            />
+
+            <button onClick={handleUpdateProduct}>
+              Update
+            </button>
+            <button onClick={() => setShowEditModal(false)}>
+              Cancel
             </button>
           </div>
         </div>
@@ -337,7 +348,7 @@ export default function ProductList() {
       {showCartModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Shopping Cart</h3>
+            <h3>Cart</h3>
 
             {cart.map((i) => (
               <p key={i.id}>
