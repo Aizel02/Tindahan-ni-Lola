@@ -220,27 +220,31 @@ const confirmDeleteProduct = async () => {
 
       {/* FILTER BAR */}
       <div className="filters">
-        <Search size={16} />
-        <input
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+  <div className="search-box">
+    <Search size={16} />
+    <input
+      placeholder="Search products..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+  </div>
 
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="All">All Categories</option>
-          {CATEGORIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
+  <select
+    value={categoryFilter}
+    onChange={(e) => setCategoryFilter(e.target.value)}
+  >
+    <option value="All">All Categories</option>
+    {CATEGORIES.map((c) => (
+      <option key={c}>{c}</option>
+    ))}
+  </select>
 
-        <button onClick={() => setShowAddModal(true)}>
-          <ShoppingCart size={16} /> Add Product
-        </button>
-      </div>
+  <button className="add-product-btn" onClick={() => setShowAddModal(true)}>
+    <ShoppingCart size={16} />
+    Add Product
+  </button>
+</div>
+
 
       {/* PRODUCTS */}
       {loading ? (

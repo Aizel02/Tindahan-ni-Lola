@@ -74,49 +74,67 @@
 ========================= */
 .filters {
   display: flex;
-  align-items: center;
+  align-items: center; /* ✅ makes all same height */
   gap: 12px;
-  padding: 16px 24px;
   max-width: 1200px;
   margin: 0 auto 24px;
+  padding: 16px 24px;
 }
 
-.filters svg {
-  color: #6b7280;
-}
-
-.filters input {
-  flex: 1;
-  padding: 10px 14px;
-  border-radius: 10px;
+/* 🔍 SEARCH BOX */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
   border: 1px solid #e5e7eb;
-  font-size: 14px;
+  border-radius: 10px;
+  padding: 0 14px;
+  height: 42px; /* ✅ SAME HEIGHT */
+  flex: 1;
 }
 
+.search-box svg {
+  color: #9ca3af;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  flex: 1;
+  height: 100%;
+}
+
+/* 🔽 SELECT */
 .filters select {
-  padding: 10px 14px;
+  height: 42px; /* ✅ SAME HEIGHT */
+  padding: 0 14px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   background: #fff;
   font-size: 14px;
 }
 
-.filters button {
+/* ➕ ADD PRODUCT BUTTON */
+.add-product-btn {
+  height: 42px; /* ✅ SAME HEIGHT */
   background: #7c83f7;
   color: white;
   border: none;
-  padding: 10px 18px;
+  padding: 0 18px;
   border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 600;
   cursor: pointer;
 }
 
-.filters button:hover {
+.add-product-btn:hover {
   background: #6a70e6;
 }
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
