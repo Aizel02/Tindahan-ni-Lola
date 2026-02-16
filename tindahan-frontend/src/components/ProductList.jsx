@@ -22,24 +22,6 @@ const CATEGORIES = [
   "Others",
 ];
 
-/* ================= IMAGE UPLOAD ================= */
-const uploadImage = async (file, userId) => {
-  const ext = file.name.split(".").pop();
-  const fileName = `${userId}/${Date.now()}.${ext}`;
-
-  const { error } = await supabase.storage
-    .from("product-images")
-    .upload(fileName, file);
-
-  if (error) throw error;
-
-  const { data } = supabase.storage
-    .from("product-images")
-    .getPublicUrl(fileName);
-
-  return data.publicUrl;
-};
-
 export default function ProductList() {
   /* ================= STATES ================= */
   const [products, setProducts] = useState([]);
@@ -50,18 +32,13 @@ export default function ProductList() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
-  const [showQtyModal, setShowQtyModal] = useState(false);
   const [showPrintConfirm, setShowPrintConfirm] = useState(false);
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
     price: "",
     description: "",
-    imageFile: null,
   });
 
   const [editProduct, setEditProduct] = useState(null);
@@ -94,39 +71,22 @@ export default function ProductList() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    let imageUrl = null;
-    if (newProduct.imageFile) {
-      imageUrl = await uploadImage(newProduct.imageFile, user.id);
-    }
-
     await supabase.from("products").insert([{
       user_id: user.id,
       name: newProduct.name,
       category: newProduct.category,
       price: Number(newProduct.price),
       description: newProduct.description,
-      image_url: imageUrl,
     }]);
 
     setShowAddModal(false);
-    setNewProduct({
-      name: "",
-      category: "",
-      price: "",
-      description: "",
-      imageFile: null,
-    });
+    setNewProduct({ name: "", category: "", price: "", description: "" });
     fetchProducts();
   };
 
   /* ================= UPDATE ================= */
   const handleUpdateProduct = async () => {
-    let imageUrl = editProduct.image_url;
-
-    if (editProduct.imageFile) {
-      const { data: { user } } = await supabase.auth.getUser();
-      imageUrl = await uploadImage(editProduct.imageFile, user.id);
-    }
+    if (!editProduct) return;
 
     await supabase
       .from("products")
@@ -135,7 +95,6 @@ export default function ProductList() {
         category: editProduct.category,
         price: Number(editProduct.price),
         description: editProduct.description,
-        image_url: imageUrl,
       })
       .eq("id", editProduct.id);
 
@@ -151,15 +110,15 @@ export default function ProductList() {
   };
 
   /* ================= CART ================= */
-  const addToCart = (product, qty = 1) => {
+  const addToCart = (product) => {
     setCart((prev) => {
       const found = prev.find((i) => i.id === product.id);
       if (found) {
         return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + qty } : i
+          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
         );
       }
-      return [...prev, { ...product, qty }];
+      return [...prev, { ...product, qty: 1 }];
     });
   };
 
@@ -172,13 +131,13 @@ export default function ProductList() {
     win.document.write(`
 <pre style="font-family:monospace;font-size:12px;width:80mm">
 TINDAHAN NI LOLA
------------------------------
+---------------------------
 ${cart.map(i =>
 `${i.name} x${i.qty} ₱${(i.qty * i.price).toFixed(2)}`
 ).join("\n")}
------------------------------
+---------------------------
 TOTAL: ₱${cartTotal.toFixed(2)}
-Thank you!
+THANK YOU!
 </pre>
 <script>
 window.onload = () => { window.print(); window.close(); }
@@ -187,15 +146,8 @@ window.onload = () => { window.print(); window.close(); }
     win.document.close();
   };
 
-  const confirmSale = () => {
-    printReceipt();
-    setCart([]);
-    setShowPrintConfirm(false);
-    setShowCartModal(false);
-  };
-
   /* ================= FILTER ================= */
-  const filteredProducts = products.filter(p => {
+  const filteredProducts = products.filter((p) => {
     const nameMatch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
     const catMatch =
       categoryFilter === "All" || p.category === categoryFilter;
@@ -205,7 +157,10 @@ window.onload = () => { window.print(); window.close(); }
   /* ================= UI ================= */
   return (
     <div className="product-list-page">
-      <Header cartCount={cart.length} onCartClick={() => setShowCartModal(true)} />
+      <Header
+        cartCount={cart.length}
+        onCartClick={() => setShowCartModal(true)}
+      />
 
       {/* FILTERS */}
       <div className="filters">
@@ -221,7 +176,9 @@ window.onload = () => { window.print(); window.close(); }
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="All">All Categories</option>
-          {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
         </select>
 
         <button onClick={() => setShowAddModal(true)}>
@@ -234,17 +191,9 @@ window.onload = () => { window.print(); window.close(); }
         <p>Loading...</p>
       ) : (
         <div className="product-grid">
-          {filteredProducts.map(p => (
+          {filteredProducts.map((p) => (
             <div key={p.id} className="product-card">
-              <img
-                src={p.image_url || fallbackImage}
-                alt={p.name}
-                onClick={() => {
-                  setSelectedProduct(p);
-                  setQuantity(1);
-                  setShowQtyModal(true);
-                }}
-              />
+              <img src={fallbackImage} alt={p.name} />
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
@@ -264,28 +213,45 @@ window.onload = () => { window.print(); window.close(); }
         </div>
       )}
 
-      {/* Quantity Modal */}
-      {showQtyModal && selectedProduct && (
+      {/* ADD MODAL */}
+      {showAddModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>{selectedProduct.name}</h3>
-            <img
-              className="qty-image"
-              src={selectedProduct.image_url || fallbackImage}
-              alt=""
+            <h3>Add Product</h3>
+            <input
+              placeholder="Name"
+              value={newProduct.name}
+              onChange={(e) =>
+                setNewProduct({ ...newProduct, name: e.target.value })
+              }
             />
-            <div className="qty-controls">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-              <span>{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
-            </div>
-            <button onClick={() => {
-              addToCart(selectedProduct, quantity);
-              setShowQtyModal(false);
-            }}>
-              Add to Cart
-            </button>
-            <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+            <input
+              type="number"
+              placeholder="Price"
+              value={newProduct.price}
+              onChange={(e) =>
+                setNewProduct({ ...newProduct, price: e.target.value })
+              }
+            />
+            <button onClick={handleAddProduct}>Save</button>
+            <button onClick={() => setShowAddModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT MODAL */}
+      {showEditModal && editProduct && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit Product</h3>
+            <input
+              value={editProduct.name}
+              onChange={(e) =>
+                setEditProduct({ ...editProduct, name: e.target.value })
+              }
+            />
+            <button onClick={handleUpdateProduct}>Update</button>
+            <button onClick={() => setShowEditModal(false)}>Cancel</button>
           </div>
         </div>
       )}
@@ -295,7 +261,7 @@ window.onload = () => { window.print(); window.close(); }
         <div className="modal-overlay">
           <div className="modal">
             <h3>Shopping Cart</h3>
-            {cart.map(i => (
+            {cart.map((i) => (
               <div key={i.id}>
                 {i.name} x{i.qty}
                 <button onClick={() => removeFromCart(i.id)}>✖</button>
@@ -316,15 +282,13 @@ window.onload = () => { window.print(); window.close(); }
           <div className="modal">
             <h3>Confirm Print</h3>
             <p>Total: ₱{cartTotal.toFixed(2)}</p>
-            <button onClick={confirmSale}>Yes, Print</button>
+            <button onClick={printReceipt}>Yes, Print</button>
             <button onClick={() => setShowPrintConfirm(false)}>Cancel</button>
           </div>
         </div>
       )}
 
-      <footer className="app-footer">
-        © 2025 Tindahan ni Lola
-      </footer>
+      <footer className="app-footer">© 2025 Tindahan ni Lola</footer>
     </div>
   );
 }
