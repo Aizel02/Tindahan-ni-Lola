@@ -33,6 +33,9 @@ export default function ProductList() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [productToDelete, setProductToDelete] = useState(null);
+
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -160,19 +163,67 @@ const uploadToCloudinary = async (file) => {
   }
 };
 // ===================== DELETE PRODUCT (DITO 👇) =====================
-const handleDeleteProduct = async (product) => {
-  const confirmDelete = window.confirm(
-    `Delete "${product.name}"?`
-  );
+// const handleDeleteProduct = async (product) => {
+//   const confirmDelete = window.confirm(
+//     `Delete "${product.name}"?`
+//   );
 
-  if (!confirmDelete) return;
+//   if (!confirmDelete) return;
 
-  // 🔥 optional: delete image from Cloudinary later
+//   // 🔥 optional: delete image from Cloudinary later
+//   await supabase
+//     .from("products")
+//     .delete()
+//     .eq("id", product.id);
+
+//   fetchProducts();
+// };
+const handleDeleteClick = (product) => {
+  setProductToDelete(product);
+  setShowDeleteModal(true);
+};
+{showDeleteModal && productToDelete && (
+  <div className="modal-overlay">
+    <div className="modal delete-modal">
+      <h3>Delete Product</h3>
+
+      <p>
+        Are you sure you want to delete
+        <strong> "{productToDelete.name}"</strong>?
+      </p>
+
+      <div className="modal-actions">
+        <button
+          className="btn danger"
+          onClick={confirmDeleteProduct}
+        >
+          Delete
+        </button>
+
+        <button
+          className="btn"
+          onClick={() => {
+            setShowDeleteModal(false);
+            setProductToDelete(null);
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+const confirmDeleteProduct = async () => {
+  if (!productToDelete) return;
+
   await supabase
     .from("products")
     .delete()
-    .eq("id", product.id);
+    .eq("id", productToDelete.id);
 
+  setShowDeleteModal(false);
+  setProductToDelete(null);
   fetchProducts();
 };
 
@@ -270,12 +321,10 @@ const handleDeleteProduct = async (product) => {
                   <Pencil size={14} />
                 </button>
 
-                <button
-  onClick={() => handleDeleteProduct(p)}
-  className="delete-btn"
->
+                <button onClick={() => handleDeleteClick(p)}>
   <Trash2 size={14} />
 </button>
+
 
               </div>
             </div>

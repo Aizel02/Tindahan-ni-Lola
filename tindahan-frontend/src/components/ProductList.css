@@ -320,6 +320,37 @@
   pointer-events: auto;
   cursor: pointer;
 }
+  .delete-modal {
+  max-width: 380px;
+  text-align: center;
+}
+
+.delete-modal p {
+  margin: 16px 0 24px;
+  color: #444;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.danger {
+  background: #e53935;
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #c62828;
+}
 
 /* =========================
    FOOTER
