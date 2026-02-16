@@ -163,56 +163,10 @@ const uploadToCloudinary = async (file) => {
   }
 };
 // ===================== DELETE PRODUCT (DITO 👇) =====================
-// const handleDeleteProduct = async (product) => {
-//   const confirmDelete = window.confirm(
-//     `Delete "${product.name}"?`
-//   );
-
-//   if (!confirmDelete) return;
-
-//   // 🔥 optional: delete image from Cloudinary later
-//   await supabase
-//     .from("products")
-//     .delete()
-//     .eq("id", product.id);
-
-//   fetchProducts();
-// };
 const handleDeleteClick = (product) => {
   setProductToDelete(product);
   setShowDeleteModal(true);
 };
-{showDeleteModal && productToDelete && (
-  <div className="modal-overlay">
-    <div className="modal delete-modal">
-      <h3>Delete Product</h3>
-
-      <p>
-        Are you sure you want to delete
-        <strong> "{productToDelete.name}"</strong>?
-      </p>
-
-      <div className="modal-actions">
-        <button
-          className="btn danger"
-          onClick={confirmDeleteProduct}
-        >
-          Delete
-        </button>
-
-        <button
-          className="btn"
-          onClick={() => {
-            setShowDeleteModal(false);
-            setProductToDelete(null);
-          }}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
 
 const confirmDeleteProduct = async () => {
   if (!productToDelete) return;
@@ -226,6 +180,7 @@ const confirmDeleteProduct = async () => {
   setProductToDelete(null);
   fetchProducts();
 };
+
 
   /* ===================== CART ===================== */
   const addToCart = (product) => {
@@ -324,8 +279,44 @@ const confirmDeleteProduct = async () => {
                 <button onClick={() => handleDeleteClick(p)}>
   <Trash2 size={14} />
 </button>
+{/* DELETE CONFIRM MODAL */}
+{showDeleteModal && productToDelete && (
+  <div
+    className="modal-overlay"
+    onClick={() => {
+      setShowDeleteModal(false);
+      setProductToDelete(null);
+    }}
+  >
+    <div
+      className="modal delete-modal animate-scale"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h3>Delete Product</h3>
 
+      <p>
+        Are you sure you want to delete
+        <strong> “{productToDelete.name}”</strong>?
+      </p>
 
+      <div className="modal-actions">
+        <button className="btn danger" onClick={confirmDeleteProduct}>
+          Delete
+        </button>
+
+        <button
+          className="btn"
+          onClick={() => {
+            setShowDeleteModal(false);
+            setProductToDelete(null);
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
               </div>
             </div>
           ))}
