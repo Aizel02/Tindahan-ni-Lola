@@ -221,13 +221,15 @@ const confirmDeleteProduct = async () => {
       {/* FILTER BAR */}
       <div className="filters">
   <div className="search-box">
-    <Search size={16} />
-    <input
-      placeholder="Search products..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-  </div>
+  <Search className="search-icon" size={16} />
+  <input
+    type="text"
+    placeholder="Search products..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+</div>
+
 
   <select
     value={categoryFilter}

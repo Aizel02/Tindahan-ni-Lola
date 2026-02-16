@@ -84,27 +84,41 @@
 /* 🔍 SEARCH BOX */
 .search-box {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: center;           /* ✅ center vertically */
+  gap: 10px;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  padding: 0 14px;
-  height: 42px; /* ✅ SAME HEIGHT */
-  flex: 1;
+  padding: 0 14px;               /* ❌ wag vertical padding */
+  height: 42px;                  /* ✅ fixed height */
+  box-sizing: border-box;
 }
 
-.search-box svg {
+.search-icon {
   color: #9ca3af;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
+/* INPUT */
 .search-box input {
   border: none;
   outline: none;
   font-size: 14px;
+  height: 100%;                  /* ✅ match parent */
+  line-height: 1;
   flex: 1;
-  height: 100%;
+  background: transparent;
+  padding: 0;                    /* ❌ alisin default padding */
 }
+
+/* FOCUS STATE */
+.search-box:focus-within {
+  border-color: #7c83f7;
+  box-shadow: 0 0 0 2px rgba(124, 131, 247, 0.15);
+}
+
 
 /* 🔽 SELECT */
 .filters select {
