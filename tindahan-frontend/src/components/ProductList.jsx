@@ -69,48 +69,58 @@ export default function ProductList() {
   }, []);
 
   /* ===================== IMAGE UPLOAD ===================== */
-  const uploadImage = async (file, userId) => {
-    const ext = file.name.split(".").pop();
-    const path = `${userId}/${Date.now()}.${ext}`;
+ const uploadImage = async (file, userId) => {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${userId}/${crypto.randomUUID()}.${fileExt}`;
 
-    await supabase.storage
-      .from("product-images")
-      .upload(path, file);
+  const { error } = await supabase.storage
+    .from("product-images")
+    .upload(fileName, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
 
-    const { data } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(path);
+  if (error) {
+    console.error("Upload error:", error);
+    return null;
+  }
 
-    return data.publicUrl;
-  };
+  const { data } = supabase.storage
+    .from("product-images")
+    .getPublicUrl(fileName);
+
+  return data.publicUrl; // ✅ THIS is what <img> needs
+};
+
 
   /* ===================== ADD PRODUCT ===================== */
-  const handleAddProduct = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+ const handleAddProduct = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (!user) return;
+  if (!user) return;
 
-    let imageUrl = null;
-    if (newProduct.imageFile) {
-      imageUrl = await uploadImage(newProduct.imageFile, user.id);
-    }
+  let imageUrl = null;
 
-    await supabase.from("products").insert([
-      {
-        user_id: user.id,
-        name: newProduct.name,
-        category: newProduct.category,
-        price: Number(newProduct.price),
-        image_url: imageUrl,
-      },
-    ]);
+  if (newProduct.imageFile) {
+    imageUrl = await uploadImage(newProduct.imageFile, user.id);
+  }
 
-    setShowAddModal(false);
-    setNewProduct({ name: "", category: "", price: "", imageFile: null });
-    fetchProducts();
-  };
+  await supabase.from("products").insert([
+    {
+      user_id: user.id,
+      name: newProduct.name,
+      category: newProduct.category,
+      price: Number(newProduct.price),
+      image_url: imageUrl, // ✅ SAVE PUBLIC URL
+    },
+  ]);
+
+  setShowAddModal(false);
+  fetchProducts();
+};
+
 
   /* ===================== UPDATE PRODUCT ===================== */
   const handleUpdateProduct = async () => {
@@ -206,9 +216,14 @@ export default function ProductList() {
           {filteredProducts.map((p) => (
             <div key={p.id} className="product-card">
               <img
-                src={p.image_url || fallbackImage}
-                alt={p.name}
-              />
+  src={p.image_url || fallbackImage}
+  alt={p.name}
+  onError={(e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = fallbackImage;
+  }}
+/>
+
 
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
