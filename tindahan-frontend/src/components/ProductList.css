@@ -316,6 +316,10 @@
   background: #2563eb;
   color: white;
 }
+.card-actions button {
+  pointer-events: auto;
+  cursor: pointer;
+}
 
 /* =========================
    FOOTER

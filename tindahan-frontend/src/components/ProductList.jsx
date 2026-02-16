@@ -159,7 +159,22 @@ const uploadToCloudinary = async (file) => {
     alert("Update failed");
   }
 };
+// ===================== DELETE PRODUCT (DITO 👇) =====================
+const handleDeleteProduct = async (product) => {
+  const confirmDelete = window.confirm(
+    `Delete "${product.name}"?`
+  );
 
+  if (!confirmDelete) return;
+
+  // 🔥 optional: delete image from Cloudinary later
+  await supabase
+    .from("products")
+    .delete()
+    .eq("id", product.id);
+
+  fetchProducts();
+};
 
   /* ===================== CART ===================== */
   const addToCart = (product) => {
@@ -255,9 +270,13 @@ const uploadToCloudinary = async (file) => {
                   <Pencil size={14} />
                 </button>
 
-                <button>
-                  <Trash2 size={14} />
-                </button>
+                <button
+  onClick={() => handleDeleteProduct(p)}
+  className="delete-btn"
+>
+  <Trash2 size={14} />
+</button>
+
               </div>
             </div>
           ))}
