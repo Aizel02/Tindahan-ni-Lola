@@ -103,21 +103,50 @@ export default function ProductList() {
 
   let imageUrl = null;
 
+  // 1️⃣ Upload image if exists
   if (newProduct.imageFile) {
-    imageUrl = await uploadImage(newProduct.imageFile, user.id);
+    const fileExt = newProduct.imageFile.name.split(".").pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("products")
+      .upload(fileName, newProduct.imageFile);
+
+    if (uploadError) {
+      alert("Image upload failed");
+      console.error(uploadError);
+      return;
+    }
+
+    // 2️⃣ Get public URL
+    const { data } = supabase.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    imageUrl = data.publicUrl;
   }
 
+  // 3️⃣ Save product with image_url
   await supabase.from("products").insert([
     {
       user_id: user.id,
       name: newProduct.name,
       category: newProduct.category,
       price: Number(newProduct.price),
-      image_url: imageUrl, // ✅ SAVE PUBLIC URL
+      description: newProduct.description,
+      image_url: imageUrl,
     },
   ]);
 
   setShowAddModal(false);
+  setNewProduct({
+    name: "",
+    category: "",
+    price: "",
+    description: "",
+    imageFile: null,
+  });
+
   fetchProducts();
 };
 
@@ -256,40 +285,46 @@ export default function ProductList() {
         <div className="modal-overlay">
           <div className="modal">
             <h3>Add Product</h3>
+<input
+  placeholder="Product Name"
+  value={newProduct.name}
+  onChange={(e) =>
+    setNewProduct({ ...newProduct, name: e.target.value })
+  }
+/>
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  imageFile: e.target.files[0],
-                })
-              }
-            />
+<select
+  value={newProduct.category}
+  onChange={(e) =>
+    setNewProduct({ ...newProduct, category: e.target.value })
+  }
+>
+  <option value="">Select Category</option>
+  {CATEGORIES.map((c) => (
+    <option key={c} value={c}>{c}</option>
+  ))}
+</select>
 
-            <input
-              placeholder="Product Name"
-              value={newProduct.name}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, name: e.target.value })
-              }
-            />
+<input
+  type="number"
+  placeholder="Price"
+  value={newProduct.price}
+  onChange={(e) =>
+    setNewProduct({ ...newProduct, price: e.target.value })
+  }
+/>
 
-            <select
-              value={newProduct.category}
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  category: e.target.value,
-                })
-              }
-            >
-              <option value="">Select category</option>
-              {CATEGORIES.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
+<input
+  type="file"
+  accept="image/*"
+  onChange={(e) =>
+    setNewProduct({
+      ...newProduct,
+      imageFile: e.target.files[0],
+    })
+  }
+/>
+
 
             <input
               type="number"
