@@ -23,7 +23,7 @@ export default function Header({ cartCount = 0, onCartClick }) {
 
         <div className="header-right">
           <button className="back-btn" onClick={() => navigate("/")}>
-            <Home size={12} /> Back to Home
+            <Home size={12} /> Lohout
           </button>
 
           {/* ✅ SHOW ONLY IN PRODUCTS */}
