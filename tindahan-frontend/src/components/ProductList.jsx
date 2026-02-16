@@ -103,37 +103,36 @@ export default function ProductList() {
 
   let imageUrl = null;
 
-  // 1️⃣ Upload image if exists
   if (newProduct.imageFile) {
     const fileExt = newProduct.imageFile.name.split(".").pop();
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    const filePath = `${user.id}/${Date.now()}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
-      .from("products")
-      .upload(fileName, newProduct.imageFile);
+      .from("product-images")
+      .upload(filePath, newProduct.imageFile, {
+        cacheControl: "3600",
+        upsert: false,
+      });
 
     if (uploadError) {
-      alert("Image upload failed");
       console.error(uploadError);
+      alert("Image upload failed");
       return;
     }
 
-    // 2️⃣ Get public URL
     const { data } = supabase.storage
-      .from("products")
-      .getPublicUrl(fileName);
+      .from("product-images")
+      .getPublicUrl(filePath);
 
     imageUrl = data.publicUrl;
   }
 
-  // 3️⃣ Save product with image_url
   await supabase.from("products").insert([
     {
       user_id: user.id,
       name: newProduct.name,
       category: newProduct.category,
       price: Number(newProduct.price),
-      description: newProduct.description,
       image_url: imageUrl,
     },
   ]);
@@ -143,13 +142,11 @@ export default function ProductList() {
     name: "",
     category: "",
     price: "",
-    description: "",
     imageFile: null,
   });
 
   fetchProducts();
 };
-
 
   /* ===================== UPDATE PRODUCT ===================== */
   const handleUpdateProduct = async () => {
@@ -285,6 +282,16 @@ export default function ProductList() {
         <div className="modal-overlay">
           <div className="modal">
             <h3>Add Product</h3>
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) =>
+    setNewProduct({
+      ...newProduct,
+      imageFile: e.target.files[0],
+    })
+  }
+/>
 <input
   placeholder="Product Name"
   value={newProduct.name}
@@ -313,27 +320,14 @@ export default function ProductList() {
     setNewProduct({ ...newProduct, price: e.target.value })
   }
 />
-
-<input
-  type="file"
-  accept="image/*"
-  onChange={(e) =>
-    setNewProduct({
-      ...newProduct,
-      imageFile: e.target.files[0],
-    })
-  }
-/>
-
-
-            <input
+            {/* <input
               type="number"
               placeholder="Price"
               value={newProduct.price}
               onChange={(e) =>
                 setNewProduct({ ...newProduct, price: e.target.value })
               }
-            />
+            /> */}
 
             <button onClick={handleAddProduct}>Add</button>
             <button onClick={() => setShowAddModal(false)}>
