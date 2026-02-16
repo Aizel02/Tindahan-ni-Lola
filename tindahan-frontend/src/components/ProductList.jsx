@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import {
-  Pencil,
-  ShoppingCart,
-  Trash2,
-  Printer,
-  Search,
-} from "lucide-react";
+import { Pencil, ShoppingCart, Trash2, Printer, Search } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 const fallbackImage = "/no-image.png";
@@ -28,6 +22,24 @@ const CATEGORIES = [
   "Others",
 ];
 
+/* ================= IMAGE UPLOAD ================= */
+const uploadImage = async (file, userId) => {
+  const ext = file.name.split(".").pop();
+  const fileName = `${userId}/${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("product-images")
+    .upload(fileName, file);
+
+  if (error) throw error;
+
+  const { data } = supabase.storage
+    .from("product-images")
+    .getPublicUrl(fileName);
+
+  return data.publicUrl;
+};
+
 export default function ProductList() {
   /* ================= STATES ================= */
   const [products, setProducts] = useState([]);
@@ -39,11 +51,10 @@ export default function ProductList() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
   const [showQtyModal, setShowQtyModal] = useState(false);
+  const [showPrintConfirm, setShowPrintConfirm] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-
-  const [cart, setCart] = useState([]);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -54,37 +65,14 @@ export default function ProductList() {
   });
 
   const [editProduct, setEditProduct] = useState(null);
+  const [cart, setCart] = useState([]);
 
-  const cartTotal = cart.reduce(
-    (sum, i) => sum + i.qty * i.price,
-    0
-  );
-
-  /* ================= IMAGE UPLOAD ================= */
-  const uploadImage = async (file, userId) => {
-    const ext = file.name.split(".").pop();
-    const fileName = `${userId}-${Date.now()}.${ext}`;
-
-    const { error } = await supabase.storage
-      .from("product-images")
-      .upload(fileName, file);
-
-    if (error) throw error;
-
-    const { data } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(fileName);
-
-    return data.publicUrl;
-  };
+  const cartTotal = cart.reduce((s, i) => s + i.qty * i.price, 0);
 
   /* ================= FETCH ================= */
   const fetchProducts = async () => {
     setLoading(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const { data } = await supabase
@@ -101,27 +89,24 @@ export default function ProductList() {
     fetchProducts();
   }, []);
 
-  /* ================= ADD PRODUCT ================= */
+  /* ================= ADD ================= */
   const handleAddProduct = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
     let imageUrl = null;
     if (newProduct.imageFile) {
       imageUrl = await uploadImage(newProduct.imageFile, user.id);
     }
 
-    await supabase.from("products").insert([
-      {
-        user_id: user.id,
-        name: newProduct.name,
-        category: newProduct.category,
-        price: Number(newProduct.price),
-        description: newProduct.description,
-        image_url: imageUrl,
-      },
-    ]);
+    await supabase.from("products").insert([{
+      user_id: user.id,
+      name: newProduct.name,
+      category: newProduct.category,
+      price: Number(newProduct.price),
+      description: newProduct.description,
+      image_url: imageUrl,
+    }]);
 
     setShowAddModal(false);
     setNewProduct({
@@ -131,18 +116,15 @@ export default function ProductList() {
       description: "",
       imageFile: null,
     });
-
     fetchProducts();
   };
 
-  /* ================= UPDATE PRODUCT ================= */
+  /* ================= UPDATE ================= */
   const handleUpdateProduct = async () => {
     let imageUrl = editProduct.image_url;
 
     if (editProduct.imageFile) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       imageUrl = await uploadImage(editProduct.imageFile, user.id);
     }
 
@@ -188,30 +170,33 @@ export default function ProductList() {
   const printReceipt = () => {
     const win = window.open("", "_blank", "width=350,height=600");
     win.document.write(`
-      <pre style="font-family:monospace;font-size:12px;width:80mm">
+<pre style="font-family:monospace;font-size:12px;width:80mm">
 TINDAHAN NI LOLA
---------------------------
-${cart
-  .map(
-    (i) => `${i.name} x${i.qty} ₱${(i.qty * i.price).toFixed(2)}`
-  )
-  .join("\n")}
---------------------------
+-----------------------------
+${cart.map(i =>
+`${i.name} x${i.qty} ₱${(i.qty * i.price).toFixed(2)}`
+).join("\n")}
+-----------------------------
 TOTAL: ₱${cartTotal.toFixed(2)}
-THANK YOU!
-      </pre>
-      <script>
-        window.onload = () => { window.print(); window.close(); }
-      </script>
-    `);
+Thank you!
+</pre>
+<script>
+window.onload = () => { window.print(); window.close(); }
+</script>
+`);
     win.document.close();
   };
 
+  const confirmSale = () => {
+    printReceipt();
+    setCart([]);
+    setShowPrintConfirm(false);
+    setShowCartModal(false);
+  };
+
   /* ================= FILTER ================= */
-  const filteredProducts = products.filter((p) => {
-    const nameMatch = p.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+  const filteredProducts = products.filter(p => {
+    const nameMatch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
     const catMatch =
       categoryFilter === "All" || p.category === categoryFilter;
     return nameMatch && catMatch;
@@ -220,10 +205,7 @@ THANK YOU!
   /* ================= UI ================= */
   return (
     <div className="product-list-page">
-      <Header
-        cartCount={cart.length}
-        onCartClick={() => setShowCartModal(true)}
-      />
+      <Header cartCount={cart.length} onCartClick={() => setShowCartModal(true)} />
 
       {/* FILTERS */}
       <div className="filters">
@@ -239,9 +221,7 @@ THANK YOU!
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="All">All Categories</option>
-          {CATEGORIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
+          {CATEGORIES.map(c => <option key={c}>{c}</option>)}
         </select>
 
         <button onClick={() => setShowAddModal(true)}>
@@ -254,7 +234,7 @@ THANK YOU!
         <p>Loading...</p>
       ) : (
         <div className="product-grid">
-          {filteredProducts.map((p) => (
+          {filteredProducts.map(p => (
             <div key={p.id} className="product-card">
               <img
                 src={p.image_url || fallbackImage}
@@ -265,7 +245,6 @@ THANK YOU!
                   setShowQtyModal(true);
                 }}
               />
-
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
@@ -273,14 +252,9 @@ THANK YOU!
                 <button onClick={() => addToCart(p)}>
                   <ShoppingCart size={14} />
                 </button>
-
-                <button onClick={() => {
-                  setEditProduct(p);
-                  setShowEditModal(true);
-                }}>
+                <button onClick={() => { setEditProduct(p); setShowEditModal(true); }}>
                   <Pencil size={14} />
                 </button>
-
                 <button onClick={() => handleDeleteProduct(p.id)}>
                   <Trash2 size={14} />
                 </button>
@@ -290,7 +264,63 @@ THANK YOU!
         </div>
       )}
 
-      {/* ADD, EDIT, QTY, CART MODALS GO HERE (same pattern) */}
+      {/* Quantity Modal */}
+      {showQtyModal && selectedProduct && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{selectedProduct.name}</h3>
+            <img
+              className="qty-image"
+              src={selectedProduct.image_url || fallbackImage}
+              alt=""
+            />
+            <div className="qty-controls">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+              <span>{quantity}</span>
+              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+            </div>
+            <button onClick={() => {
+              addToCart(selectedProduct, quantity);
+              setShowQtyModal(false);
+            }}>
+              Add to Cart
+            </button>
+            <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* CART MODAL */}
+      {showCartModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Shopping Cart</h3>
+            {cart.map(i => (
+              <div key={i.id}>
+                {i.name} x{i.qty}
+                <button onClick={() => removeFromCart(i.id)}>✖</button>
+              </div>
+            ))}
+            <h4>Total: ₱{cartTotal.toFixed(2)}</h4>
+            <button onClick={() => setShowPrintConfirm(true)}>
+              <Printer size={16} /> Print Receipt
+            </button>
+            <button onClick={() => setShowCartModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* PRINT CONFIRM */}
+      {showPrintConfirm && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Confirm Print</h3>
+            <p>Total: ₱{cartTotal.toFixed(2)}</p>
+            <button onClick={confirmSale}>Yes, Print</button>
+            <button onClick={() => setShowPrintConfirm(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
 
       <footer className="app-footer">
         © 2025 Tindahan ni Lola
