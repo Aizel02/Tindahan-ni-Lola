@@ -74,54 +74,104 @@
 ========================= */
 .filters {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 12px;
-  padding: 20px;
-}
+  gap: 10px;
 
+  padding: 12px 16px;
+  margin-bottom: 12px;
+
+  /* keep it from stretching too much */
+  max-width: 1100px;
+  margin-inline: auto;
+}
 .search-box {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: white;
-  padding: 10px 12px;
+
+  background: #ffffff;
+  padding: 6px 10px;
+
   border-radius: 8px;
   border: 1px solid #d1d5db;
+
+  width: 260px;
+}
+
+.search-box svg {
+  color: #6b7280;
+  flex-shrink: 0;
 }
 
 .search-box input {
   border: none;
   outline: none;
-}
+  width: 100%;
 
+  font-size: 13px;
+}
 .filters select {
-  padding: 10px 12px;
+  height: 34px;
+  padding: 0 10px;
+
+  font-size: 13px;
+
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  background: white;
+  background: #ffffff;
 }
-
 .add-product-btn {
-  background: #0b73b8;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
+
+  height: 34px;
+  padding: 0 14px;
+
+  background: #0b73b8;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 500;
+
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
-/* =========================
-   EMPTY STATE
-========================= */
+.add-product-btn svg {
+  flex-shrink: 0;
+}
+
+.add-product-btn:hover {
+  background: #095f99;
+}
+
+.add-product-btn:active {
+  transform: scale(0.96);
+}
 .no-products {
   text-align: center;
   padding: 80px 0;
   color: #6b7280;
-  font-size: 15px;
+  font-size: 14px;
+}
+@media (max-width: 640px) {
+  .filters {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filters select,
+  .add-product-btn {
+    width: 100%;
+  }
 }
 
 /* =========================
@@ -317,9 +367,41 @@
   color: white;
 }
 .card-actions button {
-  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+
   cursor: pointer;
+  pointer-events: auto;
+
+  transition: background 0.2s ease, transform 0.1s ease;
 }
+.card-actions button:hover {
+  background: #f3f4f6;
+}
+
+.card-actions button:active {
+  transform: scale(0.95);
+}
+.card-actions button:nth-child(1):hover {
+  background: #e0f2fe; /* add to cart */
+}
+
+.card-actions button:nth-child(2):hover {
+  background: #fef3c7; /* edit */
+}
+
+.card-actions button:nth-child(3):hover {
+  background: #fee2e2; /* delete */
+}
+
  /* Overlay fade */
 .modal-overlay {
   position: fixed;
