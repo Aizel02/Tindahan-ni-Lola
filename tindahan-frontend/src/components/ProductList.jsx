@@ -23,6 +23,7 @@ const CATEGORIES = [
 ];
 
 export default function ProductList() {
+  /* ===================== STATES ===================== */
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +44,7 @@ export default function ProductList() {
   const [editProduct, setEditProduct] = useState(null);
   const [cart, setCart] = useState([]);
 
-  /* ================= FETCH ================= */
+  /* ===================== FETCH ===================== */
   const fetchProducts = async () => {
     setLoading(true);
 
@@ -67,81 +68,80 @@ export default function ProductList() {
     fetchProducts();
   }, []);
 
-  /* ================= IMAGE UPLOAD ================= */
-  const uploadImage = async (file, userId) => {
-    const fileExt = file.name.split(".").pop();
-    const filePath = `${userId}/${crypto.randomUUID()}.${fileExt}`;
+  /* ===================== IMAGE UPLOAD ===================== */
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append(
+    "upload_preset",
+    process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+  );
 
-    const { error } = await supabase.storage
-      .from("product-images")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
-    if (error) {
-      console.error("UPLOAD ERROR:", error);
-      throw error;
+  const data = await res.json();
+
+  if (!data.secure_url) {
+    throw new Error("Cloudinary upload failed");
+  }
+
+  return data.secure_url; // ✅ PERFECT IMAGE URL
+};
+
+  /* ===================== ADD PRODUCT ===================== */
+ const handleAddProduct = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  let imageUrl = null;
+
+  try {
+    if (newProduct.imageFile) {
+      imageUrl = await uploadToCloudinary(newProduct.imageFile);
     }
 
-    const { data } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(filePath);
+    await supabase.from("products").insert([
+      {
+        user_id: user.id,
+        name: newProduct.name,
+        category: newProduct.category,
+        price: Number(newProduct.price),
+        image_url: imageUrl, // ✅ Cloudinary URL
+      },
+    ]);
 
-    return data.publicUrl;
-  };
+    setShowAddModal(false);
+    setNewProduct({
+      name: "",
+      category: "",
+      price: "",
+      imageFile: null,
+    });
 
-  /* ================= ADD PRODUCT ================= */
-  const handleAddProduct = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    fetchProducts();
+  } catch (err) {
+    console.error(err);
+    alert("Image upload failed");
+  }
+};
 
-    if (!user) return;
 
-    try {
-      let imageUrl = null;
-
-      if (newProduct.imageFile) {
-        imageUrl = await uploadImage(
-          newProduct.imageFile,
-          user.id
-        );
-      }
-
-      await supabase.from("products").insert([
-        {
-          user_id: user.id,
-          name: newProduct.name,
-          category: newProduct.category,
-          price: Number(newProduct.price),
-          image_url: imageUrl,
-        },
-      ]);
-
-      setShowAddModal(false);
-      setNewProduct({
-        name: "",
-        category: "",
-        price: "",
-        imageFile: null,
-      });
-
-      fetchProducts();
-    } catch {
-      alert("Image upload failed. Check bucket + policy.");
-    }
-  };
-
-  /* ================= UPDATE ================= */
+  /* ===================== UPDATE PRODUCT ===================== */
   const handleUpdateProduct = async () => {
-    let imageUrl = editProduct.image_url;
+  let imageUrl = editProduct.image_url;
 
+  try {
     if (editProduct.imageFile) {
-      imageUrl = await uploadImage(
-        editProduct.imageFile,
-        editProduct.user_id
-      );
+      imageUrl = await uploadToCloudinary(editProduct.imageFile);
     }
 
     await supabase
@@ -157,9 +157,14 @@ export default function ProductList() {
     setShowEditModal(false);
     setEditProduct(null);
     fetchProducts();
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Update failed");
+  }
+};
 
-  /* ================= CART ================= */
+
+  /* ===================== CART ===================== */
   const addToCart = (product) => {
     setCart((prev) => {
       const found = prev.find((i) => i.id === product.id);
@@ -177,7 +182,7 @@ export default function ProductList() {
     0
   );
 
-  /* ================= FILTER ================= */
+  /* ===================== FILTER ===================== */
   const filteredProducts = products.filter((p) => {
     const nameMatch = p.name
       .toLowerCase()
@@ -187,7 +192,7 @@ export default function ProductList() {
     return nameMatch && catMatch;
   });
 
-  /* ================= UI ================= */
+  /* ===================== UI ===================== */
   return (
     <div className="product-list-page">
       <Header
@@ -195,6 +200,7 @@ export default function ProductList() {
         onCartClick={() => setShowCartModal(true)}
       />
 
+      {/* FILTER BAR */}
       <div className="filters">
         <Search size={16} />
         <input
@@ -218,6 +224,7 @@ export default function ProductList() {
         </button>
       </div>
 
+      {/* PRODUCTS */}
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -225,12 +232,14 @@ export default function ProductList() {
           {filteredProducts.map((p) => (
             <div key={p.id} className="product-card">
               <img
-                src={p.image_url || fallbackImage}
-                alt={p.name}
-                onError={(e) => {
-                  e.currentTarget.src = fallbackImage;
-                }}
-              />
+  src={p.image_url || fallbackImage}
+  alt={p.name}
+  onError={(e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = fallbackImage;
+  }}
+/>
+
 
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
@@ -263,55 +272,52 @@ export default function ProductList() {
         <div className="modal-overlay">
           <div className="modal">
             <h3>Add Product</h3>
-
             <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  imageFile: e.target.files[0],
-                })
-              }
-            />
+  type="file"
+  accept="image/*"
+  onChange={(e) =>
+    setNewProduct({
+      ...newProduct,
+      imageFile: e.target.files[0],
+    })
+  }
+/>
+<input
+  placeholder="Product Name"
+  value={newProduct.name}
+  onChange={(e) =>
+    setNewProduct({ ...newProduct, name: e.target.value })
+  }
+/>
 
-            <input
-              placeholder="Product Name"
-              value={newProduct.name}
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  name: e.target.value,
-                })
-              }
-            />
+<select
+  value={newProduct.category}
+  onChange={(e) =>
+    setNewProduct({ ...newProduct, category: e.target.value })
+  }
+>
+  <option value="">Select Category</option>
+  {CATEGORIES.map((c) => (
+    <option key={c} value={c}>{c}</option>
+  ))}
+</select>
 
-            <select
-              value={newProduct.category}
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  category: e.target.value,
-                })
-              }
-            >
-              <option value="">Select Category</option>
-              {CATEGORIES.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-
-            <input
+<input
+  type="number"
+  placeholder="Price"
+  value={newProduct.price}
+  onChange={(e) =>
+    setNewProduct({ ...newProduct, price: e.target.value })
+  }
+/>
+            {/* <input
               type="number"
               placeholder="Price"
               value={newProduct.price}
               onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  price: e.target.value,
-                })
+                setNewProduct({ ...newProduct, price: e.target.value })
               }
-            />
+            /> */}
 
             <button onClick={handleAddProduct}>Add</button>
             <button onClick={() => setShowAddModal(false)}>
@@ -321,16 +327,75 @@ export default function ProductList() {
         </div>
       )}
 
+      {/* EDIT MODAL (THIS FIXES ESLINT) */}
+      {showEditModal && editProduct && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit Product</h3>
+
+            <input
+              value={editProduct.name}
+              onChange={(e) =>
+                setEditProduct({
+                  ...editProduct,
+                  name: e.target.value,
+                })
+              }
+            />
+
+            <select
+              value={editProduct.category}
+              onChange={(e) =>
+                setEditProduct({
+                  ...editProduct,
+                  category: e.target.value,
+                })
+              }
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              value={editProduct.price}
+              onChange={(e) =>
+                setEditProduct({
+                  ...editProduct,
+                  price: e.target.value,
+                })
+              }
+            />
+
+            <button onClick={handleUpdateProduct}>
+              Update
+            </button>
+            <button onClick={() => setShowEditModal(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* CART MODAL */}
       {showCartModal && (
         <div className="modal-overlay">
           <div className="modal">
             <h3>Cart</h3>
+
             {cart.map((i) => (
               <p key={i.id}>
                 {i.name} x{i.qty}
               </p>
             ))}
+
             <h4>Total: ₱{cartTotal.toFixed(2)}</h4>
+
+            <button onClick={() => window.print()}>
+              Print Receipt
+            </button>
+
             <button onClick={() => setShowCartModal(false)}>
               Close
             </button>
