@@ -77,61 +77,71 @@
 ========================= */
 .filters {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  margin-bottom: 25px;
 }
 
-/* 🔥 force same height */
-.filters > * {
-  height: 42px;
-  box-sizing: border-box;
-}
-
-
-/* 🔍 SEARCH */
-.search-box {
-  position: relative;
-  width: 260px;
-  height: 42px;              /* 🔥 lock height */
-  display: flex;
-  align-items: center;
-}
-
-.search-box input {
-  width: 100%;
-  height: 100%;
-  padding: 0 14px 0 40px;    /* ❌ no vertical padding */
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-  line-height: 42px;         /* 🔥 critical */
-  box-sizing: border-box;
-  background: white;
-}
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  pointer-events: none;
-}
+.filters input,
 .filters select {
-  height: 42px;
-  padding: 0 14px;          /* ❌ no vertical padding */
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  background: #fff;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
   font-size: 14px;
-  line-height: 42px;        /* 🔥 critical */
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  box-sizing: border-box;
 }
+
+.filters input:focus,
+.filters select:focus {
+  border-color: #0077b6;
+}
+
 .add-product-btn {
+  background: #0077b6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-product-btn:hover {
+  background: #023e8a;
+}
+
+/* Category Filter Buttons */
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.category-buttons button {
+  background: #e3f2fd;
+  color: #0077b6;
+  border: 1px solid #0077b6;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.category-buttons button:hover,
+.category-buttons button.active {
+  background: #0077b6;
+  color: white;
+}
+
+
+/* ➕ ADD PRODUCT */
+/* .add-product-btn {
   height: 42px;
   padding: 0 18px;
   display: flex;
@@ -145,10 +155,9 @@
   cursor: pointer;
 }
 
-
 .add-product-btn:hover {
   background: #6a70e6;
-}
+} */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
