@@ -56,26 +56,6 @@ const openQtyModal = (product) => {
   setShowQtyModal(true);
 };
 
-// ✅ PUT THIS RIGHT AFTER openQtyModal
-const confirmAddToCart = () => {
-  setCart((prev) => {
-    const found = prev.find((i) => i.id === selectedProduct.id);
-
-    if (found) {
-      return prev.map((i) =>
-        i.id === selectedProduct.id
-          ? { ...i, qty: i.qty + qty }
-          : i
-      );
-    }
-
-    return [...prev, { ...selectedProduct, qty }];
-  });
-
-  setShowQtyModal(false);
-  setSelectedProduct(null);
-};
-
 
 
   /* ===================== FETCH ===================== */
@@ -214,22 +194,24 @@ const confirmDeleteProduct = async () => {
 
 
   /* ===================== CART ===================== */
-  const addToCart = (product) => {
-    setCart((prev) => {
-      const found = prev.find((i) => i.id === product.id);
-      if (found) {
-        return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
-        );
-      }
-      return [...prev, { ...product, qty: 1 }];
-    });
-  };
+const confirmAddToCart = () => {
+  setCart((prev) => {
+    const found = prev.find((i) => i.id === selectedProduct.id);
 
-  const cartTotal = cart.reduce(
-    (sum, i) => sum + i.qty * i.price,
-    0
-  );
+    if (found) {
+      return prev.map((i) =>
+        i.id === selectedProduct.id
+          ? { ...i, qty: i.qty + qty }
+          : i
+      );
+    }
+
+    return [...prev, { ...selectedProduct, qty }];
+  });
+
+  setShowQtyModal(false);
+  setSelectedProduct(null);
+};
 
   /* ===================== FILTER ===================== */
   const filteredProducts = products.filter((p) => {
@@ -342,8 +324,6 @@ const confirmDeleteProduct = async () => {
                 <button onClick={() => openQtyModal(p)}>
   <ShoppingCart size={14} />
 </button>
-
-
                 <button
                   onClick={() => {
                     setEditProduct(p);
@@ -511,30 +491,83 @@ const confirmDeleteProduct = async () => {
         </div>
       )}
 
-      {/* CART MODAL */}
-      {showCartModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Cart</h3>
+     {/* CART MODAL */}
+{showCartModal && (
+  <div className="modal-overlay" onClick={() => setShowCartModal(false)}>
+    <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
 
-            {cart.map((i) => (
-              <p key={i.id}>
-                {i.name} x{i.qty}
+      {/* HEADER */}
+      <div className="cart-header">
+        <h3>Shopping Cart</h3>
+        <button className="close-btn" onClick={() => setShowCartModal(false)}>
+          ✕
+        </button>
+      </div>
+
+      {/* ITEMS */}
+      <div className="cart-list">
+        {cart.map((item) => (
+          <div className="cart-item" key={item.id}>
+            <img
+              src={item.image_url || fallbackImage}
+              alt={item.name}
+            />
+
+            <div className="cart-info">
+              <h4>{item.name}</h4>
+              <p className="category">{item.category}</p>
+              <p className="qty">
+                Qty: {item.qty} × ₱{item.price.toFixed(2)}
               </p>
-            ))}
+            </div>
 
-            <h4>Total: ₱{cartTotal.toFixed(2)}</h4>
-
-            <button onClick={() => window.print()}>
-              Print Receipt
-            </button>
-
-            <button onClick={() => setShowCartModal(false)}>
-              Close
-            </button>
+            <div className="cart-price">
+              ₱{(item.qty * item.price).toFixed(2)}
+            </div>
           </div>
+        ))}
+      </div>
+
+      {/* TOTALS */}
+      <div className="cart-summary">
+        <div className="row">
+          <span>Subtotal ({cart.length} items):</span>
+          <span>₱{cartTotal.toFixed(2)}</span>
         </div>
-      )}
+
+        <div className="row grand">
+          <span>Grand Total:</span>
+          <span>₱{cartTotal.toFixed(2)}</span>
+        </div>
+      </div>
+
+      {/* ACTIONS */}
+      <div className="cart-actions">
+        <button
+          className="btn outline"
+          onClick={() => setShowCartModal(false)}
+        >
+          Continue Shopping
+        </button>
+
+        <button className="btn blue" onClick={() => window.print()}>
+          🖨 Print Receipt
+        </button>
+
+        <button
+          className="btn green"
+          onClick={() => {
+            setCart([]);
+            setShowCartModal(false);
+          }}
+        >
+          OK – Confirm & Reset
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
