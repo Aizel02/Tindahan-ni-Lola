@@ -111,6 +111,30 @@
   line-height: 42px; /* 🔥 THIS FIXES THE VISUAL HEIGHT */
 }
 
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.category-buttons button {
+  background: #e3f2fd;
+  color: #0077b6;
+  border: 1px solid #0077b6;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.category-buttons button:hover,
+.category-buttons button.active {
+  background: #0077b6;
+  color: white;
+}
 
 .search-box {
   position: relative;
