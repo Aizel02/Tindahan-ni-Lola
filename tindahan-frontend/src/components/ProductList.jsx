@@ -325,8 +325,8 @@ const printReceipt = () => {
   return (
     <div className="product-list-page">
       <Header
-        cartCount={cart.length}
-        onCartClick={() => setShowCartModal(true)}
+        // cartCount={cart.length}
+        // onCartClick={() => setShowCartModal(true)}
       />
 
       {/* FILTER BAR */}
