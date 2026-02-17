@@ -220,7 +220,7 @@ const confirmDeleteProduct = async () => {
 
       {/* FILTER BAR */}
       <div className="filters">
-  <div className="search-box">
+ <div className="search-box">
   <Search className="search-icon" size={16} />
   <input
     type="text"
@@ -236,8 +236,10 @@ const confirmDeleteProduct = async () => {
     onChange={(e) => setCategoryFilter(e.target.value)}
   >
     <option value="All">All Categories</option>
-    {CATEGORIES.map((c) => (
-      <option key={c}>{c}</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
     ))}
   </select>
 
