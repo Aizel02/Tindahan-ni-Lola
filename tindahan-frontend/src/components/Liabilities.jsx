@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./Liabilities.css";
-import { Pencil, Trash2, Search } from 'lucide-react';
-const API_URL =
-  "https://tindahan-ni-lola-backend-1.onrender.com/api/liabilities";
+import { Pencil, Trash2, Search } from "lucide-react";
+import { supabase } from "../supabaseClient";
 
 export default function Liabilities() {
   const [liabilities, setLiabilities] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [activePerson, setActivePerson] = useState(null); // add debt to same person
-  const [editingDebt, setEditingDebt] = useState(null);   // edit debt
+  const [activePerson, setActivePerson] = useState(null);
+  const [editingDebt, setEditingDebt] = useState(null);
 
   const [form, setForm] = useState({
     debtorName: "",
@@ -18,78 +17,91 @@ export default function Liabilities() {
     dueDate: "",
   });
 
-  // ✅ LOAD LIABILITIES
+  /* ================= LOAD LIABILITIES ================= */
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then(setLiabilities)
-      .catch(console.error);
+    const loadLiabilities = async () => {
+      const { data, error } = await supabase
+        .from("liabilities")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error) setLiabilities(data);
+    };
+
+    loadLiabilities();
   }, []);
 
-  // ✅ ADD / UPDATE LIABILITY
+  /* ================= ADD / UPDATE ================= */
   const saveLiability = async () => {
     if (!form.amount) return;
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const payload = {
-      debtorName: activePerson || form.debtorName,
+      user_id: user.id,
+      debtor_name: activePerson || form.debtorName,
       amount: Number(form.amount),
       description: form.description,
-      dueDate: form.dueDate || null,
+      due_date: form.dueDate || null,
     };
 
-    const url = editingDebt
-      ? `${API_URL}/${editingDebt.id}`
-      : API_URL;
+    if (editingDebt) {
+      const { data } = await supabase
+        .from("liabilities")
+        .update(payload)
+        .eq("id", editingDebt.id)
+        .select()
+        .single();
 
-    const method = editingDebt ? "PUT" : "POST";
+      setLiabilities((prev) =>
+        prev.map((l) => (l.id === data.id ? data : l))
+      );
+    } else {
+      const { data } = await supabase
+        .from("liabilities")
+        .insert(payload)
+        .select()
+        .single();
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-
-    setLiabilities((prev) =>
-      editingDebt
-        ? prev.map((l) => (l.id === data.id ? data : l))
-        : [...prev, data]
-    );
+      setLiabilities((prev) => [...prev, data]);
+    }
 
     resetModal();
   };
 
-  // ✅ MARK PAID
-const markPaid = async (id) => {
-  const today = new Date().toISOString().split("T")[0];
+  /* ================= MARK PAID ================= */
+  const markPaid = async (id) => {
+    const today = new Date().toISOString().split("T")[0];
 
-  await fetch(`${API_URL}/${id}/pay`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ paidDate: today }),
-  });
+    await supabase
+      .from("liabilities")
+      .update({
+        status: "Paid",
+        paid_date: today,
+      })
+      .eq("id", id);
 
-  setLiabilities((prev) =>
-    prev.map((l) =>
-      l.id === id
-        ? { ...l, status: "Paid", paidDate: today }
-        : l
-    )
-  );
-};
+    setLiabilities((prev) =>
+      prev.map((l) =>
+        l.id === id
+          ? { ...l, status: "Paid", paid_date: today }
+          : l
+      )
+    );
+  };
 
-
-  // ✅ DELETE
+  /* ================= DELETE ================= */
   const deleteLiability = async (id) => {
-    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    await supabase.from("liabilities").delete().eq("id", id);
     setLiabilities((prev) => prev.filter((l) => l.id !== id));
   };
 
-  // ✅ GROUP BY PERSON
+  /* ================= GROUP BY PERSON ================= */
   const grouped = liabilities.reduce((acc, item) => {
-    acc[item.debtorName] = acc[item.debtorName] || [];
-    acc[item.debtorName].push(item);
+    acc[item.debtor_name] = acc[item.debtor_name] || [];
+    acc[item.debtor_name].push(item);
     return acc;
   }, {});
 
@@ -97,36 +109,41 @@ const markPaid = async (id) => {
     setShowModal(false);
     setActivePerson(null);
     setEditingDebt(null);
-    setForm({ debtorName: "", amount: "", description: "", dueDate: "" });
+    setForm({
+      debtorName: "",
+      amount: "",
+      description: "",
+      dueDate: "",
+    });
   };
 
   return (
     <div className="liabilities-page">
       <Header />
 
-<div className="liabilities-header">
-  <div className="search-wrapper">
-    <Search size={16} className="search-icon" />
-    <input
-      type="text"
-      placeholder="Search person who owed..."
-      className="liabilities-search"
-    />
-  </div>
+      {/* HEADER */}
+      <div className="liabilities-header">
+        <div className="search-wrapper">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search person who owed..."
+            className="liabilities-search"
+          />
+        </div>
 
-  <button
-    className="add-liability-btn"
-    onClick={() => setShowModal(true)}
-  >
-    + Add Liability
-  </button>
-</div>
+        <button
+          className="add-liability-btn"
+          onClick={() => setShowModal(true)}
+        >
+          + Add Liability
+        </button>
+      </div>
 
-
-      {/* ===== GRID ===== */}
+      {/* GRID */}
       {Object.keys(grouped).length === 0 ? (
         <p className="liabilities-empty">
-          No liabilities recorded. Add one to get started!
+          No liabilities recorded.
         </p>
       ) : (
         <div className="liability-grid">
@@ -151,24 +168,25 @@ const markPaid = async (id) => {
                   {list.map((l) => (
                     <div className="debt-card" key={l.id}>
                       <div>
-  <strong>{l.description || "Debt"}</strong>
-  <p>₱{l.amount}</p>
+                        <strong>{l.description || "Debt"}</strong>
+                        <p>₱{l.amount}</p>
 
-  <small>
-    Borrowed: {l.dueDate || "—"}
-  </small>
+                        <small>
+                          Due: {l.due_date || "—"}
+                        </small>
 
-  {l.status === "Paid" && (
-    <small className="paid-date">
-      Paid: {l.paidDate}
-    </small>
-  )}
+                        {l.status === "Paid" && (
+                          <small className="paid-date">
+                            Paid: {l.paid_date}
+                          </small>
+                        )}
 
-  <span className={`status ${l.status.toLowerCase()}`}>
-    {l.status}
-  </span>
-</div>
-
+                        <span
+                          className={`status ${l.status.toLowerCase()}`}
+                        >
+                          {l.status}
+                        </span>
+                      </div>
 
                       <div className="debt-actions">
                         {l.status !== "Paid" && (
@@ -188,17 +206,19 @@ const markPaid = async (id) => {
                               debtorName: name,
                               amount: l.amount,
                               description: l.description,
-                              dueDate: l.dueDate || "",
+                              dueDate: l.due_date || "",
                             });
                             setShowModal(true);
                           }}
                         >
-                    <Pencil size={16} />
-                             </button>
+                          <Pencil size={16} />
+                        </button>
+
                         <button
                           className="delete"
                           onClick={() => deleteLiability(l.id)}
-                        ><Trash2 size={16} />
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
@@ -220,7 +240,7 @@ const markPaid = async (id) => {
         </div>
       )}
 
-      {/* ===== MODAL ===== */}
+      {/* MODAL */}
       {showModal && (
         <div className="modal-overlay">
           <div className="liability-modal">
@@ -244,7 +264,10 @@ const markPaid = async (id) => {
                   <input
                     value={form.debtorName}
                     onChange={(e) =>
-                      setForm({ ...form, debtorName: e.target.value })
+                      setForm({
+                        ...form,
+                        debtorName: e.target.value,
+                      })
                     }
                   />
                 </>
@@ -263,7 +286,10 @@ const markPaid = async (id) => {
               <input
                 value={form.description}
                 onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
+                  setForm({
+                    ...form,
+                    description: e.target.value,
+                  })
                 }
               />
 
@@ -272,7 +298,10 @@ const markPaid = async (id) => {
                 type="date"
                 value={form.dueDate}
                 onChange={(e) =>
-                  setForm({ ...form, dueDate: e.target.value })
+                  setForm({
+                    ...form,
+                    dueDate: e.target.value,
+                  })
                 }
               />
             </div>
@@ -289,9 +318,9 @@ const markPaid = async (id) => {
         </div>
       )}
 
-     <footer className="app-footer">
-    © 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez
-  </footer>
+      <footer className="app-footer">
+        © 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez
+      </footer>
     </div>
   );
 }

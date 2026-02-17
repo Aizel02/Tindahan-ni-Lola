@@ -176,6 +176,44 @@
   font-weight: 700;
 }
 
+.card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  background: #f1f3f5;
+  width: 100%;
+}
+
+.card-actions button {
+  background: transparent;
+  color: black;
+  border:2px solid #7e96de;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 10px;  
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.card-actions button:hover {
+  background: #023e8a;
+  color: white;
+}
+.empty-cart {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.empty-cart span {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+}
 
 @keyframes scaleFade {
   from {
