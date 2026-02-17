@@ -81,7 +81,7 @@
   margin: 0 auto 24px;
   padding: 16px 24px;
 }
-.search-box {
+/* .search-box {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -92,7 +92,7 @@
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-}
+} */
 
 .search-icon {
   color: #9ca3af;
