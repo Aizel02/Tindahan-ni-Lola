@@ -81,7 +81,7 @@
   margin: 0 auto 24px;
   padding: 16px 24px;
 }
-/* .search-box {
+.search-box {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -92,20 +92,20 @@
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-} */
+}
 
 .search-icon {
   color: #9ca3af;
 }
 
-.search-box input {
+/* .search-box input {
   flex: 1;
   height: 100%;
   border: none;
   outline: none;
   font-size: 14px;
   background: transparent;
-}
+} */
 .filters select {
   height: 42px;
   padding: 0 14px;
