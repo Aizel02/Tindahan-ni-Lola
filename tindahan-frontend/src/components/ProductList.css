@@ -72,76 +72,56 @@
 /* =========================
    FILTER BAR
 ========================= */
-/* =========================
-   FILTER BAR (FINAL)
-========================= */
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 25px;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto 24px;
 }
 
-.filters input,
-.filters select {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  font-size: 14px;
-}
-
-.filters input:focus,
-.filters select:focus {
-  border-color: #0077b6;
-}
-
-.add-product-btn {
-  background: #0077b6;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.add-product-btn:hover {
-  background: #023e8a;
-}
-
-/* Category Filter Buttons */
-.category-buttons {
+/* 🔍 SEARCH */
+.search-box {
+  position: relative;
+  width: 260px;
+  height: 42px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 25px;
+  align-items: center;
 }
 
-.category-buttons button {
-  background: #e3f2fd;
-  color: #0077b6;
-  border: 1px solid #0077b6;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.3s;
+.search-box input {
+  width: 100%;
+  height: 100%;
+  padding: 0 14px 0 40px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-.category-buttons button:hover,
-.category-buttons button.active {
-  background: #0077b6;
-  color: white;
+/* icon perfectly centered */
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
 }
 
+/* 🔽 SELECT */
+.filters select {
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
 
 /* ➕ ADD PRODUCT */
-/* .add-product-btn {
+.add-product-btn {
   height: 42px;
   padding: 0 18px;
   display: flex;
@@ -155,9 +135,10 @@
   cursor: pointer;
 }
 
+
 .add-product-btn:hover {
   background: #6a70e6;
-} */
+}
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -608,13 +589,18 @@
   .filters {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+    padding: 16px;
   }
-
-  .filters > * {
+.filters > * {
+    width: 100%;
+  }
+  .search-box,
+  .filters select,
+  .add-product-btn {
     width: 100%;
   }
 }
-
 
 /* Extra small phones */
 @media (max-width: 420px) {
