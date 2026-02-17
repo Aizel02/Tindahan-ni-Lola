@@ -213,6 +213,7 @@ const confirmAddToCart = () => {
   setSelectedProduct(null);
 };
 
+
 // ✅ ADD THIS RIGHT HERE
 const cartTotal = cart.reduce(
   (sum, item) => sum + item.qty * item.price,
@@ -376,6 +377,7 @@ const printReceipt = () => {
     e.currentTarget.src = fallbackImage;
   }}
 />
+{/* QTY MODAL (GLOBAL) */}
 {showQtyModal && selectedProduct && (
   <div className="modal-overlay">
     <div className="modal qty-modal">
@@ -398,12 +400,6 @@ const printReceipt = () => {
         <button onClick={() => setQty((q) => q + 1)}>+</button>
       </div>
 
-      <div className="qty-summary">
-        <p>Unit Price: ₱{selectedProduct.price}</p>
-        <p>Quantity: {qty}</p>
-        <strong>Total: ₱{selectedProduct.price * qty}</strong>
-      </div>
-
       <div className="modal-actions">
         <button onClick={() => setShowQtyModal(false)}>Cancel</button>
         <button className="confirm" onClick={confirmAddToCart}>
@@ -413,6 +409,7 @@ const printReceipt = () => {
     </div>
   </div>
 )}
+
 
 
               <h4>{p.name}</h4>
