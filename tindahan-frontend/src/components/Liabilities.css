@@ -6,11 +6,12 @@
   background: #faf7f2;
   padding: 24px 40px 80px;
 }
-.liabilities-container {
-  max-width: 1100px;
-  margin: 0 auto;
-}
 
+@media (max-width: 768px) {
+  .liabilities-page {
+    padding: 16px;
+  }
+}
 
 /* ================================
    HEADER
@@ -19,41 +20,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 30px 0;
+  margin: 24px 0;
   gap: 16px;
 }
-@media (max-width: 768px) {
-  .liabilities-page {
-    padding: 16px;
-  }
 
-  .liabilities-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-}
-
-/* Wrapper */
-.liabilities-header {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0;
-}
-
-/* Group search + button */
-.search-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* Search */
 .search-wrapper {
   position: relative;
   width: 260px;
@@ -75,7 +45,6 @@
   border: 1px solid #d1d5db;
 }
 
-/* Button */
 .add-liability-btn {
   height: 42px;
   padding: 0 18px;
@@ -91,11 +60,10 @@
   background: #4f46e5;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
-  .search-actions {
+  .liabilities-header {
     flex-direction: column;
-    width: 100%;
+    align-items: stretch;
   }
 
   .search-wrapper,
@@ -111,17 +79,16 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
-  padding: 20px;
 }
 
 /* ================================
    PERSON CARD
 ================================ */
 .person-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 12px;
   padding: 14px;
-  box-shadow: 0 4px 10px rgba(0,0,0,.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,.06);
   display: flex;
   flex-direction: column;
 }
@@ -144,96 +111,31 @@
 }
 
 .person-total {
-  font-weight: bold;
-  color: #dfe0eb;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 /* ================================
-   DEBT ITEMS
+   DEBT LIST
 ================================ */
-/* Scrollable debt list */
 .debt-list {
-  max-height: 230px;
+  max-height: 240px;
   overflow-y: auto;
-  padding-right: 5px;
+  padding-right: 6px;
 }
 
-/* Scrollbar style */
 .debt-list::-webkit-scrollbar {
   width: 6px;
 }
+
 .debt-list::-webkit-scrollbar-thumb {
-  background:  #c7d2fe;;
+  background: #c7d2fe;
   border-radius: 4px;
 }
 
-/* Status colors */
-.status {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 2px 8px;
-  font-size: 12px;
-  border-radius: 4px;
-}
-
-.status.pending {
-  background: #fde68a;
-  color: #92400e;
-}
-
-.status.paid {
-  background: #bbf7d0;
-  color: #065f46;
-}
-
-.paid-date {
-  display: block;
-  font-size: 12px;
-  color: #059669;
-  margin-top: 2px;
-}
-
-.debt-card {
-  background: #d5d2ce;
-  padding: 10px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.debt-card strong {
-  display: block;
-  font-size: 14px;
-}
-
-.debt-card p {
-  font-size: 13px;
-  margin: 2px 0;
-}
-
-.status {
-  font-size: 11px;
-  background: #fde68a;
-  padding: 2px 6px;
-  border-radius: 4px;
-  
-}
-.debt-scroll {
-  max-height: 260px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-/* scrollbar */
-.debt-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.debt-scroll::-webkit-scrollbar-thumb {
-  background: #c7c7c7;
-  border-radius: 10px;
-}
-
+/* ================================
+   DEBT CARD
+================================ */
 .debt-card {
   background: #fff7ed;
   padding: 10px;
@@ -241,19 +143,39 @@
   margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  gap: 10px;
 }
 
+.debt-card strong {
+  font-size: 14px;
+  display: block;
+}
+
+.debt-card p {
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.debt-card small {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+/* ================================
+   STATUS
+================================ */
 .status {
   display: inline-block;
   margin-top: 4px;
   padding: 2px 8px;
   font-size: 12px;
-  border-radius: 5px;
+  border-radius: 6px;
+  font-weight: 500;
 }
 
-.status.pending {
+.status.unpaid {
   background: #fde68a;
+  color: #92400e;
 }
 
 .status.paid {
@@ -262,21 +184,10 @@
 }
 
 .paid-date {
-  display: block;
   font-size: 11px;
-  color: #4b5563;
-}
-
-.actions button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 16px;
-  margin-left: 5px;
-}
-
-.actions .delete {
-  color: red;
+  color: #059669;
+  margin-top: 2px;
+  display: block;
 }
 
 /* ================================
@@ -288,72 +199,27 @@
 }
 
 .debt-actions button {
-  border: none;
-  cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-.debt-actions .pay {
-  background: transparent;
-  color: black;
-}
-.debt-actions .edit {
-  background: transparent;
-  color: black;
-}
-
-.debt-actions .delete {
-  background: transparent;
-  color: black;
-}
-.delete {
   background: transparent;
   border: none;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 6px;
   cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.delete:hover {
-  color: #c7132e;
-}
-.pay {
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pay:hover {
+.debt-actions .pay:hover {
   color: #059669;
 }
-.edit {
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.edit:hover {
+.debt-actions .edit:hover {
   color: #4f46e5;
 }
 
+.debt-actions .delete:hover {
+  color: #dc2626;
+}
 
 /* ================================
    ADD DEBT BUTTON
@@ -399,10 +265,6 @@
   align-items: center;
 }
 
-.modal-header h3 {
-  margin: 0;
-}
-
 .close-btn {
   background: none;
   border: none;
@@ -421,14 +283,14 @@
   padding: 8px;
   margin-top: 4px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .cancel-btn {
@@ -440,38 +302,25 @@
 
 .confirm-btn {
   background: #4f46e5;
-  color: black;
+  color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
 }
 
 /* ================================
-   FOOTER
+   EMPTY STATE
 ================================ */
-.footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #111827;
-  color: white;
+.liabilities-empty {
   text-align: center;
-  padding: 10px;
-  font-size: 13px;
+  color: #6b7280;
+  margin-top: 40px;
 }
-.page-content {
-  flex: 1;
-}
-
 
 /* ================================
    MOBILE
 ================================ */
 @media (max-width: 600px) {
-  .liabilities-header {
-    flex-direction: column;
-  }
-
   .liability-grid {
     grid-template-columns: 1fr;
   }
@@ -479,6 +328,5 @@
   .debt-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
   }
 }

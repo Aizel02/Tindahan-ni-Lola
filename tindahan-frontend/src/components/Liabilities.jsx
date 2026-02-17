@@ -9,6 +9,7 @@ export default function Liabilities() {
   const [showModal, setShowModal] = useState(false);
   const [activePerson, setActivePerson] = useState(null);
   const [editingDebt, setEditingDebt] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     debtorName: "",
@@ -18,26 +19,54 @@ export default function Liabilities() {
   });
 
   /* ================= LOAD LIABILITIES ================= */
+  const loadLiabilities = async () => {
+    setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("You must be logged in to view liabilities.");
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("liabilities")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("LOAD ERROR:", error);
+      alert(error.message);
+    } else {
+      setLiabilities(data || []);
+    }
+
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const loadLiabilities = async () => {
-      const { data, error } = await supabase
-        .from("liabilities")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error) setLiabilities(data);
-    };
-
     loadLiabilities();
   }, []);
 
   /* ================= ADD / UPDATE ================= */
   const saveLiability = async () => {
-    if (!form.amount) return;
+    if (!form.amount) {
+      alert("Amount is required");
+      return;
+    }
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Not authenticated");
+      return;
+    }
 
     const payload = {
       user_id: user.id,
@@ -47,27 +76,30 @@ export default function Liabilities() {
       due_date: form.dueDate || null,
     };
 
+    let result;
+
     if (editingDebt) {
-      const { data } = await supabase
+      result = await supabase
         .from("liabilities")
         .update(payload)
         .eq("id", editingDebt.id)
         .select()
         .single();
-
-      setLiabilities((prev) =>
-        prev.map((l) => (l.id === data.id ? data : l))
-      );
     } else {
-      const { data } = await supabase
+      result = await supabase
         .from("liabilities")
         .insert(payload)
         .select()
         .single();
-
-      setLiabilities((prev) => [...prev, data]);
     }
 
+    if (result.error) {
+      console.error("SAVE ERROR:", result.error);
+      alert(result.error.message);
+      return;
+    }
+
+    await loadLiabilities();
     resetModal();
   };
 
@@ -75,7 +107,7 @@ export default function Liabilities() {
   const markPaid = async (id) => {
     const today = new Date().toISOString().split("T")[0];
 
-    await supabase
+    const { error } = await supabase
       .from("liabilities")
       .update({
         status: "Paid",
@@ -83,19 +115,32 @@ export default function Liabilities() {
       })
       .eq("id", id);
 
-    setLiabilities((prev) =>
-      prev.map((l) =>
-        l.id === id
-          ? { ...l, status: "Paid", paid_date: today }
-          : l
-      )
-    );
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
+
+    await loadLiabilities();
   };
 
   /* ================= DELETE ================= */
   const deleteLiability = async (id) => {
-    await supabase.from("liabilities").delete().eq("id", id);
-    setLiabilities((prev) => prev.filter((l) => l.id !== id));
+    const ok = window.confirm("Delete this liability?");
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from("liabilities")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
+
+    await loadLiabilities();
   };
 
   /* ================= GROUP BY PERSON ================= */
@@ -117,11 +162,11 @@ export default function Liabilities() {
     });
   };
 
+  /* ================= UI ================= */
   return (
     <div className="liabilities-page">
       <Header />
 
-      {/* HEADER */}
       <div className="liabilities-header">
         <div className="search-wrapper">
           <Search size={16} className="search-icon" />
@@ -140,11 +185,10 @@ export default function Liabilities() {
         </button>
       </div>
 
-      {/* GRID */}
-      {Object.keys(grouped).length === 0 ? (
-        <p className="liabilities-empty">
-          No liabilities recorded.
-        </p>
+      {loading ? (
+        <p className="liabilities-empty">Loading...</p>
+      ) : Object.keys(grouped).length === 0 ? (
+        <p className="liabilities-empty">No liabilities recorded.</p>
       ) : (
         <div className="liability-grid">
           {Object.entries(grouped).map(([name, list]) => {
@@ -170,10 +214,7 @@ export default function Liabilities() {
                       <div>
                         <strong>{l.description || "Debt"}</strong>
                         <p>₱{l.amount}</p>
-
-                        <small>
-                          Due: {l.due_date || "—"}
-                        </small>
+                        <small>Due: {l.due_date || "—"}</small>
 
                         {l.status === "Paid" && (
                           <small className="paid-date">
@@ -240,7 +281,6 @@ export default function Liabilities() {
         </div>
       )}
 
-      {/* MODAL */}
       {showModal && (
         <div className="modal-overlay">
           <div className="liability-modal">
@@ -264,10 +304,7 @@ export default function Liabilities() {
                   <input
                     value={form.debtorName}
                     onChange={(e) =>
-                      setForm({
-                        ...form,
-                        debtorName: e.target.value,
-                      })
+                      setForm({ ...form, debtorName: e.target.value })
                     }
                   />
                 </>
@@ -298,10 +335,7 @@ export default function Liabilities() {
                 type="date"
                 value={form.dueDate}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    dueDate: e.target.value,
-                  })
+                  setForm({ ...form, dueDate: e.target.value })
                 }
               />
             </div>
