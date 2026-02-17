@@ -213,6 +213,12 @@ const confirmAddToCart = () => {
   setSelectedProduct(null);
 };
 
+// ✅ ADD THIS RIGHT HERE
+const cartTotal = cart.reduce(
+  (sum, item) => sum + item.qty * item.price,
+  0
+);
+
   /* ===================== FILTER ===================== */
   const filteredProducts = products.filter((p) => {
     const nameMatch = p.name
