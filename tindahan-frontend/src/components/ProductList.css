@@ -72,29 +72,53 @@
 /* =========================
    FILTER BAR
 ========================= */
+/* =========================
+   FILTER BAR (FINAL)
+========================= */
 .filters {
   display: flex;
   align-items: center;
   gap: 12px;
   max-width: 1200px;
   margin: 0 auto 24px;
+  padding: 16px 24px;
 }
 
+/* FORCE SAME HEIGHT */
+.filters > * {
+  height: 42px;
+}
 
-.filters input,
-.filters select {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
+/* 🔍 SEARCH */
+.search-box {
+  position: relative;
+  width: 260px;
+  display: flex;
+  align-items: center;
+}
+
+.search-box input {
+  width: 100%;
+  height: 100%;
+  padding: 0 12px 0 40px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
   font-size: 14px;
+  line-height: 42px;        /* 🔥 CRITICAL */
+  box-sizing: border-box;
 }
 
-.filters input:focus,
-.filters select:focus {
-  border-color: #0077b6;
+/* ICON CENTER */
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
 }
-/* 🔽 CATEGORY SELECT */
+
+/* 🔽 SELECT — FIXED */
 .filters select {
   height: 42px;
   padding: 0 14px;
@@ -107,83 +131,17 @@
   -webkit-appearance: none;
   -moz-appearance: none;
 
+  line-height: 42px;        /* 🔥 FIX */
   box-sizing: border-box;
-  line-height: 42px; /* 🔥 THIS FIXES THE VISUAL HEIGHT */
 }
 
-.category-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 25px;
-}
-
-.category-buttons button {
-  background: #e3f2fd;
-  color: #0077b6;
-  border: 1px solid #0077b6;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.category-buttons button:hover,
-.category-buttons button.active {
-  background: #0077b6;
-  color: white;
-}
-
-.search-box {
-  position: relative;
-  width: 260px;
-  height: 42px;                 /* SAME HEIGHT AS OTHERS */
-  display: flex;
-  align-items: center;
-}
-
-.search-box input {
-  width: 100%;
-  height: 100%;
-  padding-left: 40px;           /* space for icon */
-  padding-right: 12px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-  outline: none;
-  line-height: 1;               /* 🔥 IMPORTANT */
-  background: white;
-}
-
-.search-box input:focus {
-  border-color: #2563eb;
-}
-
-/* 🔍 ICON */
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);  /* 🔥 TRUE CENTER */
-  color: #9ca3af;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
+/* ➕ ADD PRODUCT */
 .add-product-btn {
   height: 42px;
   padding: 0 18px;
-
   display: flex;
   align-items: center;
   gap: 8px;
-
   background: #7c83f7;
   color: white;
   border: none;
@@ -645,18 +603,13 @@
   .filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 16px;
   }
-.filters > * {
-    width: 100%;
-  }
-  .search-box,
-  .filters select,
-  .add-product-btn {
+
+  .filters > * {
     width: 100%;
   }
 }
+
 
 /* Extra small phones */
 @media (max-width: 420px) {
