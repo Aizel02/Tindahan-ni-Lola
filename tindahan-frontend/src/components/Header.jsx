@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { Home, ShoppingCart } from "lucide-react";
+
 export default function Header({ cartCount = 0, onCartClick }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,7 +15,6 @@ export default function Header({ cartCount = 0, onCartClick }) {
 
   return (
     <>
-      {/* ===== HEADER ===== */}
       <div className="header">
         <div className="header-left">
           <h1>Tindahan ni Lola</h1>
@@ -26,10 +26,10 @@ export default function Header({ cartCount = 0, onCartClick }) {
             <Home size={12} /> Logout
           </button>
 
-          {/* ✅ SHOW ONLY IN PRODUCTS */}
           {isProductsPage && (
             <button className="cart-btn" onClick={onCartClick}>
-              <ShoppingCart sizesize={12} /> View Cart
+              <ShoppingCart size={12} />
+              View Cart
               {cartCount > 0 && (
                 <span className="cart-badge">{cartCount}</span>
               )}
@@ -38,19 +38,12 @@ export default function Header({ cartCount = 0, onCartClick }) {
         </div>
       </div>
 
-      {/* ===== TABS ===== */}
       <div className="page-tabs">
-        <NavLink
-          to="/products"
-          className={({ isActive }) => (isActive ? "tab active" : "tab")}
-        >
+        <NavLink to="/products" className="tab">
           Products
         </NavLink>
 
-        <NavLink
-          to="/liabilities"
-          className={({ isActive }) => (isActive ? "tab active" : "tab")}
-        >
+        <NavLink to="/liabilities" className="tab">
           Debts/Utang
         </NavLink>
       </div>
