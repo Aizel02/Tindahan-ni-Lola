@@ -219,6 +219,98 @@ const cartTotal = cart.reduce(
   0
 );
 
+  /* ===================== thermal printer  ===================== */
+  // ✅ ADD THIS RIGHT AFTER cartTotal
+const printReceipt = () => {
+  const win = window.open("", "_blank", "width=350,height=600");
+
+  const receipt = `
+  <html>
+    <head>
+      <style>
+        body {
+          font-family: monospace;
+          width: 80mm;
+          margin: 0;
+          padding: 10px;
+        }
+        .center { text-align: center; }
+        .line { border-top: 1px dashed #000; margin: 6px 0; }
+        .row {
+          display: flex;
+          justify-content: space-between;
+        }
+        .small { font-size: 12px; }
+      </style>
+    </head>
+    <body>
+
+      <div class="center">
+        ==============================<br/>
+        <strong>TINDAHAN NI LOLA</strong><br/>
+        Receipt of Sale<br/>
+        ==============================
+      </div>
+
+      <br/>
+      <div class="center">${new Date().toLocaleString()}</div>
+      <br/>
+
+      <div class="row small">
+        <strong>ITEM</strong>
+        <strong>QTY&nbsp;&nbsp;TOTAL</strong>
+      </div>
+      <div class="line"></div>
+
+      ${cart.map(item => `
+        <div class="row small">
+          <span>${item.name}</span>
+          <span>${item.qty}  ₱${(item.qty * item.price).toFixed(2)}</span>
+        </div>
+      `).join("")}
+
+      <div class="line"></div>
+
+      <div class="row small">
+        <span>Items:</span>
+        <span>${cart.length}</span>
+      </div>
+
+      <div class="row small">
+        <span>Subtotal:</span>
+        <span>₱${cartTotal.toFixed(2)}</span>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="row">
+        <strong>TOTAL:</strong>
+        <strong>₱${cartTotal.toFixed(2)}</strong>
+      </div>
+
+      <br/>
+      <div class="center">
+        ==============================<br/>
+        Thank you for your purchase!<br/>
+        Visit us again!<br/>
+        ==============================
+      </div>
+
+      <script>
+        window.onload = () => {
+          window.print();
+          window.close();
+        };
+      </script>
+
+    </body>
+  </html>
+  `;
+
+  win.document.write(receipt);
+  win.document.close();
+};
+
   /* ===================== FILTER ===================== */
   const filteredProducts = products.filter((p) => {
     const nameMatch = p.name
@@ -556,10 +648,9 @@ const cartTotal = cart.reduce(
           Continue Shopping
         </button>
 
-        <button className="btn blue" onClick={() => window.print()}>
-          🖨 Print Receipt
-        </button>
-
+        <button className="btn blue" onClick={printReceipt}>
+         <Printer size={14} /> Print Receipt
+          </button>
         <button
           className="btn green"
           onClick={() => {
