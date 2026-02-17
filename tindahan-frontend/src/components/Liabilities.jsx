@@ -147,6 +147,18 @@ export default function Liabilities() {
     acc[item.debtor_name].push(item);
     return acc;
   }, {});
+const totalsByMonth = liabilities.reduce((acc, item) => {
+  if (!item.due_date) return acc;
+
+  const date = new Date(item.due_date);
+  const key = date.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  acc[key] = (acc[key] || 0) + Number(item.amount);
+  return acc;
+}, {});
 
   const resetModal = () => {
     setShowModal(false);
@@ -166,22 +178,39 @@ export default function Liabilities() {
       <Header />
 
       <div className="liabilities-header">
-        <div className="search-wrapper">
-          <Search size={16} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search person who owed..."
-            className="liabilities-search"
-          />
-        </div>
+  <div className="header-center">
+    <div className="search-wrapper">
+      <Search size={16} className="search-icon" />
+      <input
+        type="text"
+        placeholder="Search person who owed..."
+        className="liabilities-search"
+      />
+    </div>
 
-        <button
-          className="add-liability-btn"
-          onClick={() => setShowModal(true)}
-        >
-          + Add Liability
-        </button>
-      </div>
+    <button
+      className="add-liability-btn"
+      onClick={() => setShowModal(true)}
+    >
+      + Add Liability
+    </button>
+  </div>
+</div>
+
+{Object.keys(totalsByMonth).length > 0 && (
+  <div className="monthly-summary">
+    <h3>Monthly Totals</h3>
+
+    <div className="month-list">
+      {Object.entries(totalsByMonth).map(([month, total]) => (
+        <div className="month-row" key={month}>
+          <span>{month}</span>
+          <strong>₱{total.toFixed(2)}</strong>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
       {loading ? (
         <p className="liabilities-empty">Loading...</p>
