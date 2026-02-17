@@ -214,22 +214,22 @@ const confirmDeleteProduct = async () => {
 
 
   /* ===================== CART ===================== */
-  // const addToCart = (product) => {
-  //   setCart((prev) => {
-  //     const found = prev.find((i) => i.id === product.id);
-  //     if (found) {
-  //       return prev.map((i) =>
-  //         i.id === product.id ? { ...i, qty: i.qty + 1 } : i
-  //       );
-  //     }
-  //     return [...prev, { ...product, qty: 1 }];
-  //   });
-  // };
+  const addToCart = (product) => {
+    setCart((prev) => {
+      const found = prev.find((i) => i.id === product.id);
+      if (found) {
+        return prev.map((i) =>
+          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
+        );
+      }
+      return [...prev, { ...product, qty: 1 }];
+    });
+  };
 
-  // const cartTotal = cart.reduce(
-  //   (sum, i) => sum + i.qty * i.price,
-  //   0
-  // );
+  const cartTotal = cart.reduce(
+    (sum, i) => sum + i.qty * i.price,
+    0
+  );
 
   /* ===================== FILTER ===================== */
   const filteredProducts = products.filter((p) => {
