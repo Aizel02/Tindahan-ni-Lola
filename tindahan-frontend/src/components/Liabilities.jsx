@@ -27,16 +27,16 @@ export default function Liabilities() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("You must be logged in to view liabilities.");
+      alert("You must be logged in");
       setLoading(false);
       return;
     }
 
     const { data, error } = await supabase
-      .from("liabilities")
+      .from("liability") // ✅ FIXED TABLE NAME
       .select("*")
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .order("id", { ascending: false });
 
     if (error) {
       console.error("LOAD ERROR:", error);
@@ -74,20 +74,21 @@ export default function Liabilities() {
       amount: Number(form.amount),
       description: form.description,
       due_date: form.dueDate || null,
+      status: "Pending",
     };
 
     let result;
 
     if (editingDebt) {
       result = await supabase
-        .from("liabilities")
+        .from("liability") // ✅
         .update(payload)
         .eq("id", editingDebt.id)
         .select()
         .single();
     } else {
       result = await supabase
-        .from("liabilities")
+        .from("liability") // ✅
         .insert(payload)
         .select()
         .single();
@@ -108,7 +109,7 @@ export default function Liabilities() {
     const today = new Date().toISOString().split("T")[0];
 
     const { error } = await supabase
-      .from("liabilities")
+      .from("liability") // ✅
       .update({
         status: "Paid",
         paid_date: today,
@@ -116,7 +117,6 @@ export default function Liabilities() {
       .eq("id", id);
 
     if (error) {
-      console.error(error);
       alert(error.message);
       return;
     }
@@ -126,16 +126,14 @@ export default function Liabilities() {
 
   /* ================= DELETE ================= */
   const deleteLiability = async (id) => {
-    const ok = window.confirm("Delete this liability?");
-    if (!ok) return;
+    if (!window.confirm("Delete this liability?")) return;
 
     const { error } = await supabase
-      .from("liabilities")
+      .from("liability") // ✅
       .delete()
       .eq("id", id);
 
     if (error) {
-      console.error(error);
       alert(error.message);
       return;
     }
@@ -222,9 +220,7 @@ export default function Liabilities() {
                           </small>
                         )}
 
-                        <span
-                          className={`status ${l.status.toLowerCase()}`}
-                        >
+                        <span className={`status ${l.status.toLowerCase()}`}>
                           {l.status}
                         </span>
                       </div>
@@ -323,10 +319,7 @@ export default function Liabilities() {
               <input
                 value={form.description}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: e.target.value,
-                  })
+                  setForm({ ...form, description: e.target.value })
                 }
               />
 
