@@ -51,7 +51,7 @@ export default function Header({ cartCount = 0, onCartClick }) {
           to="/liabilities"
           className={({ isActive }) => (isActive ? "tab active" : "tab")}
         >
-          Liabilities
+          Debts/Utang
         </NavLink>
       </div>
     </>
