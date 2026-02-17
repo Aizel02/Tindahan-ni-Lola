@@ -74,12 +74,12 @@
 ========================= */
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 25px;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto 24px;
 }
+
 
 .filters input,
 .filters select {
@@ -94,43 +94,57 @@
 .filters select:focus {
   border-color: #0077b6;
 }
+/* 🔽 CATEGORY SELECT */
+.filters select {
+  height: 42px;                 /* SAME AS SEARCH & BUTTON */
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+  appearance: none;             /* 🔥 remove default browser style */
+}
+
 .search-box {
   position: relative;
-  width: 100%;
-  max-width: 260px;
+  width: 260px;
+  height: 42px;                 /* SAME HEIGHT AS OTHERS */
+  display: flex;
+  align-items: center;
 }
 
 .search-box input {
   width: 100%;
-  height: 42px;
-  padding: 10px 12px 10px 40px;
-  border-radius: 8px;
+  height: 100%;
+  padding-left: 40px;           /* space for icon */
+  padding-right: 12px;
+  border-radius: 10px;
   border: 1px solid #d1d5db;
   font-size: 14px;
   outline: none;
+  line-height: 1;               /* 🔥 IMPORTANT */
+  background: white;
 }
 
 .search-box input:focus {
   border-color: #2563eb;
 }
 
+/* 🔍 ICON */
 .search-icon {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
+  transform: translateY(-50%);  /* 🔥 TRUE CENTER */
+  color: #9ca3af;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  font-size: 16px;
 }
-/* .filters select {
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  font-size: 14px;
-} */
+
 .add-product-btn {
   height: 42px;
   padding: 0 18px;
@@ -576,23 +590,11 @@
     gap: 8px;
   }
 
-  /* Filters */
-  .filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  /* .search-box,
-  .filters select,
-  .add-product-btn {
-    width: 100%;
-  } */
-
   /* Product Grid */
-  .product-grid {
+  /* .product-grid {
     grid-template-columns: repeat(2, 1fr);
     padding: 16px;
-  }
+  } */
 
   /* Modals */
   .modal,
@@ -606,6 +608,20 @@
   .app-footer {
     font-size: 12px;
     padding: 12px;
+  }
+}
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .search-box,
+  .filters select,
+  .add-product-btn {
+    width: 100%;
   }
 }
 
