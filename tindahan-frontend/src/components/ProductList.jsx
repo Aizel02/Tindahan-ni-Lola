@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "./ProductList.css";
-import { Pencil, ShoppingCart, Trash2, Search } from "lucide-react";
+import { Pencil, ShoppingCart, Trash2, Search, Printer } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 const fallbackImage = "/no-image.png";
