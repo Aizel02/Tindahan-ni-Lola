@@ -107,43 +107,25 @@ export default function Liabilities() {
   };
 
   /* ================= MARK PAID ================= */
- const markPaid = async (liability) => {
-  const today = new Date().toISOString().split("T")[0];
+  const markPaid = async (id) => {
+    const today = new Date().toISOString().split("T")[0];
 
-  const { error } = await supabase
-    .from("liability")
-    .update({
-      status: "Paid",
-      paid_date: today,
-    })
-    .eq("id", liability.id);
+    const { error } = await supabase
+      .from("liability") // ✅
+      .update({
+        status: "Paid",
+        paid_date: today,
+      })
+      .eq("id", id);
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-  // ✅ AUTO OPEN MESSENGER
-  sendThankYouMessage(liability);
-
-  await loadLiabilities();
-};
-
-  const sendThankYouMessage = (liability) => {
-  if (!liability.fb_thread_id) {
-    console.warn("No Messenger ID for this debtor");
-    return;
-  }
-
-  const message = encodeURIComponent(
-    "Thank you for trusting Aizel Load 🙏 Your payment has been received."
-  );
-
-  const url = `https://www.facebook.com/messages/t/${liability.fb_thread_id}?text=${message}`;
-
-  window.open(url, "_blank");
-};
-
+    await loadLiabilities();
+  };
+  
 
   /* ================= DELETE ================= */
   const deleteLiability = async (id) => {
@@ -277,9 +259,12 @@ const totalsByMonth = liabilities.reduce((acc, item) => {
 
                       <div className="debt-actions">
                         {l.status !== "Paid" && (
-                          <button className="pay" onClick={() => markPaid(l)}>
-  ✔
-</button>
+                          <button
+                            className="pay"
+                            onClick={() => markPaid(l.id)}
+                          >
+                            ✔
+                          </button>
                         )}
                         <button
                           className="edit"
