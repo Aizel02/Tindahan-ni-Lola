@@ -96,14 +96,21 @@
 }
 /* 🔽 CATEGORY SELECT */
 .filters select {
-  height: 42px;                 /* SAME AS SEARCH & BUTTON */
+  height: 42px;
   padding: 0 14px;
   border-radius: 10px;
   border: 1px solid #d1d5db;
-  background: white;
+  background: #fff;
   font-size: 14px;
-  appearance: none;             /* 🔥 remove default browser style */
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  box-sizing: border-box;
+  line-height: 42px; /* 🔥 THIS FIXES THE VISUAL HEIGHT */
 }
+
 
 .search-box {
   position: relative;
@@ -617,7 +624,9 @@
     gap: 12px;
     padding: 16px;
   }
-
+.filters > * {
+    width: 100%;
+  }
   .search-box,
   .filters select,
   .add-product-btn {
