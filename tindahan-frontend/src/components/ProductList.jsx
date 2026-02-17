@@ -46,6 +46,37 @@ const [productToDelete, setProductToDelete] = useState(null);
 
   const [editProduct, setEditProduct] = useState(null);
   const [cart, setCart] = useState([]);
+ const [showQtyModal, setShowQtyModal] = useState(false);
+const [selectedProduct, setSelectedProduct] = useState(null);
+const [qty, setQty] = useState(1);
+
+const openQtyModal = (product) => {
+  setSelectedProduct(product);
+  setQty(1);
+  setShowQtyModal(true);
+};
+
+// ✅ PUT THIS RIGHT AFTER openQtyModal
+const confirmAddToCart = () => {
+  setCart((prev) => {
+    const found = prev.find((i) => i.id === selectedProduct.id);
+
+    if (found) {
+      return prev.map((i) =>
+        i.id === selectedProduct.id
+          ? { ...i, qty: i.qty + qty }
+          : i
+      );
+    }
+
+    return [...prev, { ...selectedProduct, qty }];
+  });
+
+  setShowQtyModal(false);
+  setSelectedProduct(null);
+};
+
+
 
   /* ===================== FETCH ===================== */
   const fetchProducts = async () => {
@@ -183,22 +214,22 @@ const confirmDeleteProduct = async () => {
 
 
   /* ===================== CART ===================== */
-  const addToCart = (product) => {
-    setCart((prev) => {
-      const found = prev.find((i) => i.id === product.id);
-      if (found) {
-        return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
-        );
-      }
-      return [...prev, { ...product, qty: 1 }];
-    });
-  };
+  // const addToCart = (product) => {
+  //   setCart((prev) => {
+  //     const found = prev.find((i) => i.id === product.id);
+  //     if (found) {
+  //       return prev.map((i) =>
+  //         i.id === product.id ? { ...i, qty: i.qty + 1 } : i
+  //       );
+  //     }
+  //     return [...prev, { ...product, qty: 1 }];
+  //   });
+  // };
 
-  const cartTotal = cart.reduce(
-    (sum, i) => sum + i.qty * i.price,
-    0
-  );
+  // const cartTotal = cart.reduce(
+  //   (sum, i) => sum + i.qty * i.price,
+  //   0
+  // );
 
   /* ===================== FILTER ===================== */
   const filteredProducts = products.filter((p) => {
@@ -265,15 +296,53 @@ const confirmDeleteProduct = async () => {
     e.currentTarget.src = fallbackImage;
   }}
 />
+{showQtyModal && selectedProduct && (
+  <div className="modal-overlay">
+    <div className="modal qty-modal">
+
+      <h3>Select Quantity</h3>
+
+      <img
+        src={selectedProduct.image_url || fallbackImage}
+        alt={selectedProduct.name}
+        className="qty-image"
+      />
+
+      <h4>{selectedProduct.name}</h4>
+      <p>{selectedProduct.category}</p>
+      <p>₱{selectedProduct.price}</p>
+
+      <div className="qty-controls">
+        <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
+        <span>{qty}</span>
+        <button onClick={() => setQty((q) => q + 1)}>+</button>
+      </div>
+
+      <div className="qty-summary">
+        <p>Unit Price: ₱{selectedProduct.price}</p>
+        <p>Quantity: {qty}</p>
+        <strong>Total: ₱{selectedProduct.price * qty}</strong>
+      </div>
+
+      <div className="modal-actions">
+        <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+        <button className="confirm" onClick={confirmAddToCart}>
+          Add ({qty})
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
               <div className="card-actions">
-                <button onClick={() => addToCart(p)}>
-                  <ShoppingCart size={14} />
-                </button>
+                <button onClick={() => openQtyModal(p)}>
+  <ShoppingCart size={14} />
+</button>
+
 
                 <button
                   onClick={() => {
