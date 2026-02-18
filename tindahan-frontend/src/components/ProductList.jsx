@@ -324,7 +324,13 @@ const printReceipt = () => {
 
   /* ===================== UI ===================== */
   return (
-    <div className="product-list-page">
+  <>
+    {/* ================= PAGE CONTENT (BLUR THIS) ================= */}
+    <div
+      className={`product-list-page ${
+        showQtyModal || showCartModal || showDeleteModal ? "blurred" : ""
+      }`}
+    >
       <Header
         cartCount={cart.length}
         onCartClick={() => setShowCartModal(true)}
@@ -332,35 +338,36 @@ const printReceipt = () => {
 
       {/* FILTER BAR */}
       <div className="filters">
- <div className="search-box">
-  <Search className="search-icon" size={16} />
-  <input
-    type="text"
-    placeholder="Search products..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
-</div>
+        <div className="search-box">
+          <Search className="search-icon" size={16} />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-
-  <select
-    value={categoryFilter}
-    onChange={(e) => setCategoryFilter(e.target.value)}
-  >
-    <option value="All">All Categories</option>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="All">All Categories</option>
           {CATEGORIES.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>
-    ))}
-  </select>
+          ))}
+        </select>
 
-  <button className="add-product-btn" onClick={() => setShowAddModal(true)}>
-    <ShoppingCart size={16} />
-    Add Product
-  </button>
-</div>
-
+        <button
+          className="add-product-btn"
+          onClick={() => setShowAddModal(true)}
+        >
+          <ShoppingCart size={16} />
+          Add Product
+        </button>
+      </div>
 
       {/* PRODUCTS */}
       {loading ? (
@@ -370,55 +377,19 @@ const printReceipt = () => {
           {filteredProducts.map((p) => (
             <div key={p.id} className="product-card">
               <img
-  src={p.image_url || fallbackImage}
-  alt={p.name}
-  onError={(e) => {
-    e.currentTarget.onerror = null;
-    e.currentTarget.src = fallbackImage;
-  }}
-/>
-{/* QTY MODAL (GLOBAL) */}
-{showQtyModal && selectedProduct && (
-  <div className="modal-overlay">
-    <div className="modal qty-modal">
-
-      <h3>Select Quantity</h3>
-
-      <img
-        src={selectedProduct.image_url || fallbackImage}
-        alt={selectedProduct.name}
-        className="qty-image"
-      />
-
-      <h4>{selectedProduct.name}</h4>
-      <p>{selectedProduct.category}</p>
-      <p>₱{selectedProduct.price}</p>
-
-      <div className="qty-controls">
-        <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
-        <span>{qty}</span>
-        <button onClick={() => setQty((q) => q + 1)}>+</button>
-      </div>
-
-      <div className="modal-actions">
-        <button onClick={() => setShowQtyModal(false)}>Cancel</button>
-        <button className="confirm" onClick={confirmAddToCart}>
-          Add ({qty})
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
+                src={p.image_url || fallbackImage}
+                alt={p.name}
+                onError={(e) => (e.currentTarget.src = fallbackImage)}
+              />
 
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
               <div className="card-actions">
                 <button onClick={() => openQtyModal(p)}>
-  <ShoppingCart size={14} />
-</button>
+                  <ShoppingCart size={14} />
+                </button>
+
                 <button
                   onClick={() => {
                     setEditProduct(p);
@@ -429,239 +400,148 @@ const printReceipt = () => {
                 </button>
 
                 <button onClick={() => handleDeleteClick(p)}>
-  <Trash2 size={14} />
-</button>
-{/* DELETE CONFIRM MODAL */}
-{showDeleteModal && productToDelete && (
-  <div
-    className="modal-overlay"
-    onClick={() => {
-      setShowDeleteModal(false);
-      setProductToDelete(null);
-    }}
-  >
-    <div
-      className="modal delete-modal animate-scale"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <h3>Delete Product</h3>
-
-      <p>
-        Are you sure you want to delete
-        <strong> “{productToDelete.name}”</strong>?
-      </p>
-
-      <div className="modal-actions">
-        <button className="btn danger" onClick={confirmDeleteProduct}>
-          Delete
-        </button>
-
-        <button
-          className="btn"
-          onClick={() => {
-            setShowDeleteModal(false);
-            setProductToDelete(null);
-          }}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                  <Trash2 size={14} />
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
+    </div>
 
-      {/* ADD MODAL */}
-      {showAddModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Add Product</h3>
-            <input
-  type="file"
-  accept="image/*"
-  onChange={(e) =>
-    setNewProduct({
-      ...newProduct,
-      imageFile: e.target.files[0],
-    })
-  }
-/>
-<input
-  placeholder="Product Name"
-  value={newProduct.name}
-  onChange={(e) =>
-    setNewProduct({ ...newProduct, name: e.target.value })
-  }
-/>
+    {/* ================= MODALS (NOT BLURRED) ================= */}
 
-<select
-  value={newProduct.category}
-  onChange={(e) =>
-    setNewProduct({ ...newProduct, category: e.target.value })
-  }
->
-  <option value="">Select Category</option>
-  {CATEGORIES.map((c) => (
-    <option key={c} value={c}>{c}</option>
-  ))}
-</select>
+    {/* QTY MODAL */}
+    {showQtyModal && selectedProduct && (
+      <div className="modal-overlay">
+        <div className="modal qty-modal">
+          <h3>Select Quantity</h3>
 
-<input
-  type="number"
-  placeholder="Price"
-  value={newProduct.price}
-  onChange={(e) =>
-    setNewProduct({ ...newProduct, price: e.target.value })
-  }
-/>
-            {/* <input
-              type="number"
-              placeholder="Price"
-              value={newProduct.price}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, price: e.target.value })
-              }
-            /> */}
+          <img
+            src={selectedProduct.image_url || fallbackImage}
+            alt={selectedProduct.name}
+            className="qty-image"
+          />
 
-            <button onClick={handleAddProduct}>Add</button>
-            <button onClick={() => setShowAddModal(false)}>
-              Cancel
+          <h4>{selectedProduct.name}</h4>
+          <p>{selectedProduct.category}</p>
+          <p>₱{selectedProduct.price}</p>
+
+          <div className="qty-controls">
+            <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
+            <span>{qty}</span>
+            <button onClick={() => setQty((q) => q + 1)}>+</button>
+          </div>
+
+          <div className="modal-actions">
+            <button onClick={() => setShowQtyModal(false)}>Cancel</button>
+            <button className="confirm" onClick={confirmAddToCart}>
+              Add ({qty})
             </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-      {/* EDIT MODAL (THIS FIXES ESLINT) */}
-      {showEditModal && editProduct && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Edit Product</h3>
+    {/* DELETE MODAL */}
+    {showDeleteModal && productToDelete && (
+      <div className="modal-overlay">
+        <div className="modal delete-modal">
+          <h3>Delete Product</h3>
+          <p>
+            Are you sure you want to delete
+            <strong> “{productToDelete.name}”</strong>?
+          </p>
 
-            <input
-              value={editProduct.name}
-              onChange={(e) =>
-                setEditProduct({
-                  ...editProduct,
-                  name: e.target.value,
-                })
-              }
-            />
-
-            <select
-              value={editProduct.category}
-              onChange={(e) =>
-                setEditProduct({
-                  ...editProduct,
-                  category: e.target.value,
-                })
-              }
+          <div className="modal-actions">
+            <button className="btn danger" onClick={confirmDeleteProduct}>
+              Delete
+            </button>
+            <button
+              className="btn"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setProductToDelete(null);
+              }}
             >
-              {CATEGORIES.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-
-            <input
-              type="number"
-              value={editProduct.price}
-              onChange={(e) =>
-                setEditProduct({
-                  ...editProduct,
-                  price: e.target.value,
-                })
-              }
-            />
-
-            <button onClick={handleUpdateProduct}>
-              Update
-            </button>
-            <button onClick={() => setShowEditModal(false)}>
               Cancel
             </button>
           </div>
         </div>
-      )}
-
-     {/* CART MODAL */}
-{showCartModal && (
-  <div className="modal-overlay" onClick={() => setShowCartModal(false)}>
-    <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
-
-      {/* HEADER */}
-      <div className="cart-header">
-        <h3>Shopping Cart</h3>
-        <button className="close-btn" onClick={() => setShowCartModal(false)}>
-          ✕
-        </button>
       </div>
+    )}
 
-      {/* ITEMS */}
-      <div className="cart-list">
-        {cart.map((item) => (
-          <div className="cart-item" key={item.id}>
-            <img
-              src={item.image_url || fallbackImage}
-              alt={item.name}
-            />
+    {/* CART MODAL */}
+    {showCartModal && (
+      <div className="modal-overlay" onClick={() => setShowCartModal(false)}>
+        <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="cart-header">
+            <h3>Shopping Cart</h3>
+            <button
+              className="close-btn"
+              onClick={() => setShowCartModal(false)}
+            >
+              ✕
+            </button>
+          </div>
 
-            <div className="cart-info">
-              <h4>{item.name}</h4>
-              <p className="category">{item.category}</p>
-              <p className="qty">
-                Qty: {item.qty} × ₱{item.price.toFixed(2)}
-              </p>
+          <div className="cart-list">
+            {cart.map((item) => (
+              <div className="cart-item" key={item.id}>
+                <img
+                  src={item.image_url || fallbackImage}
+                  alt={item.name}
+                />
+                <div className="cart-info">
+                  <h4>{item.name}</h4>
+                  <p className="category">{item.category}</p>
+                  <p className="qty">
+                    Qty: {item.qty} × ₱{item.price}
+                  </p>
+                </div>
+                <div className="cart-price">
+                  ₱{(item.qty * item.price).toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="cart-summary">
+            <div className="row">
+              <span>Subtotal ({cart.length} items):</span>
+              <span>₱{cartTotal.toFixed(2)}</span>
             </div>
-
-            <div className="cart-price">
-              ₱{(item.qty * item.price).toFixed(2)}
+            <div className="row grand">
+              <span>Grand Total:</span>
+              <span>₱{cartTotal.toFixed(2)}</span>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* TOTALS */}
-      <div className="cart-summary">
-        <div className="row">
-          <span>Subtotal ({cart.length} items):</span>
-          <span>₱{cartTotal.toFixed(2)}</span>
+          <div className="cart-actions">
+            <button
+              className="btn outline"
+              onClick={() => setShowCartModal(false)}
+            >
+              Continue Shopping
+            </button>
+
+            <button className="btn blue" onClick={printReceipt}>
+              <Printer size={14} /> Print Receipt
+            </button>
+
+            <button
+              className="btn green"
+              onClick={() => {
+                setCart([]);
+                setShowCartModal(false);
+              }}
+            >
+              OK – Confirm & Reset
+            </button>
+          </div>
         </div>
-
-        <div className="row grand">
-          <span>Grand Total:</span>
-          <span>₱{cartTotal.toFixed(2)}</span>
-        </div>
       </div>
-
-      {/* ACTIONS */}
-      <div className="cart-actions">
-        <button
-          className="btn outline"
-          onClick={() => setShowCartModal(false)}
-        >
-          Continue Shopping
-        </button>
-
-        <button className="btn blue" onClick={printReceipt}>
-         <Printer size={14} /> Print Receipt
-          </button>
-        <button
-          className="btn green"
-          onClick={() => {
-            setCart([]);
-            setShowCartModal(false);
-          }}
-        >
-          OK – Confirm & Reset
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
-    </div>
-  );
+    )}
+  </>
+);
 }
