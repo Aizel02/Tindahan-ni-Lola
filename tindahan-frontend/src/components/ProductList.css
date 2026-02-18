@@ -486,9 +486,9 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.15); /* light tint */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.15); /* LIGHT overlay */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -691,15 +691,11 @@
 .cart-modal {
   animation: scaleIn 0.25s ease-out;
 }
-
-.modal-overlay {
-  animation: fadeIn 0.2s ease-out;
-}
-
+/* 
 @keyframes fadeIn {
   from { backdrop-filter: blur(0); }
   to   { backdrop-filter: blur(8px); }
-}
+} */
 /* =========================
    MOBILE RESPONSIVE
 ========================= */
