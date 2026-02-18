@@ -7,6 +7,10 @@
   display: flex;
   flex-direction: column;
 }
+.product-list-page.blurred {
+  filter: blur(8px);
+  transition: filter 0.2s ease;
+}
 
 /* =========================
    HEADER
@@ -486,14 +490,13 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.15); /* LIGHT overlay */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.35); /* soft dim only */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
 }
+
 
 /* Modal base */
 .modal {
