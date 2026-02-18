@@ -700,7 +700,7 @@
   from { backdrop-filter: blur(0); }
   to   { backdrop-filter: blur(8px); }
 }
- =========================
+/* =========================
    MOBILE RESPONSIVE
 ========================= */
 @media (max-width: 768px) {
@@ -719,13 +719,6 @@
     flex-wrap: wrap;
     gap: 8px;
   }
-
-  /* Product Grid */
-  /* .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 16px;
-  } */
-
   /* Modals */
   .modal,
   .cart-modal{
@@ -798,12 +791,6 @@
   .receipt .total {
     font-weight: bold;
     font-size: 13px;
-  }
-}
-@keyframes scaleIn {
-  to {
-    transform: scale(1);
-    opacity: 1;
   }
 }
 
