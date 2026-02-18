@@ -7,10 +7,10 @@
   display: flex;
   flex-direction: column;
 }
-.product-list-page.blurred {
+/* .product-list-page.blurred {
   filter: blur(6px);
   pointer-events: none;
-}
+} */
 
 
 /* =========================
@@ -256,7 +256,7 @@
 /* =========================
    PRODUCT GRID
 ========================= */
-.product-grid {
+/* .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
@@ -288,7 +288,7 @@
 .price {
   font-weight: 600;
   color: #111827;
-}
+} */
 
 /* =========================
    ADD / EDIT MODAL
