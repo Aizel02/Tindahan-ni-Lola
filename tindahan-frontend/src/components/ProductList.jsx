@@ -227,6 +227,10 @@ const ProductList = () => {
     setProductToDelete(null);
     fetchProducts();
   };
+  const removeFromCart = (id) => {
+  setCart((prev) => prev.filter((item) => item.id !== id));
+};
+
 
   /* ===================== CART LOGIC (FIXED) ===================== */
   const addToCart = (product, qty) => {
@@ -352,7 +356,7 @@ const ProductList = () => {
               return (
                 <div key={id || Math.random()} className="product-card">
                  <img
-  src={normalizeImageUrl(product.imageUrl || product.image || "")}
+  src={normalizeImageUrl(product.image_url)}
   alt={product.name || "product"}
   className="product-image"
   onClick={() => {
@@ -383,7 +387,7 @@ const ProductList = () => {
                     >
                       <Pencil size={16} /> Edit
                     </button>
-                    <button onClick={() => handleDeleteProduct(id)}><Trash2 size={16} /> Delete</button>
+                   <button onClick={() => handleDeleteClick(product)}><Trash2 size={16} /> Delete</button>
                   </div>
                 </div>
               );
