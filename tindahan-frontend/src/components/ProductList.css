@@ -16,7 +16,7 @@
 /* =========================
    HEADER
 ========================= */
-.header {
+/* .header {
   background: linear-gradient(90deg, #005c8f, #0077b6);
   color: white;
   padding: 18px 32px;
@@ -47,7 +47,7 @@
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
-}
+} */
 
 /* =========================
    TABS
@@ -490,23 +490,62 @@
 ========================= */
 .modal-overlay {
   position: fixed;
-  inset: 0;
-  background: transparent; /* WALANG BLACK */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 9999;
+  justify-content: center;
+  z-index: 999;
 }
 
-
-/* Modal base */
-/* .modal {
-  background: #fff;
+/* Modal Box */
+.modal {
+  background: white;
   border-radius: 12px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-} */
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0077b6;
+  color: white;
+  padding: 15px 20px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
 
 /* Delete modal emphasis */
 .delete-modal {
@@ -514,12 +553,12 @@
 }
 
 /* Buttons */
-.modal-actions {
+/* .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
-}
+} */
 
 .btn {
   padding: 8px 14px;
@@ -536,12 +575,6 @@
 /* 🎬 SCALE + FADE ANIMATION */
 .animate-scale {
   animation: scaleIn 0.25s ease-out;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
 }
 
 .btn {

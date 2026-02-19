@@ -380,38 +380,49 @@ const printReceipt = () => {
 {/* QTY MODAL (GLOBAL) */}
 {showQtyModal && selectedProduct && (
   <div className="modal-overlay">
-    <div className="modal qty-modal">
-
-      <h3>Select Quantity</h3>
+    <div className="qty-modal">
+      <div className="qty-header">
+        <h3>Select Quantity</h3>
+        <button onClick={() => setShowQtyModal(false)}>✖</button>
+      </div>
 
       <img
-        src={selectedProduct.image_url || fallbackImage}
+        src={normalizeImageUrl(selectedProduct.imageUrl)}
         alt={selectedProduct.name}
         className="qty-image"
       />
 
       <h4>{selectedProduct.name}</h4>
       <p>{selectedProduct.category}</p>
-      <p>₱{selectedProduct.price}</p>
+      <p>₱{Number(selectedProduct.price).toFixed(2)}</p>
 
       <div className="qty-controls">
-        <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
-        <span>{qty}</span>
-        <button onClick={() => setQty((q) => q + 1)}>+</button>
+        <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+        <span>{quantity}</span>
+        <button onClick={() => setQuantity(quantity + 1)}>+</button>
       </div>
 
-      <div className="modal-actions">
+      <div className="summary-box">
+        <p>Unit Price: ₱{selectedProduct.price}</p>
+        <p>Quantity: {quantity} pc</p>
+        <h4>Total: ₱{(quantity * selectedProduct.price).toFixed(2)}</h4>
+      </div>
+
+      <div className="modal-footer">
         <button onClick={() => setShowQtyModal(false)}>Cancel</button>
-        <button className="confirm" onClick={confirmAddToCart}>
-          Add ({qty})
+        <button
+          className="confirm"
+          onClick={() => {
+            addToCart(selectedProduct, quantity);
+            setShowQtyModal(false); // 🔙 back to product screen
+          }}
+        >
+          Add ({quantity})
         </button>
       </div>
     </div>
   </div>
 )}
-
-
-
               <h4>{p.name}</h4>
               <p>₱{p.price}</p>
 
@@ -476,152 +487,184 @@ const printReceipt = () => {
       )}
 
       {/* ADD MODAL */}
-      {showAddModal && (
+       {showAddModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Add Product</h3>
-            <input
-  type="file"
-  accept="image/*"
-  onChange={(e) =>
-    setNewProduct({
-      ...newProduct,
-      imageFile: e.target.files[0],
-    })
-  }
-/>
-<input
-  placeholder="Product Name"
-  value={newProduct.name}
-  onChange={(e) =>
-    setNewProduct({ ...newProduct, name: e.target.value })
-  }
-/>
-
-<select
-  value={newProduct.category}
-  onChange={(e) =>
-    setNewProduct({ ...newProduct, category: e.target.value })
-  }
->
-  <option value="">Select Category</option>
-  {CATEGORIES.map((c) => (
-    <option key={c} value={c}>{c}</option>
-  ))}
-</select>
-
-<input
-  type="number"
-  placeholder="Price"
-  value={newProduct.price}
-  onChange={(e) =>
-    setNewProduct({ ...newProduct, price: e.target.value })
-  }
-/>
-            {/* <input
-              type="number"
-              placeholder="Price"
-              value={newProduct.price}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, price: e.target.value })
-              }
-            /> */}
-
-            <button onClick={handleAddProduct}>Add</button>
-            <button onClick={() => setShowAddModal(false)}>
-              Cancel
-            </button>
+            <div className="modal-header">
+              <h3>Add New Product</h3>
+              <button onClick={() => setShowAddModal(false)}>✖</button>
+            </div>
+            <div className="modal-body">
+              <label>Upload Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, imageFile: e.target.files?.[0] })
+                }
+              />
+              <label>Product Name</label>
+              <input
+                type="text"
+                value={newProduct.name}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, name: e.target.value })
+                }
+              />
+              <label>Category</label>
+              <select
+                value={newProduct.category}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, category: e.target.value })
+                }
+              >
+                <option value="">Select Category</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+              <label>Description</label>
+              <textarea
+                rows="3"
+                placeholder="Enter product description"
+                value={newProduct.description}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, description: e.target.value })
+                }
+              />
+              <label>Price (₱)</label>
+              <input
+                type="number"
+                value={newProduct.price}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, price: e.target.value })
+                }
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="cancel" onClick={() => setShowAddModal(false)}>
+                Cancel
+              </button>
+              <button className="confirm" onClick={handleAddProduct}>
+                Add Product
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* EDIT MODAL (THIS FIXES ESLINT) */}
-      {showEditModal && editProduct && (
+     {showEditModal && editProduct && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Edit Product</h3>
-
-            <input
-              value={editProduct.name}
-              onChange={(e) =>
-                setEditProduct({
-                  ...editProduct,
-                  name: e.target.value,
-                })
-              }
-            />
-
-            <select
-              value={editProduct.category}
-              onChange={(e) =>
-                setEditProduct({
-                  ...editProduct,
-                  category: e.target.value,
-                })
-              }
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-
-            <input
-              type="number"
-              value={editProduct.price}
-              onChange={(e) =>
-                setEditProduct({
-                  ...editProduct,
-                  price: e.target.value,
-                })
-              }
-            />
-
-            <button onClick={handleUpdateProduct}>
-              Update
-            </button>
-            <button onClick={() => setShowEditModal(false)}>
-              Cancel
-            </button>
+            <div className="modal-header">
+              <h3>Edit Product</h3>
+              <button onClick={() => setShowEditModal(false)}>✖</button>
+            </div>
+            <div className="modal-body">
+              <label>Change Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, imageFile: e.target.files?.[0] })
+                }
+              />
+              <label>Product Name</label>
+              <input
+                type="text"
+                value={editProduct.name || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, name: e.target.value })
+                }
+              />
+              <label>Category</label>
+              <select
+                value={editProduct.category || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, category: e.target.value })
+                }
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+              <label>Description</label>
+              <textarea
+                rows="3"
+                value={editProduct.description || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, description: e.target.value })
+                }
+              />
+              <label>Price (₱)</label>
+              <input
+                type="number"
+                value={editProduct.price || ""}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, price: e.target.value })
+                }
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="cancel" onClick={() => setShowEditModal(false)}>
+                Cancel
+              </button>
+              <button className="confirm" onClick={handleUpdateProduct}>
+                Update Product
+              </button>
+            </div>
           </div>
         </div>
       )}
 
      {/* CART MODAL */}
 {showCartModal && (
-  <div className="modal-overlay" onClick={() => setShowCartModal(false)}>
-    <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
-
-      {/* HEADER */}
+  <div className="modal-overlay">
+    <div className="cart-modal">
       <div className="cart-header">
         <h3>Shopping Cart</h3>
-        <button className="close-btn" onClick={() => setShowCartModal(false)}>
-          ✕
-        </button>
+        <button onClick={() => setShowCartModal(false)}>✖</button>
       </div>
+        {/* SCROLLABLE ITEMS */}
+  {/* SCROLLABLE CART LIST */}
+<div className="cart-list scrollable">
+  {cart.length === 0 ? (
+    <div className="empty-cart">
+      <strong>Your cart is empty</strong>
+      <span>Click products to add items</span>
+    </div>
+  ) : (
+    cart.map((item) => (
+      <div className="cart-item" key={item.id}>
+        <img
+          src={normalizeImageUrl(item.imageUrl)}
+          alt={item.name}
+          className="cart-item-img"
+        />
 
-      {/* ITEMS */}
-      <div className="cart-list">
-        {cart.map((item) => (
-          <div className="cart-item" key={item.id}>
-            <img
-              src={item.image_url || fallbackImage}
-              alt={item.name}
-            />
+        <div className="cart-item-info">
+          <h4>{item.name}</h4>
+          <p>Qty: {item.qty} × ₱{item.price}</p>
+        </div>
 
-            <div className="cart-info">
-              <h4>{item.name}</h4>
-              <p className="category">{item.category}</p>
-              <p className="qty">
-                Qty: {item.qty} × ₱{item.price.toFixed(2)}
-              </p>
-            </div>
-
-            <div className="cart-price">
-              ₱{(item.qty * item.price).toFixed(2)}
-            </div>
-          </div>
-        ))}
+        <div className="cart-item-price">
+          ₱{(item.qty * item.price).toFixed(2)}
+          <button
+            className="remove-btn"
+            onClick={() => removeFromCart(item.id)}
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
+    ))
+  )}
+</div>
 
       {/* TOTALS */}
       <div className="cart-summary">
