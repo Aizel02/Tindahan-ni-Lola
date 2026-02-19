@@ -324,11 +324,15 @@ const printReceipt = () => {
 
   /* ===================== UI ===================== */
   return (
-    <div className="product-list-page">
-      <Header
-        cartCount={cart.length}
-        onCartClick={() => setShowCartModal(true)}
-      />
+  <div
+    className={`product-list-page ${
+      showQtyModal || showCartModal ? "blurred" : ""
+    }`}
+  >
+    <Header
+      cartCount={cart.length}
+      onCartClick={() => setShowCartModal(true)}
+    />
 
       {/* FILTER BAR */}
       <div className="filters">
