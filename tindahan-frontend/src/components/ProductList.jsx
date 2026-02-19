@@ -194,14 +194,19 @@ const printReceipt = () => {
   };
 
   // ✅ ADD PRODUCT (SUPABASE)
-  const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.price) {
-      alert("Fill all fields");
-      return;
-    }
+const handleAddProduct = async () => {
+  if (!newProduct.name || !newProduct.price) {
+    alert("Fill all fields");
+    return;
+  }
 
-    // ⛅ Cloudinary upload handled elsewhere
-    const imageUrl = newProduct.imageFile?.cloudinaryUrl || "";
+  try {
+    let imageUrl = "";
+
+    // ✅ upload image to Cloudinary if selected
+    if (newProduct.imageFile) {
+      imageUrl = await uploadToCloudinary(newProduct.imageFile);
+    }
 
     const { error } = await supabase.from("products").insert([
       {
@@ -209,26 +214,39 @@ const printReceipt = () => {
         category: newProduct.category,
         price: Number(newProduct.price),
         description: newProduct.description,
-        imageUrl,
+        imageUrl, // 👈 Cloudinary URL saved to Supabase
       },
     ]);
 
-    if (!error) {
-      fetchProducts();
-      setShowAddModal(false);
-      setNewProduct({
-        name: "",
-        category: "",
-        price: "",
-        description: "",
-        imageFile: null,
-      });
-    }
-  };
+    if (error) throw error;
+
+    fetchProducts();
+    setShowAddModal(false);
+    setNewProduct({
+      name: "",
+      category: "",
+      price: "",
+      description: "",
+      imageFile: null,
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to add product");
+  }
+};
+
 
   // ✅ UPDATE PRODUCT (SUPABASE)
-  const handleUpdateProduct = async () => {
-    if (!editProduct?.id) return;
+ const handleUpdateProduct = async () => {
+  if (!editProduct?.id) return;
+
+  try {
+    let imageUrl = editProduct.imageUrl;
+
+    // ✅ upload new image only if user selected one
+    if (editProduct.imageFile) {
+      imageUrl = await uploadToCloudinary(editProduct.imageFile);
+    }
 
     const { error } = await supabase
       .from("products")
@@ -237,16 +255,21 @@ const printReceipt = () => {
         category: editProduct.category,
         price: Number(editProduct.price),
         description: editProduct.description,
-        imageUrl: editProduct.imageUrl, // Cloudinary unchanged
+        imageUrl,
       })
       .eq("id", editProduct.id);
 
-    if (!error) {
-      fetchProducts();
-      setShowEditModal(false);
-      setEditProduct(null);
-    }
-  };
+    if (error) throw error;
+
+    fetchProducts();
+    setShowEditModal(false);
+    setEditProduct(null);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to update product");
+  }
+};
+
 
   // ✅ DELETE PRODUCT (SUPABASE)
   const handleDeleteProduct = async (id) => {
