@@ -212,10 +212,7 @@ const ProductList = () => {
   };
 
   /* ===================== DELETE PRODUCT ===================== */
-  const handleDeleteClick = (product) => {
-    setProductToDelete(product);
-    setShowDeleteModal(true);
-  };
+
 const handleDeleteProduct = async (id) => {
   await supabase.from("products").delete().eq("id", id);
   fetchProducts();
@@ -379,7 +376,10 @@ const handleDeleteProduct = async (id) => {
                     >
                       <Pencil size={16} /> Edit
                     </button>
-                   <button onClick={() => handleDeleteClick(product)}><Trash2 size={16} /> Delete</button>
+                   <button onClick={() => handleDeleteProduct(product.id)}>
+  <Trash2 size={16} /> Delete
+</button>
+
                   </div>
                 </div>
               );
@@ -557,9 +557,10 @@ const handleDeleteProduct = async (id) => {
 
         <div className="cart-item-price">
           ₱{(item.qty * item.price).toFixed(2)}
-          <button onClick={() => handleDeleteProduct(id)}>
-  <Trash2 size={16} /> Delete
+        <button onClick={() => removeFromCart(item.id)}>
+  <Trash2 size={16} />
 </button>
+
 
         </div>
       </div>
