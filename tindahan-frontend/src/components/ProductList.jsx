@@ -267,11 +267,12 @@ const handleDeleteProduct = async (id) => {
         <button onClick={() => setShowQtyModal(false)}>✖</button>
       </div>
 
-      <img
-        src={normalizeImageUrl(selectedProduct.imageUrl)}
-        alt={selectedProduct.name}
-        className="qty-image"
-      />
+     <img
+  src={normalizeImageUrl(selectedProduct.image_url)}
+  alt={selectedProduct.name}
+  className="qty-image"
+/>
+
 
       <h4>{selectedProduct.name}</h4>
       <p>{selectedProduct.category}</p>
