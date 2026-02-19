@@ -61,7 +61,6 @@ const ProductList = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [showCartModal, setShowCartModal] = useState(false);
-  const [user, setUser] = useState(null);
 
   const cartTotal = cart.reduce(
     (sum, item) => sum + item.qty * item.price,
@@ -163,17 +162,17 @@ const printReceipt = () => {
 };
 
   // ✅ AUTH + INITIAL LOAD
-  useEffect(() => {
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentUser = data?.session?.user;
-      if (!currentUser) return;
+ useEffect(() => {
+  const init = async () => {
+    const { data } = await supabase.auth.getSession();
+    const currentUser = data?.session?.user;
+    if (!currentUser) return;
 
-      setUser(currentUser);
-      fetchProducts();
-    };
-    init();
-  }, []);
+    fetchProducts();
+  };
+  init();
+}, []);
+
 
   // ✅ FETCH PRODUCTS (SUPABASE)
   const fetchProducts = async () => {
