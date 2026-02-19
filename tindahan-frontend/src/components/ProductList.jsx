@@ -56,7 +56,7 @@ const ProductList = () => {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -70,10 +70,6 @@ const ProductList = () => {
   });
 
   const [editProduct, setEditProduct] = useState(null);
-
-  /* ✅ DELETE MODAL STATES (FIX) */
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
 
   /* 🛒 CART */
   const [cart, setCart] = useState([]);
@@ -220,13 +216,11 @@ const ProductList = () => {
     setProductToDelete(product);
     setShowDeleteModal(true);
   };
+const handleDeleteProduct = async (id) => {
+  await supabase.from("products").delete().eq("id", id);
+  fetchProducts();
+};
 
-  const confirmDeleteProduct = async () => {
-    await supabase.from("products").delete().eq("id", productToDelete.id);
-    setShowDeleteModal(false);
-    setProductToDelete(null);
-    fetchProducts();
-  };
   const removeFromCart = (id) => {
   setCart((prev) => prev.filter((item) => item.id !== id));
 };
@@ -346,9 +340,7 @@ const ProductList = () => {
 
       {loading ? (
         <p className="status-text"><Loader size={16} /> Loading products...</p>
-      ) : error ? (
-        <p className="error-text">{error}</p>
-      ) : (
+     ) : (
         <div className="product-grid">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => {
@@ -565,12 +557,10 @@ const ProductList = () => {
 
         <div className="cart-item-price">
           ₱{(item.qty * item.price).toFixed(2)}
-          <button
-            className="remove-btn"
-            onClick={() => removeFromCart(item.id)}
-          >
-            <Trash2 size={16} />
-          </button>
+          <button onClick={() => handleDeleteProduct(id)}>
+  <Trash2 size={16} /> Delete
+</button>
+
         </div>
       </div>
     ))
