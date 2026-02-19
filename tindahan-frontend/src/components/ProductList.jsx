@@ -35,7 +35,7 @@ const uploadToCloudinary = async (file) => {
     throw new Error("Image upload failed");
   }
 
-  return data.secure_url;
+  return data.secure_url; // 👈 use THIS in <img src="">
 };
 
 const fallbackImage = "/no-image.png";
@@ -142,126 +142,129 @@ const ProductList = () => {
   };
 
   /* ===================== AUTH + FETCH ===================== */
-  useEffect(() => {
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data?.session?.user) return;
-      fetchProducts();
-    };
-    init();
-  }, []);
-
   const fetchProducts = async () => {
-    setLoading(true);
-    setError("");
-
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .order("name", { ascending: true });
-
-    if (error) setError("Failed to load products");
-    else setProducts(data || []);
-
-    setLoading(false);
-  };
-
+      setLoading(true);
+  
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+  
+      if (!user) return;
+  
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("name");
+  
+      setProducts(data || []);
+      setLoading(false);
+    };
+  
+    useEffect(() => {
+      fetchProducts();
+    }, []);
+  
   /* ===================== ADD PRODUCT ===================== */
   const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.price) return alert("Fill all fields");
-
-    try {
-      let imageUrl = "";
-      if (newProduct.imageFile) {
-        imageUrl = await uploadToCloudinary(newProduct.imageFile);
-      }
-
-      await supabase.from("products").insert([
-        {
-          name: newProduct.name,
-          category: newProduct.category,
-          price: Number(newProduct.price),
-          description: newProduct.description,
-          imageUrl,
-        },
-      ]);
-
-      fetchProducts();
-      setShowAddModal(false);
-      setNewProduct({
-        name: "",
-        category: "",
-        price: "",
-        description: "",
-        imageFile: null,
-      });
-    } catch {
-      alert("Failed to add product");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+  
+    if (!user) return;
+  
+    let imageUrl = null;
+  
+    if (newProduct.imageFile) {
+      imageUrl = await uploadToCloudinary(newProduct.imageFile);
     }
-  };
-
-  /* ===================== UPDATE PRODUCT ===================== */
-  const handleUpdateProduct = async () => {
-    if (!editProduct?.id) return;
-
-    try {
-      let imageUrl = editProduct.imageUrl;
-      if (editProduct.imageFile) {
-        imageUrl = await uploadToCloudinary(editProduct.imageFile);
-      }
-
-      await supabase
-        .from("products")
-        .update({
-          name: editProduct.name,
-          category: editProduct.category,
-          price: Number(editProduct.price),
-          description: editProduct.description,
-          imageUrl,
-        })
-        .eq("id", editProduct.id);
-
-      fetchProducts();
-      setShowEditModal(false);
-      setEditProduct(null);
-    } catch {
-      alert("Failed to update product");
-    }
-  };
-
-  // ✅ DELETE PRODUCT (SUPABASE)
-  const handleDeleteProduct = async (id) => {
-    await supabase.from("products").delete().eq("id", id);
+  
+    await supabase.from("products").insert([
+      {
+        user_id: user.id,
+        name: newProduct.name,
+        category: newProduct.category,
+        price: Number(newProduct.price),
+        image_url: imageUrl,
+      },
+    ]);
+  
+    setShowAddModal(false);
+    setNewProduct({
+      name: "",
+      category: "",
+      price: "",
+      imageFile: null,
+    });
+  
     fetchProducts();
   };
+  /* ===================== UPDATE PRODUCT ===================== */
+ const handleUpdateProduct = async () => {
+  let imageUrl = editProduct.image_url;
 
-  // 🛒 CART LOGIC (UNCHANGED)
-  const addToCart = (product, qty) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, qty: item.qty + qty }
-            : item
-        );
-      }
-      return [
-        ...prev,
-        {
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          qty,
-        },
-      ];
-    });
-  };
+  try {
+    if (editProduct.imageFile) {
+      imageUrl = await uploadToCloudinary(editProduct.imageFile);
+    }
 
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+    await supabase
+      .from("products")
+      .update({
+        name: editProduct.name,
+        category: editProduct.category,
+        price: Number(editProduct.price),
+        image_url: imageUrl,
+      })
+      .eq("id", editProduct.id);
+
+    setShowEditModal(false);
+    setEditProduct(null);
+    fetchProducts();
+  } catch (err) {
+    console.error(err);
+    alert("Update failed");
+  }
+};
+// ===================== DELETE PRODUCT (DITO 👇) =====================
+const handleDeleteClick = (product) => {
+  setProductToDelete(product);
+  setShowDeleteModal(true);
+};
+
+const confirmDeleteProduct = async () => {
+  if (!productToDelete) return;
+
+  await supabase
+    .from("products")
+    .delete()
+    .eq("id", productToDelete.id);
+
+  setShowDeleteModal(false);
+  setProductToDelete(null);
+  fetchProducts();
+};
+
+
+  /* ===================== CART ===================== */
+const confirmAddToCart = () => {
+  setCart((prev) => {
+    const found = prev.find((i) => i.id === selectedProduct.id);
+
+    if (found) {
+      return prev.map((i) =>
+        i.id === selectedProduct.id
+          ? { ...i, qty: i.qty + qty }
+          : i
+      );
+    }
+
+    return [...prev, { ...selectedProduct, qty }];
+  });
+
+  setShowQtyModal(false);
+  setSelectedProduct(null);
+};
 
   // 🔍 FILTERING (UNCHANGED)
   const filteredProducts = products
