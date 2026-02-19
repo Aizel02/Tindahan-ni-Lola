@@ -9,13 +9,40 @@ import {
   Loader,
   Search,
 } from "lucide-react";
-import { supabase } from "../supabaseClient"; // ✅ SUPABASE
+import { supabase } from "../supabaseClient";
+
+/* ===================== IMAGE UPLOAD ===================== */
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append(
+    "upload_preset",
+    process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+  );
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.error("Cloudinary error:", data);
+    throw new Error("Image upload failed");
+  }
+
+  return data.secure_url;
+};
 
 const fallbackImage = "/no-image.png";
 
-const normalizeImageUrl = (imageUrl) => {
-  if (!imageUrl) return fallbackImage;
-  if (imageUrl.startsWith("http")) return imageUrl; // Cloudinary stays
+const normalizeImageUrl = (url) => {
+  if (!url) return fallbackImage;
+  if (url.startsWith("http")) return url;
   return fallbackImage;
 };
 
@@ -42,6 +69,7 @@ const ProductList = () => {
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -50,12 +78,12 @@ const ProductList = () => {
     category: "",
     price: "",
     description: "",
-    imageFile: null, // still Cloudinary
+    imageFile: null,
   });
 
   const [editProduct, setEditProduct] = useState(null);
 
-  // 🛒 CART STATES (UNCHANGED)
+  // 🛒 CART
   const [cart, setCart] = useState([]);
   const [showQtyModal, setShowQtyModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -66,115 +94,63 @@ const ProductList = () => {
     (sum, item) => sum + item.qty * item.price,
     0
   );
-// 🖨️ PRINT RECEIPT
-const printReceipt = () => {
-  const win = window.open("", "_blank", "width=350,height=600");
 
-  const receipt = `
-  <html>
-    <head>
-      <style>
-        body {
-          font-family: monospace;
-          width: 80mm;
-          margin: 0;
-          padding: 10px;
-        }
-        .center { text-align: center; }
-        .line { border-top: 1px dashed #000; margin: 6px 0; }
-        .row {
-          display: flex;
-          justify-content: space-between;
-        }
-        .small { font-size: 12px; }
-      </style>
-    </head>
-    <body>
+  /* ===================== PRINT RECEIPT ===================== */
+  const printReceipt = () => {
+    const win = window.open("", "_blank", "width=350,height=600");
 
-      <div class="center">
-        ==============================<br/>
-        <strong>TINDAHAN NI LOLA</strong><br/>
-        Receipt of Sale<br/>
-        ==============================
-      </div>
+    const receipt = `
+    <html>
+      <body style="font-family: monospace; width: 80mm; padding: 10px;">
+        <center>
+          ==============================<br/>
+          <b>TINDAHAN NI LOLA</b><br/>
+          Receipt of Sale<br/>
+          ==============================<br/><br/>
+          ${new Date().toLocaleString()}
+        </center><br/>
 
-      <br/>
-      <div class="center">${new Date().toLocaleString()}</div>
-      <br/>
+        ${cart
+          .map(
+            (item) => `
+            ${item.name} <br/>
+            ${item.qty} × ₱${item.price} = ₱${(
+              item.qty * item.price
+            ).toFixed(2)}<br/><br/>
+          `
+          )
+          .join("")}
 
-      <div class="row small">
-        <strong>ITEM</strong>
-        <strong>QTY&nbsp;&nbsp;TOTAL</strong>
-      </div>
-      <div class="line"></div>
+        ------------------------------<br/>
+        TOTAL: ₱${cartTotal.toFixed(2)}<br/>
+        ------------------------------<br/><br/>
 
-      ${cart
-        .map(
-          (item) => `
-        <div class="row small">
-          <span>${item.name}</span>
-          <span>${item.qty}  ₱${(item.qty * item.price).toFixed(2)}</span>
-        </div>
-      `
-        )
-        .join("")}
+        <center>Thank you!<br/>Visit again!</center>
 
-      <div class="line"></div>
+        <script>
+          window.onload = () => {
+            window.print();
+            window.close();
+          };
+        </script>
+      </body>
+    </html>
+    `;
 
-      <div class="row small">
-        <span>Items:</span>
-        <span>${cart.length}</span>
-      </div>
-
-      <div class="row small">
-        <span>Subtotal:</span>
-        <span>₱${cartTotal.toFixed(2)}</span>
-      </div>
-
-      <div class="line"></div>
-
-      <div class="row">
-        <strong>TOTAL:</strong>
-        <strong>₱${cartTotal.toFixed(2)}</strong>
-      </div>
-
-      <br/>
-      <div class="center">
-        ==============================<br/>
-        Thank you for your purchase!<br/>
-        Visit us again!<br/>
-        ==============================
-      </div>
-
-      <script>
-        window.onload = () => {
-          window.print();
-          window.close();
-        };
-      </script>
-
-    </body>
-  </html>
-  `;
-
-  win.document.write(receipt);
-  win.document.close();
-};
-
-  // ✅ AUTH + INITIAL LOAD
- useEffect(() => {
-  const init = async () => {
-    const { data } = await supabase.auth.getSession();
-    const currentUser = data?.session?.user;
-    if (!currentUser) return;
-
-    fetchProducts();
+    win.document.write(receipt);
+    win.document.close();
   };
-  init();
-}, []);
 
+  /* ===================== AUTH + FETCH ===================== */
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session?.user) return;
+      fetchProducts();
+    };
+    init();
+  }, []);
 
-  // ✅ FETCH PRODUCTS (SUPABASE)
   const fetchProducts = async () => {
     setLoading(true);
     setError("");
@@ -184,92 +160,74 @@ const printReceipt = () => {
       .select("*")
       .order("name", { ascending: true });
 
-    if (error) {
-      console.error(error);
-      setError("Failed to load products.");
-    } else {
-      setProducts(data || []);
-    }
+    if (error) setError("Failed to load products");
+    else setProducts(data || []);
+
     setLoading(false);
   };
 
-  // ✅ ADD PRODUCT (SUPABASE)
-const handleAddProduct = async () => {
-  if (!newProduct.name || !newProduct.price) {
-    alert("Fill all fields");
-    return;
-  }
+  /* ===================== ADD PRODUCT ===================== */
+  const handleAddProduct = async () => {
+    if (!newProduct.name || !newProduct.price) return alert("Fill all fields");
 
-  try {
-    let imageUrl = "";
+    try {
+      let imageUrl = "";
+      if (newProduct.imageFile) {
+        imageUrl = await uploadToCloudinary(newProduct.imageFile);
+      }
 
-    // ✅ upload image to Cloudinary if selected
-    if (newProduct.imageFile) {
-      imageUrl = await uploadToCloudinary(newProduct.imageFile);
+      await supabase.from("products").insert([
+        {
+          name: newProduct.name,
+          category: newProduct.category,
+          price: Number(newProduct.price),
+          description: newProduct.description,
+          imageUrl,
+        },
+      ]);
+
+      fetchProducts();
+      setShowAddModal(false);
+      setNewProduct({
+        name: "",
+        category: "",
+        price: "",
+        description: "",
+        imageFile: null,
+      });
+    } catch {
+      alert("Failed to add product");
     }
+  };
 
-    const { error } = await supabase.from("products").insert([
-      {
-        name: newProduct.name,
-        category: newProduct.category,
-        price: Number(newProduct.price),
-        description: newProduct.description,
-        imageUrl, // 👈 Cloudinary URL saved to Supabase
-      },
-    ]);
+  /* ===================== UPDATE PRODUCT ===================== */
+  const handleUpdateProduct = async () => {
+    if (!editProduct?.id) return;
 
-    if (error) throw error;
+    try {
+      let imageUrl = editProduct.imageUrl;
+      if (editProduct.imageFile) {
+        imageUrl = await uploadToCloudinary(editProduct.imageFile);
+      }
 
-    fetchProducts();
-    setShowAddModal(false);
-    setNewProduct({
-      name: "",
-      category: "",
-      price: "",
-      description: "",
-      imageFile: null,
-    });
-  } catch (err) {
-    console.error(err);
-    alert("Failed to add product");
-  }
-};
+      await supabase
+        .from("products")
+        .update({
+          name: editProduct.name,
+          category: editProduct.category,
+          price: Number(editProduct.price),
+          description: editProduct.description,
+          imageUrl,
+        })
+        .eq("id", editProduct.id);
 
-
-  // ✅ UPDATE PRODUCT (SUPABASE)
- const handleUpdateProduct = async () => {
-  if (!editProduct?.id) return;
-
-  try {
-    let imageUrl = editProduct.imageUrl;
-
-    // ✅ upload new image only if user selected one
-    if (editProduct.imageFile) {
-      imageUrl = await uploadToCloudinary(editProduct.imageFile);
+      fetchProducts();
+      setShowEditModal(false);
+      setEditProduct(null);
+    } catch {
+      alert("Failed to update product");
     }
-
-    const { error } = await supabase
-      .from("products")
-      .update({
-        name: editProduct.name,
-        category: editProduct.category,
-        price: Number(editProduct.price),
-        description: editProduct.description,
-        imageUrl,
-      })
-      .eq("id", editProduct.id);
-
-    if (error) throw error;
-
-    fetchProducts();
-    setShowEditModal(false);
-    setEditProduct(null);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to update product");
-  }
-};
-
+  };
 
   // ✅ DELETE PRODUCT (SUPABASE)
   const handleDeleteProduct = async (id) => {
