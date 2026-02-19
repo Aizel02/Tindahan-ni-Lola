@@ -22,29 +22,17 @@ const uploadToCloudinary = async (file) => {
 
   const res = await fetch(
     `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
-    {
-      method: "POST",
-      body: formData,
-    }
+    { method: "POST", body: formData }
   );
 
   const data = await res.json();
-
-  if (!res.ok) {
-    console.error("Cloudinary error:", data);
-    throw new Error("Image upload failed");
-  }
-
-  return data.secure_url; // 👈 use THIS in <img src="">
+  if (!res.ok) throw new Error("Image upload failed");
+  return data.secure_url;
 };
 
 const fallbackImage = "/no-image.png";
-
-const normalizeImageUrl = (url) => {
-  if (!url) return fallbackImage;
-  if (url.startsWith("http")) return url;
-  return fallbackImage;
-};
+const normalizeImageUrl = (url) =>
+  url && url.startsWith("http") ? url : fallbackImage;
 
 const CATEGORIES = [
   "Biscuits",
@@ -83,7 +71,11 @@ const ProductList = () => {
 
   const [editProduct, setEditProduct] = useState(null);
 
-  // 🛒 CART
+  /* ✅ DELETE MODAL STATES (FIX) */
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+
+  /* 🛒 CART */
   const [cart, setCart] = useState([]);
   const [showQtyModal, setShowQtyModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -94,6 +86,29 @@ const ProductList = () => {
     (sum, item) => sum + item.qty * item.price,
     0
   );
+
+  /* ===================== FETCH ===================== */
+  const fetchProducts = async () => {
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("name");
+
+    setProducts(data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   /* ===================== PRINT RECEIPT ===================== */
   const printReceipt = () => {
@@ -141,71 +156,48 @@ const ProductList = () => {
     win.document.close();
   };
 
-  /* ===================== AUTH + FETCH ===================== */
-  const fetchProducts = async () => {
-      setLoading(true);
   
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-  
-      if (!user) return;
-  
-      const { data } = await supabase
-        .from("products")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("name");
-  
-      setProducts(data || []);
-      setLoading(false);
-    };
-  
-    useEffect(() => {
-      fetchProducts();
-    }, []);
-  
-  /* ===================== ADD PRODUCT ===================== */
+  /* * ===================== ADD PRODUCT ===================== */
   const handleAddProduct = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-  
+
     if (!user) return;
-  
-    let imageUrl = null;
-  
+
+    let image_url = null;
     if (newProduct.imageFile) {
-      imageUrl = await uploadToCloudinary(newProduct.imageFile);
+      image_url = await uploadToCloudinary(newProduct.imageFile);
     }
-  
+
     await supabase.from("products").insert([
       {
         user_id: user.id,
         name: newProduct.name,
         category: newProduct.category,
         price: Number(newProduct.price),
-        image_url: imageUrl,
+        image_url,
       },
     ]);
-  
+
     setShowAddModal(false);
     setNewProduct({
       name: "",
       category: "",
       price: "",
+      description: "",
       imageFile: null,
     });
-  
+
     fetchProducts();
   };
-  /* ===================== UPDATE PRODUCT ===================== */
- const handleUpdateProduct = async () => {
-  let imageUrl = editProduct.image_url;
 
-  try {
+  /* ===================== UPDATE PRODUCT ===================== */
+  const handleUpdateProduct = async () => {
+    let image_url = editProduct.image_url;
+
     if (editProduct.imageFile) {
-      imageUrl = await uploadToCloudinary(editProduct.imageFile);
+      image_url = await uploadToCloudinary(editProduct.imageFile);
     }
 
     await supabase
@@ -214,58 +206,40 @@ const ProductList = () => {
         name: editProduct.name,
         category: editProduct.category,
         price: Number(editProduct.price),
-        image_url: imageUrl,
+        image_url,
       })
       .eq("id", editProduct.id);
 
     setShowEditModal(false);
     setEditProduct(null);
     fetchProducts();
-  } catch (err) {
-    console.error(err);
-    alert("Update failed");
-  }
-};
-// ===================== DELETE PRODUCT (DITO 👇) =====================
-const handleDeleteClick = (product) => {
-  setProductToDelete(product);
-  setShowDeleteModal(true);
-};
+  };
 
-const confirmDeleteProduct = async () => {
-  if (!productToDelete) return;
+  /* ===================== DELETE PRODUCT ===================== */
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
 
-  await supabase
-    .from("products")
-    .delete()
-    .eq("id", productToDelete.id);
+  const confirmDeleteProduct = async () => {
+    await supabase.from("products").delete().eq("id", productToDelete.id);
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+    fetchProducts();
+  };
 
-  setShowDeleteModal(false);
-  setProductToDelete(null);
-  fetchProducts();
-};
-
-
-  /* ===================== CART ===================== */
-const confirmAddToCart = () => {
-  setCart((prev) => {
-    const found = prev.find((i) => i.id === selectedProduct.id);
-
-    if (found) {
-      return prev.map((i) =>
-        i.id === selectedProduct.id
-          ? { ...i, qty: i.qty + qty }
-          : i
-      );
-    }
-
-    return [...prev, { ...selectedProduct, qty }];
-  });
-
-  setShowQtyModal(false);
-  setSelectedProduct(null);
-};
-
+  /* ===================== CART LOGIC (FIXED) ===================== */
+  const addToCart = (product, qty) => {
+    setCart((prev) => {
+      const found = prev.find((i) => i.id === product.id);
+      if (found) {
+        return prev.map((i) =>
+          i.id === product.id ? { ...i, qty: i.qty + qty } : i
+        );
+      }
+      return [...prev, { ...product, qty }];
+    });
+  };
   // 🔍 FILTERING (UNCHANGED)
   const filteredProducts = products
     .filter((p) => {
