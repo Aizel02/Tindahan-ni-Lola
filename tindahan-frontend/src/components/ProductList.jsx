@@ -546,7 +546,7 @@ const handleDeleteProduct = async (id) => {
     cart.map((item) => (
       <div className="cart-item" key={item.id}>
         <img
-          src={normalizeImageUrl(item.imageUrl)}
+          src={normalizeImageUrl(item.image_url)}
           alt={item.name}
           className="cart-item-img"
         />
@@ -558,7 +558,9 @@ const handleDeleteProduct = async (id) => {
 
         <div className="cart-item-price">
           ₱{(item.qty * item.price).toFixed(2)}
-        <button onClick={() => removeFromCart(item.id)}>
+        <button 
+        className="trash-btn"
+        onClick={() => removeFromCart(item.id)}>
   <Trash2 size={16} />
 </button>
 

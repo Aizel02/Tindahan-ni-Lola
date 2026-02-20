@@ -652,7 +652,30 @@
   font-weight: 700;
   color: #2563eb;
 }
+.trash-btn {
+  background: transparent;   /* ❌ remove box */
+  border: none;              /* ❌ remove border */
+  padding: 4px;
+  cursor: pointer;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #64748b;            /* default icon color (slate) */
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+/* 🔥 hover effect */
+.trash-btn:hover {
+  color: #ef4444;            /* red on hover */
+  transform: scale(1.1);
+}
+
+/* optional: click feedback */
+.trash-btn:active {
+  transform: scale(0.95);
+}
 
 .cart-item-info h4 {
   margin: 0;
