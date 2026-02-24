@@ -267,7 +267,7 @@ const totalsByMonth = liabilities.reduce((acc, item) => {
                           </button>
                         )}
                         <button
-                          className="edit"
+                          className="editdebt"
                           onClick={() => {
                             setEditingDebt(l);
                             setActivePerson(name);
