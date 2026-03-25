@@ -10,6 +10,7 @@ import {
   Search,
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
+import AIInsights from "./AIInsights";
 
 /* ===================== IMAGE UPLOAD ===================== */
 const uploadToCloudinary = async (file) => {
@@ -60,6 +61,7 @@ const ProductList = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -335,7 +337,7 @@ const handleDeleteProduct = async (id) => {
           <ShoppingCart size={16} /> Add Product
         </button>
       </div>
-
+<AIInsights products={products} debts={[]} />
       {loading ? (
         <p className="status-text"><Loader size={16} /> Loading products...</p>
      ) : (

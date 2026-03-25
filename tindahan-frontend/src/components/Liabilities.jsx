@@ -3,6 +3,7 @@ import Header from "./Header";
 import "./Liabilities.css";
 import { Pencil, Trash2, Search } from "lucide-react";
 import { supabase } from "../supabaseClient";
+import AIInsights from "./AIInsights";
 
 export default function Liabilities() {
   const [liabilities, setLiabilities] = useState([]);
@@ -10,6 +11,7 @@ export default function Liabilities() {
   const [activePerson, setActivePerson] = useState(null);
   const [editingDebt, setEditingDebt] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [debts, setDebts] = useState([]);
 
   const [form, setForm] = useState({
     debtorName: "",
@@ -214,7 +216,7 @@ const totalsByMonth = liabilities.reduce((acc, item) => {
     </div>
   </div>
 )}
-
+<AIInsights products={[]} debts={liabilities} />
       {loading ? (
         <p className="liabilities-empty">Loading...</p>
       ) : Object.keys(grouped).length === 0 ? (

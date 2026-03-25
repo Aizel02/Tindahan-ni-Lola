@@ -1094,3 +1094,42 @@
     max-width: 100%;
   }
 }
+/* AI INSIGHTS BOX */
+
+.ai-box{
+ background: #ffffff;
+ border: 1px solid #e5e7eb;
+ border-radius: 12px;
+ padding: 16px;
+ margin: 20px 0;
+ box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.ai-title{
+ font-weight: 600;
+ margin-bottom: 8px;
+ color: #111827;
+}
+
+.ai-button{
+ background: #111827;
+ color: white;
+ border: none;
+ padding: 10px 14px;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 14px;
+ margin-bottom: 10px;
+ transition: 0.2s;
+}
+
+.ai-button:hover{
+ background: #374151;
+}
+
+.ai-result{
+ white-space: pre-line;
+ color: #374151;
+ font-size: 14px;
+ line-height: 1.5;
+}

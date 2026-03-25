@@ -1,76 +1,120 @@
-import { useState } from "react";
+require("dotenv").config();
 
-export default function AIInsights({ products, debts }) {
+const express = require("express");
+const OpenAI = require("openai");
+const cors = require("cors");
 
-  const [loading, setLoading] = useState(false);
-  const [insight, setInsight] = useState("");
+const app = express();
 
-  const runAI = async () => {
+/* allow frontend requests */
+app.use(cors());
 
-    setLoading(true);
+/* allow json body */
+app.use(express.json());
 
-    try{
 
-      const res = await fetch("https://tindahan-ai.onrender.com/ai-insights",{
+/* connect to OpenAI using env key */
+const openai = new OpenAI({
 
-        method:"POST",
+ apiKey: process.env.OPENAI_API_KEY
 
-        headers:{
-          "Content-Type":"application/json"
-        },
+});
 
-        body: JSON.stringify({
-          products,
-          debts
-        })
 
-      });
+/* test route */
+app.get("/", (req,res)=>{
 
-      const data = await res.json();
+ res.send("AI server running 🚀");
 
-      setInsight(data.result);
+});
 
-    }catch(error){
 
-      console.log(error);
+/* AI INSIGHTS */
+app.post("/ai-insights", async (req,res)=>{
 
-      setInsight("AI failed to analyze data.");
+ const { products, debts } = req.body;
+
+ try{
+
+  const completion = await openai.chat.completions.create({
+
+   model:"gpt-4o-mini",
+
+   messages:[
+
+    {
+
+     role:"system",
+
+     content:`
+
+     You are an AI assistant helping analyze sari-sari store data.
+
+     Provide simple insights that are easy to understand.
+
+     Keep answer short and practical.
+
+     `
+
+    },
+
+    {
+
+     role:"user",
+
+     content:`
+
+     Analyze this sari-sari store data.
+
+     PRODUCTS:
+     ${JSON.stringify(products)}
+
+     DEBTS:
+     ${JSON.stringify(debts)}
+
+     Give insights:
+
+     1. store summary
+     2. possible popular products
+     3. debt observation
+     4. recommendation
+
+     Keep answer short.
+
+     `
 
     }
 
-    setLoading(false);
+   ]
 
-  };
+  });
 
-  return(
 
-    <div className="ai-box">
+  res.json({
 
-      <div className="ai-title">
-        🤖 AI Insights
-      </div>
+   result: completion.choices[0].message.content
 
-      <button
-        className="ai-button"
-        onClick={runAI}
-      >
+  });
 
-        {loading ? "Analyzing..." : "Generate AI Insights"}
 
-      </button>
+ }catch(error){
 
-      {insight && (
+  console.log("AI ERROR:", error);
 
-        <div className="ai-result">
+  res.status(500).json({
 
-          {insight}
+   error:"AI failed to analyze data"
 
-        </div>
+  });
 
-      )}
+ }
 
-    </div>
+});
 
-  );
 
-}
+/* start server */
+app.listen(5000, ()=>{
+
+ console.log("AI server running on http://localhost:5000");
+
+});
