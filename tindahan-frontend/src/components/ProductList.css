@@ -1096,125 +1096,340 @@
 }
 
 /* AI INSIGHTS BOX */
+/* AI INSIGHTS CONTAINER */
 
 .ai-box{
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 18px;
-  margin: 20px 0;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+ background:#ffffff;
 
-  transition:0.2s ease;
+ border:1px solid #e5e7eb;
+
+ border-radius:16px;
+
+ padding:20px;
+
+ margin:20px 0;
+
+ box-shadow:
+ 0 6px 22px rgba(0,0,0,0.05);
+
+ display:flex;
+
+ flex-direction:column;
+
+ gap:16px;
+
+ transition:.2s;
+
 }
 
 .ai-box:hover{
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+
+ box-shadow:
+ 0 12px 34px rgba(0,0,0,0.08);
+
 }
 
 
-/* title */
+/* HEADER */
+
 .ai-title{
-  font-weight:600;
-  font-size:16px;
-  color:#111827;
 
-  display:flex;
-  align-items:center;
-  gap:8px;
+ font-size:18px;
+
+ font-weight:600;
+
+ display:flex;
+
+ align-items:center;
+
+ gap:8px;
+
+ color:#111827;
+
 }
 
 
-/* button */
+/* BUTTON */
+
 .ai-button{
-  background:#111827;
-  color:white;
-  border:none;
-  padding:10px 16px;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:14px;
-  font-weight:500;
 
-  width:fit-content;
+ background:linear-gradient(
 
-  transition:all 0.2s ease;
+ 135deg,
+
+ #111827,
+
+ #1f2937
+
+ );
+
+ color:white;
+
+ border:none;
+
+ padding:12px 18px;
+
+ border-radius:10px;
+
+ font-size:14px;
+
+ font-weight:500;
+
+ cursor:pointer;
+
+ width:fit-content;
+
+ transition:.2s;
+
 }
 
 .ai-button:hover{
-  background:#1f2937;
-  transform:translateY(-1px);
+
+ transform:translateY(-1px);
+
+ opacity:.95;
+
 }
 
 .ai-button:disabled{
-  background:#9ca3af;
-  cursor:not-allowed;
+
+ opacity:.6;
+
+ cursor:not-allowed;
+
 }
 
 
-/* result */
+/* WARNING */
+
+.ai-warning{
+
+ background:#fff7ed;
+
+ border:1px solid #fed7aa;
+
+ padding:12px;
+
+ border-radius:10px;
+
+ font-size:13px;
+
+ color:#9a3412;
+
+}
+
+
+/* TEXT RESULT */
+
 .ai-result{
-  background:#f9fafb;
-  border-radius:10px;
-  padding:12px;
 
-  color:#374151;
-  font-size:14px;
-  line-height:1.6;
+ background:#f8fafc;
 
-  border:1px solid #f1f5f9;
+ border-radius:10px;
 
-  white-space:pre-line;
+ padding:14px;
+
+ font-size:14px;
+
+ line-height:1.6;
+
+ border:1px solid #f1f5f9;
+
 }
 
 
-/* error */
-.ai-error{
-  color:#dc2626;
+/* KPI GRID */
+
+.dashboard-grid{
+
+ display:grid;
+
+ grid-template-columns:
+
+ repeat(auto-fit,minmax(220px,1fr));
+
+ gap:18px;
+
+}
+
+
+/* KPI CARDS */
+
+.kpi-card{
+
+ background:linear-gradient(
+
+ 135deg,
+
+ #ffffff,
+
+ #f1f5f9
+
+ );
+
+ padding:18px;
+
+ border-radius:14px;
+
+ box-shadow:
+
+ 0 6px 18px rgba(0,0,0,0.05);
+
+ display:flex;
+
+ flex-direction:column;
+
+ gap:4px;
+
+}
+
+.kpi-card span{
+
+ font-size:13px;
+
+ color:#64748b;
+
+}
+
+.kpi-card h2{
+
+ font-size:22px;
+
+ font-weight:600;
+
+ color:#0f172a;
+
+}
+
+
+/* CHART CARDS */
+
+.chart-card{
+
+ background:white;
+
+ padding:20px;
+
+ border-radius:16px;
+
+ box-shadow:
+
+ 0 10px 28px rgba(0,0,0,0.06);
+
+}
+
+
+/* SECTIONS */
+
+.ai-section{
+
+ background:#f9fafb;
+
+ padding:16px;
+
+ border-radius:12px;
+
+ font-size:14px;
+
+}
+
+
+/* RESPONSIVE BREAKPOINTS */
+
+/* tablet */
+
+@media(max-width:1024px){
+
+ .dashboard-grid{
+
+  grid-template-columns:
+
+  repeat(2,1fr);
+
+ }
+
+}
+
+
+/* mobile */
+
+@media(max-width:768px){
+
+ .ai-box{
+
+  padding:16px;
+
+ }
+
+ .dashboard-grid{
+
+  grid-template-columns:
+
+  1fr;
+
+ }
+
+ .chart-card{
+
+  padding:16px;
+
+ }
+
+ .kpi-card h2{
+
+  font-size:20px;
+
+ }
+
+}
+
+
+/* small mobile */
+
+@media(max-width:480px){
+
+ .ai-title{
+
+  font-size:16px;
+
+ }
+
+ .ai-button{
+
+  width:100%;
+
+ }
+
+ .kpi-card{
+
+  padding:14px;
+
+ }
+
+ .chart-card{
+
+  padding:14px;
+
+ }
+
+ .ai-result{
+
   font-size:13px;
-  font-weight:500;
-}
 
-
-/* MOBILE */
-@media (max-width:768px){
-
-  .ai-box{
-    padding:14px;
-    border-radius:12px;
-  }
-
-  .ai-title{
-    font-size:15px;
-  }
-
-  .ai-button{
-    width:100%;
-    text-align:center;
-    padding:12px;
-    font-size:15px;
-  }
-
-  .ai-result{
-    font-size:14px;
-  }
+ }
 
 }
+.glass{
 
+ backdrop-filter:blur(12px);
 
-/* SMALL MOBILE */
-@media (max-width:480px){
+ background:
 
-  .ai-title{
-    font-size:14px;
-  }
+ rgba(255,255,255,0.7);
 
-  .ai-result{
-    font-size:13px;
-  }
+ border:
+
+ 1px solid rgba(255,255,255,0.3);
 
 }

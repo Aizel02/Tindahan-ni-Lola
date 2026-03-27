@@ -1,170 +1,283 @@
 import { BrainCircuit } from "lucide-react";
 import { useState } from "react";
 
+import AIAnalyticsDashboard
+from "./AIAnalyticsDashboard";
+
 const SUPABASE_URL =
-  "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
+"https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
 
-export default function AIInsights({ products = [], debts = [] }) {
+export default function AIInsights({
 
-  const [loading, setLoading] = useState(false);
-  const [insight, setInsight] = useState("");
-  const [risk, setRisk] = useState("🟢");
-  const [error, setError] = useState("");
+ products=[],
+ debts=[]
 
-  const runAI = async () => {
+}){
 
-    if (!products.length && !debts.length) {
-      setError("No data yet.");
-      return;
-    }
+ const [loading,setLoading]=useState(false);
 
-    setLoading(true);
-    setError("");
-    setInsight("");
+ const [insight,setInsight]=useState("");
 
-    try {
+ const [risk,setRisk]=useState("");
 
-      const today = new Date();
+ const [analytics,setAnalytics]=useState(null);
 
-      const formattedProducts = products.map(p => ({
-        name: p.name,
-        price: p.price,
-        category: p.category
-      }));
+ const [warning,setWarning]=useState("");
 
-      const formattedDebts = debts.map(d => {
+ const [overdueList,setOverdueList]=useState([]);
 
-        const dueDate = d.due_date ? new Date(d.due_date) : null;
+ const [topCustomers,setTopCustomers]=useState([]);
 
-        const isOverdue =
-          dueDate &&
-          dueDate < today &&
-          d.status !== "Paid";
+ const runAI = async ()=>{
 
-        return {
-          name: d.debtor_name,
-          amount: d.amount,
-          status: d.status,
-          due_date: d.due_date,
-          overdue: isOverdue
-        };
+  setLoading(true);
 
-      });
+  try{
 
-      const res = await fetch(SUPABASE_URL, {
+   const res =
+   await fetch(
 
-        method: "POST",
+    SUPABASE_URL,
 
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        },
+    {
 
-        body: JSON.stringify({
+     method:"POST",
 
-          products: formattedProducts,
+     headers:{
 
-          debts: formattedDebts,
+      "Content-Type":"application/json",
 
-          summary: {
+      "apikey":SUPABASE_KEY,
 
-            totalProducts: formattedProducts.length,
+      "Authorization":
+      `Bearer ${SUPABASE_KEY}`
 
-            totalDebt: formattedDebts
-              .filter(d => d.status !== "Paid")
-              .reduce((sum, d) => sum + Number(d.amount), 0),
+     },
 
-            overdueCount:
-              formattedDebts.filter(d => d.overdue).length
+     body:JSON.stringify({
 
-          }
+      products,
+      debts
 
-        })
-
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error);
-      }
-
-      const aiText =
-        data.result ||
-        "AI could not generate insight.";
-
-      setInsight(aiText);
-
-      // risk indicator logic
-      const overdue =
-        formattedDebts.filter(d => d.overdue).length;
-
-      if (overdue >= 3) setRisk("🔴");
-      else if (overdue > 0) setRisk("🟡");
-      else setRisk("🟢");
-
-    } catch (err) {
-
-      console.error(err);
-      setError("AI failed.");
+     })
 
     }
 
-    setLoading(false);
+   );
 
-  };
+   const data = await res.json();
 
-  return (
+   setInsight(data.result);
 
-    <div className="ai-box">
+   setRisk(data.risk);
 
-      <div className="ai-title">
-        <BrainCircuit size={22}/>
-        <span>AI Insights {risk}</span>
-      </div>
+   setAnalytics(data.analytics);
 
-      <button
-        className="ai-button"
-        onClick={runAI}
-        disabled={loading}
-      >
+   setWarning(data.warning);
 
-        {loading
-          ? "Analyzing store data..."
-          : "Generate AI Insights"}
+   // overdue
 
-      </button>
+   const overdue = debts.filter(d=>
 
-      {error && (
-        <div className="ai-error">
-          ⚠️ {error}
-        </div>
-      )}
+    d.status !== "Paid"
 
-      {insight && (
+    && d.due_date
 
-        <div className="ai-result">
+    && new Date(d.due_date) < new Date()
 
-          {insight
-            .split("\n")
-            .map((line,i)=>(
+   );
 
-              <div key={i}>
-                {line}
-              </div>
+   setOverdueList(overdue);
 
-            ))}
+   // ranking
 
-        </div>
+   const ranking={};
 
-      )}
+   debts.forEach(d=>{
+
+    if(!ranking[d.debtor_name])
+
+     ranking[d.debtor_name]=0;
+
+    if(d.status!=="Paid")
+
+     ranking[d.debtor_name]+=Number(d.amount);
+
+   });
+
+   setTopCustomers(
+
+    Object.entries(ranking)
+
+    .map(([name,total])=>({
+
+     name,
+     total
+
+    }))
+
+    .sort((a,b)=>b.total-a.total)
+
+   );
+
+  }
+
+  catch(e){
+
+   console.log(e);
+
+  }
+
+  setLoading(false);
+
+ };
+
+ return(
+
+  <div className="ai-box">
+
+   <div className="ai-title">
+
+    <BrainCircuit size={20}/>
+
+    AI Insights {risk}
+
+   </div>
+
+   <button
+
+    className="ai-button"
+
+    onClick={runAI}
+
+   >
+
+    {
+
+     loading
+
+     ? "Analyzing..."
+
+     : "Generate AI Insights"
+
+    }
+
+   </button>
+
+   {warning &&
+
+    <div className="ai-warning">
+
+     {warning}
 
     </div>
 
-  );
+   }
+{insight &&
 
+ <div className="ai-result">
+
+  {insight}
+
+ </div>
+
+}
+
+
+{/* reminder generator */}
+
+{analytics && (
+
+ <div className="ai-reminder">
+
+  <strong>Collection Message Suggestion</strong>
+
+  <p>
+
+   Hi {analytics.topCustomer || "po"},  
+
+   paalala lang po sa utang nyo.
+
+   Sana mabayaran nyo po soon.
+
+   Maraming salamat!
+
+  </p>
+
+ </div>
+
+)}
+
+   {/* charts */}
+
+   <AIAnalyticsDashboard
+
+    analytics={analytics}
+
+   />
+
+   {/* overdue */}
+
+   {overdueList.length>0 &&
+
+    <div className="ai-section">
+
+     <h3>Overdue Customers</h3>
+
+     {
+
+      overdueList.map(d=>(
+
+       <div key={d.id}>
+
+        {d.debtor_name}
+
+        – ₱{d.amount}
+
+       </div>
+
+      ))
+
+     }
+
+    </div>
+
+   }
+
+   {/* ranking */}
+
+   {topCustomers.length>0 &&
+
+    <div className="ai-section">
+
+     <h3>Top Utang</h3>
+
+     {
+
+      topCustomers.slice(0,5)
+
+      .map(c=>(
+
+       <div key={c.name}>
+
+        {c.name}
+
+        – ₱{c.total}
+
+       </div>
+
+      ))
+
+     }
+
+    </div>
+
+   }
+
+  </div>
+
+ );
 }
