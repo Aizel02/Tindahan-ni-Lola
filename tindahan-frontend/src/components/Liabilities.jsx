@@ -11,7 +11,6 @@ export default function Liabilities() {
   const [activePerson, setActivePerson] = useState(null);
   const [editingDebt, setEditingDebt] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [debts, setDebts] = useState([]);
 
   const [form, setForm] = useState({
     debtorName: "",

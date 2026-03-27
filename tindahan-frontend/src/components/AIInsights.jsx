@@ -1,3 +1,4 @@
+import { BrainCircuit } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function AIInsights({ products = [], debts = [] }) {
@@ -65,7 +66,8 @@ export default function AIInsights({ products = [], debts = [] }) {
     <div className="ai-box">
 
       <div className="ai-title">
-        🤖 AI Insights
+        <BrainCircuit size={24} />
+        AI Insights
       </div>
 
       <button
