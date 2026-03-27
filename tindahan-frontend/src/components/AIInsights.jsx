@@ -1,17 +1,11 @@
 import { BrainCircuit } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function AIInsights({ products = [], debts = [] }) {
 
   const [loading, setLoading] = useState(false);
   const [insight, setInsight] = useState("");
   const [error, setError] = useState("");
-
-  /* wake up render server */
-  useEffect(() => {
-    fetch("https://tindahan-ai.onrender.com")
-      .catch(() => {});
-  }, []);
 
   const runAI = async () => {
 
@@ -28,7 +22,7 @@ export default function AIInsights({ products = [], debts = [] }) {
     try{
 
       const res = await fetch(
-        "https://tindahan-ai.onrender.com/ai-insights",
+        "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights",
         {
           method:"POST",
           headers:{
