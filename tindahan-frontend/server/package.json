@@ -1,9 +1,7 @@
 {
   "name": "tindahan-ai-server",
   "version": "1.0.0",
-  "description": "AI insights server for tindahan ni lola",
   "main": "server.js",
-  "type": "commonjs",
   "scripts": {
     "start": "node server.js"
   },

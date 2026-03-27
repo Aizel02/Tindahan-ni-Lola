@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "./.env" });
 
 const express = require("express");
 const OpenAI = require("openai");
@@ -6,79 +6,89 @@ const cors = require("cors");
 
 const app = express();
 
+/* middlewares */
 app.use(cors());
 app.use(express.json());
 
-console.log(
-  process.env.OPENAI_API_KEY
-    ? "OPENAI KEY LOADED ✅"
-    : "OPENAI KEY MISSING ❌"
-);
+/* debug check if key exists */
+if (!process.env.OPENAI_API_KEY) {
+  console.log("OPENAI KEY MISSING ❌");
+} else {
+  console.log("OPENAI KEY LOADED ✅");
+}
 
+/* connect to OpenAI */
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-app.get("/", (req,res)=>{
+/* test route */
+app.get("/", (req, res) => {
   res.send("AI server running 🚀");
 });
 
-app.post("/ai-insights", async (req,res)=>{
+/* AI INSIGHTS ROUTE */
+app.post("/ai-insights", async (req, res) => {
 
- const { products, debts } = req.body;
+  try {
 
- try{
+    const { products = [], debts = [] } = req.body;
 
-  const completion = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
 
-   model:"gpt-4o-mini",
+      model: "gpt-4o-mini",
 
-   messages:[
-    {
-     role:"system",
-     content:`
-     You are an AI assistant helping analyze sari-sari store data.
-     Provide simple insights that are easy to understand.
-     Keep answer short and practical.
-     `
-    },
+      messages: [
 
-    {
-     role:"user",
-     content:`
-     PRODUCTS:
-     ${JSON.stringify(products)}
+        {
+          role: "system",
+          content: `
+You analyze sari-sari store data.
 
-     DEBTS:
-     ${JSON.stringify(debts)}
+Give SHORT insights:
+• store summary
+• possible popular products
+• debt observation
+• recommendation
 
-     Give insights:
-     1. store summary
-     2. popular products guess
-     3. debt observation
-     4. recommendation
-     `
-    }
-   ]
+Keep answer simple.
+`
+        },
 
-  });
+        {
+          role: "user",
+          content: `
+PRODUCTS:
+${JSON.stringify(products)}
 
-  res.json({
-   result: completion.choices[0].message.content
-  });
+DEBTS:
+${JSON.stringify(debts)}
+`
+        }
 
- }catch(error){
+      ]
 
-  console.log("AI ERROR:", error.message);
+    });
 
-  res.status(500).json({
-   error:"AI failed to analyze data"
-  });
+    res.json({
+      result: completion.choices[0].message.content
+    });
 
- }
+  } catch (error) {
+
+    console.log("AI ERROR:", error);
+
+    res.status(500).json({
+      error: "AI failed to analyze data"
+    });
+
+  }
 
 });
 
-app.listen(5000, ()=>{
- console.log("AI server running on http://localhost:5000");
+/* start server */
+const PORT = 5000;
+
+app.listen(PORT, () => {
+  console.log(`AI server running on http://localhost:${PORT}`);
 });
