@@ -29,8 +29,8 @@ export default function AIInsights({ products = [], debts = [] }) {
             "Content-Type": "application/json",
 
             // public key safe for frontend
-            "apikey": "sb_publishable_7Qua1GzyLUDXRVq2jRhOqQ_0--ukgHk",
-            "Authorization": "Bearer sb_publishable_7Qua1GzyLUDXRVq2jRhOqQ_0--ukgHk"
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk"
           },
           body: JSON.stringify({
             products,
