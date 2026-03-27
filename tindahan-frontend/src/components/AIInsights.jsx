@@ -9,7 +9,7 @@ export default function AIInsights({ products = [], debts = [] }) {
 
   const runAI = async () => {
 
-    if(products.length === 0 && debts.length === 0){
+    if (products.length === 0 && debts.length === 0) {
       setInsight("");
       setError("No data to analyze yet.");
       return;
@@ -19,18 +19,18 @@ export default function AIInsights({ products = [], debts = [] }) {
     setError("");
     setInsight("");
 
-    try{
+    try {
 
       const res = await fetch(
         "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights",
         {
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
 
-            // Supabase auth
-            "apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk",
-            "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk"
+            // public key safe for frontend
+            "apikey": "sb_publishable_7Qua1GzyLUDXRVq2jRhOqQ_0--ukgHk",
+            "Authorization": "Bearer sb_publishable_7Qua1GzyLUDXRVq2jRhOqQ_0--ukgHk"
           },
           body: JSON.stringify({
             products,
@@ -41,17 +41,16 @@ export default function AIInsights({ products = [], debts = [] }) {
 
       const data = await res.json();
 
-      if(!res.ok){
-        throw new Error(data.error || "AI error");
+      if (!res.ok) {
+        throw new Error(data.message || data.error || "AI error");
       }
 
       setInsight(data.result || "No insight generated.");
 
-    }catch(err){
+    } catch (err) {
 
       console.log("AI ERROR:", err);
-
-      setError("AI failed to analyze data. Try again.");
+      setError(err.message || "AI failed to analyze data. Try again.");
 
     }
 
@@ -59,12 +58,12 @@ export default function AIInsights({ products = [], debts = [] }) {
 
   };
 
-  return(
+  return (
 
     <div className="ai-box">
 
       <div className="ai-title">
-        <BrainCircuit size={22}/>
+        <BrainCircuit size={22} />
         <span>AI Insights</span>
       </div>
 
@@ -73,9 +72,7 @@ export default function AIInsights({ products = [], debts = [] }) {
         onClick={runAI}
         disabled={loading}
       >
-
         {loading ? "Analyzing..." : "Generate AI Insights"}
-
       </button>
 
       {error && (
@@ -86,7 +83,7 @@ export default function AIInsights({ products = [], debts = [] }) {
 
       {insight && (
         <div className="ai-result">
-          {insight.split("\n").map((line,i)=>(
+          {insight.split("\n").map((line, i) => (
             <div key={i}>{line}</div>
           ))}
         </div>
