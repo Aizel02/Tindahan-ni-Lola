@@ -26,7 +26,11 @@ export default function AIInsights({ products = [], debts = [] }) {
         {
           method:"POST",
           headers:{
-            "Content-Type":"application/json"
+            "Content-Type":"application/json",
+
+            // Supabase auth
+            "apikey":"sb_publishable_7Qua1GzyLUDXRVq2jRhOqQ_0--ukgHk",
+            "Authorization":"Bearer sb_publishable_7Qua1GzyLUDXRVq2jRhOqQ_0--ukgHk"
           },
           body: JSON.stringify({
             products,
@@ -35,17 +39,17 @@ export default function AIInsights({ products = [], debts = [] }) {
         }
       );
 
-      if(!res.ok){
-        throw new Error("Server error");
-      }
-
       const data = await res.json();
+
+      if(!res.ok){
+        throw new Error(data.error || "AI error");
+      }
 
       setInsight(data.result || "No insight generated.");
 
     }catch(err){
 
-      console.log(err);
+      console.log("AI ERROR:", err);
 
       setError("AI failed to analyze data. Try again.");
 
@@ -60,8 +64,8 @@ export default function AIInsights({ products = [], debts = [] }) {
     <div className="ai-box">
 
       <div className="ai-title">
-        <BrainCircuit size={24} />
-        AI Insights
+        <BrainCircuit size={22}/>
+        <span>AI Insights</span>
       </div>
 
       <button
@@ -70,7 +74,7 @@ export default function AIInsights({ products = [], debts = [] }) {
         disabled={loading}
       >
 
-        {loading ? "Analyzing data..." : "Generate AI Insights"}
+        {loading ? "Analyzing..." : "Generate AI Insights"}
 
       </button>
 
