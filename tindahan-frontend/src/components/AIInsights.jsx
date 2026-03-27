@@ -1,40 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function AIInsights({ products, debts }) {
+export default function AIInsights({ products = [], debts = [] }) {
 
   const [loading, setLoading] = useState(false);
   const [insight, setInsight] = useState("");
+  const [error, setError] = useState("");
+
+  /* wake up render server */
+  useEffect(() => {
+    fetch("https://tindahan-ai.onrender.com")
+      .catch(() => {});
+  }, []);
 
   const runAI = async () => {
 
+    if(products.length === 0 && debts.length === 0){
+      setInsight("");
+      setError("No data to analyze yet.");
+      return;
+    }
+
     setLoading(true);
+    setError("");
+    setInsight("");
 
     try{
 
-      const res = await fetch("https://tindahan-ai.onrender.com/ai-insights",{
+      const res = await fetch(
+        "https://tindahan-ai.onrender.com/ai-insights",
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json"
+          },
+          body: JSON.stringify({
+            products,
+            debts
+          })
+        }
+      );
 
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body: JSON.stringify({
-          products,
-          debts
-        })
-
-      });
+      if(!res.ok){
+        throw new Error("Server error");
+      }
 
       const data = await res.json();
 
-      setInsight(data.result);
+      setInsight(data.result || "No insight generated.");
 
-    }catch(error){
+    }catch(err){
 
-      console.log(error);
+      console.log(err);
 
-      setInsight("AI failed to analyze data.");
+      setError("AI failed to analyze data. Try again.");
 
     }
 
@@ -53,20 +71,25 @@ export default function AIInsights({ products, debts }) {
       <button
         className="ai-button"
         onClick={runAI}
+        disabled={loading}
       >
 
-        {loading ? "Analyzing..." : "Generate AI Insights"}
+        {loading ? "Analyzing data..." : "Generate AI Insights"}
 
       </button>
 
-      {insight && (
-
-        <div className="ai-result">
-
-          {insight}
-
+      {error && (
+        <div className="ai-error">
+          ⚠️ {error}
         </div>
+      )}
 
+      {insight && (
+        <div className="ai-result">
+          {insight.split("\n").map((line,i)=>(
+            <div key={i}>{line}</div>
+          ))}
+        </div>
       )}
 
     </div>
