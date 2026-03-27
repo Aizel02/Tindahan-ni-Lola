@@ -1,6 +1,12 @@
 import { BrainCircuit } from "lucide-react";
 import { useState } from "react";
 
+const SUPABASE_URL =
+  "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
+
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
+
 export default function AIInsights({ products = [], debts = [] }) {
 
   const [loading, setLoading] = useState(false);
@@ -9,52 +15,69 @@ export default function AIInsights({ products = [], debts = [] }) {
 
   const runAI = async () => {
 
-    if (products.length === 0 && debts.length === 0) {
+    if (!products.length && !debts.length) {
       setInsight("");
-      setError("No data to analyze yet.");
+      setError("Add products or debts first.");
       return;
     }
 
     setLoading(true);
-    setError("");
     setInsight("");
+    setError("");
 
     try {
 
-      const res = await fetch(
-        "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      // clean data structure for AI
+      const formattedProducts = products.map(p => ({
+        name: p.name,
+        price: p.price,
+        category: p.category
+      }));
 
-            // public key safe for frontend
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk"
-          },
-          body: JSON.stringify({
-            products,
-            debts
-          })
-        }
-      );
+      const formattedDebts = debts.map(d => ({
+        name: d.debtor_name,
+        amount: d.amount,
+        status: d.status,
+        due_date: d.due_date
+      }));
+
+      const res = await fetch(SUPABASE_URL, {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+
+        body: JSON.stringify({
+          products: formattedProducts,
+          debts: formattedDebts
+        })
+
+      });
 
       const data = await res.json();
 
+      console.log("AI RESPONSE:", data);
+
       if (!res.ok) {
-        throw new Error(data.message || data.error || "AI error");
+        throw new Error(data.error || "AI failed");
       }
 
-      setInsight(data.result || "No insight generated.");
+      setInsight(data.result || "AI could not generate insight.");
 
     } catch (err) {
 
-      console.log("AI ERROR:", err);
-      setError(err.message || "AI failed to analyze data. Try again.");
+      console.error("AI ERROR:", err);
+      setError(err.message || "Failed to generate insight.");
+
+    } finally {
+
+      setLoading(false);
 
     }
-
-    setLoading(false);
 
   };
 
@@ -63,7 +86,7 @@ export default function AIInsights({ products = [], debts = [] }) {
     <div className="ai-box">
 
       <div className="ai-title">
-        <BrainCircuit size={22} />
+        <BrainCircuit size={22}/>
         <span>AI Insights</span>
       </div>
 
