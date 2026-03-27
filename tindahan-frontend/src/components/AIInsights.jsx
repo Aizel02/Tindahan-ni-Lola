@@ -11,35 +11,48 @@ export default function AIInsights({ products = [], debts = [] }) {
 
   const [loading, setLoading] = useState(false);
   const [insight, setInsight] = useState("");
+  const [risk, setRisk] = useState("🟢");
   const [error, setError] = useState("");
 
   const runAI = async () => {
 
     if (!products.length && !debts.length) {
-      setInsight("");
-      setError("Add products or debts first.");
+      setError("No data yet.");
       return;
     }
 
     setLoading(true);
-    setInsight("");
     setError("");
+    setInsight("");
 
     try {
 
-      // clean data structure for AI
+      const today = new Date();
+
       const formattedProducts = products.map(p => ({
         name: p.name,
         price: p.price,
         category: p.category
       }));
 
-      const formattedDebts = debts.map(d => ({
-        name: d.debtor_name,
-        amount: d.amount,
-        status: d.status,
-        due_date: d.due_date
-      }));
+      const formattedDebts = debts.map(d => {
+
+        const dueDate = d.due_date ? new Date(d.due_date) : null;
+
+        const isOverdue =
+          dueDate &&
+          dueDate < today &&
+          d.status !== "Paid";
+
+        return {
+          name: d.debtor_name,
+          amount: d.amount,
+          status: d.status,
+          due_date: d.due_date,
+          overdue: isOverdue
+        };
+
+      });
 
       const res = await fetch(SUPABASE_URL, {
 
@@ -52,32 +65,56 @@ export default function AIInsights({ products = [], debts = [] }) {
         },
 
         body: JSON.stringify({
+
           products: formattedProducts,
-          debts: formattedDebts
+
+          debts: formattedDebts,
+
+          summary: {
+
+            totalProducts: formattedProducts.length,
+
+            totalDebt: formattedDebts
+              .filter(d => d.status !== "Paid")
+              .reduce((sum, d) => sum + Number(d.amount), 0),
+
+            overdueCount:
+              formattedDebts.filter(d => d.overdue).length
+
+          }
+
         })
 
       });
 
       const data = await res.json();
 
-      console.log("AI RESPONSE:", data);
-
       if (!res.ok) {
-        throw new Error(data.error || "AI failed");
+        throw new Error(data.error);
       }
 
-      setInsight(data.result || "AI could not generate insight.");
+      const aiText =
+        data.result ||
+        "AI could not generate insight.";
+
+      setInsight(aiText);
+
+      // risk indicator logic
+      const overdue =
+        formattedDebts.filter(d => d.overdue).length;
+
+      if (overdue >= 3) setRisk("🔴");
+      else if (overdue > 0) setRisk("🟡");
+      else setRisk("🟢");
 
     } catch (err) {
 
-      console.error("AI ERROR:", err);
-      setError(err.message || "Failed to generate insight.");
-
-    } finally {
-
-      setLoading(false);
+      console.error(err);
+      setError("AI failed.");
 
     }
+
+    setLoading(false);
 
   };
 
@@ -87,7 +124,7 @@ export default function AIInsights({ products = [], debts = [] }) {
 
       <div className="ai-title">
         <BrainCircuit size={22}/>
-        <span>AI Insights</span>
+        <span>AI Insights {risk}</span>
       </div>
 
       <button
@@ -95,7 +132,11 @@ export default function AIInsights({ products = [], debts = [] }) {
         onClick={runAI}
         disabled={loading}
       >
-        {loading ? "Analyzing..." : "Generate AI Insights"}
+
+        {loading
+          ? "Analyzing store data..."
+          : "Generate AI Insights"}
+
       </button>
 
       {error && (
@@ -105,11 +146,21 @@ export default function AIInsights({ products = [], debts = [] }) {
       )}
 
       {insight && (
+
         <div className="ai-result">
-          {insight.split("\n").map((line, i) => (
-            <div key={i}>{line}</div>
-          ))}
+
+          {insight
+            .split("\n")
+            .map((line,i)=>(
+
+              <div key={i}>
+                {line}
+              </div>
+
+            ))}
+
         </div>
+
       )}
 
     </div>
