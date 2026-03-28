@@ -1,234 +1,253 @@
-/* HEADER */
+.header{
 
-.header {
+display:flex;
 
-display: flex;
+justify-content:space-between;
 
-justify-content: space-between;
+align-items:center;
 
-align-items: center;
+padding:18px 22px;
 
-padding: 18px 22px;
+border-radius:14px;
 
-border-radius: 16px;
+background:rgba(255,255,255,.6);
 
-background: rgba(255,255,255,0.65);
+backdrop-filter:blur(10px);
 
-backdrop-filter: blur(14px);
+border:1px solid rgba(255,255,255,.3);
 
-border: 1px solid rgba(255,255,255,0.25);
+margin-bottom:18px;
 
-margin-bottom: 18px;
+}
+
+body.dark .header{
+
+background:rgba(15,23,42,.6);
+
+border:1px solid rgba(255,255,255,.05);
 
 }
 
 
-/* LEFT */
+/* TITLE */
 
-.header-left h1 {
+.header-left h1{
 
-margin: 0;
+margin:0;
 
-font-family: "Space Grotesk";
+font-family:"Space Grotesk";
 
-font-size: 22px;
-
-}
-
-.header-left p {
-
-margin: 4px 0 0;
-
-font-size: 13px;
-
-opacity: .6;
+font-size:22px;
 
 }
 
+.header-left p{
 
-/* RIGHT */
+margin:4px 0 0;
 
-.header-right {
+font-size:13px;
 
-display: flex;
-
-gap: 10px;
+opacity:.6;
 
 }
 
 
-/* BUTTONS */
+/* BUTTON */
 
-.back-btn {
+.back-btn{
 
-border: none;
+border:none;
 
-padding: 7px 14px;
+padding:7px 14px;
 
-border-radius: 10px;
+border-radius:10px;
 
-cursor: pointer;
+cursor:pointer;
 
-font-size: 13px;
+font-size:13px;
 
-background: linear-gradient(120deg,#6366f1,#22c55e);
+background:#2563eb;
 
-color: white;
+color:white;
 
-display: flex;
+display:flex;
 
-align-items: center;
+align-items:center;
 
-gap: 4px;
+gap:4px;
 
-transition: .2s;
-
-}
-
-.back-btn:hover {
-
-transform: translateY(-2px);
+transition:.25s;
 
 }
 
+.back-btn:hover{
 
-.cart-btn {
-
-border: none;
-
-padding: 7px 14px;
-
-border-radius: 10px;
-
-cursor: pointer;
-
-font-size: 13px;
-
-background: rgba(255,255,255,0.6);
-
-backdrop-filter: blur(10px);
-
-border: 1px solid rgba(255,255,255,0.3);
-
-display: flex;
-
-align-items: center;
-
-gap: 5px;
-
-position: relative;
+background:#1d4ed8;
 
 }
 
 
-.cart-badge {
+/* CART */
 
-position: absolute;
+.cart-btn{
 
-top: -6px;
+border:none;
 
-right: -6px;
+padding:7px 14px;
 
-background: #ef4444;
+border-radius:10px;
 
-color: white;
+cursor:pointer;
 
-font-size: 10px;
+font-size:13px;
 
-padding: 2px 6px;
+background:rgba(255,255,255,.6);
 
-border-radius: 50%;
+backdrop-filter:blur(10px);
+
+border:1px solid rgba(255,255,255,.3);
+
+display:flex;
+
+align-items:center;
+
+gap:5px;
+
+position:relative;
+
+}
+
+body.dark .cart-btn{
+
+background:rgba(15,23,42,.6);
+
+border:1px solid rgba(255,255,255,.05);
+
+}
+
+
+/* BADGE */
+
+.cart-badge{
+
+position:absolute;
+
+top:-6px;
+
+right:-6px;
+
+background:#ef4444;
+
+color:white;
+
+font-size:10px;
+
+padding:2px 6px;
+
+border-radius:50%;
 
 }
 
 
 /* TABS */
 
-.page-tabs {
+.page-tabs{
 
-display: flex;
+display:flex;
 
-gap: 24px;
+gap:26px;
 
-border-bottom: 1px solid rgba(0,0,0,.06);
+border-bottom:1px solid rgba(0,0,0,.08);
 
-margin-bottom: 20px;
+margin-bottom:20px;
+
+}
+
+body.dark .page-tabs{
+
+border-bottom:1px solid rgba(255,255,255,.05);
 
 }
 
 
-.tab {
+.tab{
 
-padding: 10px 0;
+padding:10px 0;
 
-text-decoration: none;
+text-decoration:none;
 
-color: #6b7280;
+color:#6b7280;
 
-font-size: 15px;
+font-size:15px;
 
-font-weight: 500;
+font-weight:500;
 
-position: relative;
+position:relative;
+
+}
+
+body.dark .tab{
+
+color:#94a3b8;
 
 }
 
 
-.tab.active {
+.tab.active{
 
-color: #6366f1;
+color:#2563eb;
 
 }
 
 
-.tab.active::after {
+.tab.active::after{
 
-content: "";
+content:"";
 
-position: absolute;
+position:absolute;
 
-left: 0;
+left:0;
 
-bottom: -1px;
+bottom:-1px;
 
-width: 100%;
+width:100%;
 
-height: 3px;
+height:3px;
 
-border-radius: 3px;
+border-radius:3px;
 
-background: linear-gradient(120deg,#6366f1,#22c55e);
+background:#2563eb;
 
 }
 
 
 /* RESPONSIVE */
 
-@media (max-width: 768px) {
+@media(max-width:768px){
 
-.header {
+.header{
 
-flex-direction: column;
+flex-direction:column;
 
-align-items: flex-start;
+align-items:flex-start;
 
-gap: 12px;
-
-}
-
-.header-right {
-
-width: 100%;
-
-justify-content: flex-end;
+gap:12px;
 
 }
 
-.page-tabs {
+.header-right{
 
-overflow-x: auto;
+width:100%;
 
-gap: 16px;
+justify-content:flex-end;
+
+}
+
+.page-tabs{
+
+overflow-x:auto;
+
+gap:16px;
 
 }
 
