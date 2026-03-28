@@ -1,9 +1,9 @@
-// INDUSTRY STANDARD MINISTORE AI COPILOT
-// chat based analytics + dynamic widgets + risk scoring
-
-import { useState } from "react";
-import { BrainCircuit, Send, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { BrainCircuit, Send, X, Download } from "lucide-react";
 import Draggable from "react-draggable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 import {
  ResponsiveContainer,
  LineChart,
@@ -13,148 +13,289 @@ import {
  Tooltip,
  CartesianGrid,
  BarChart,
- Bar,
- AreaChart,
- Area
+ Bar
 } from "recharts";
 
-const SUPABASE_URL = "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
-const SUPABASE_KEY = "PASTE_PUBLIC_ANON_KEY";
+const SUPABASE_URL =
+"https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
-export default function MiniStoreAI({ products = [], debts = [] }){
-
- const [open,setOpen] = useState(false);
- const [loading,setLoading] = useState(false);
-
- const [messages,setMessages] = useState([
-  {
-   role:"ai",
-   content:"Hi 👋 I am MiniStore AI. Ask about utang, prediction, trends or customers."
-  }
- ]);
-
- const [widgets,setWidgets] = useState([]);
-
- const calculateRisk = (debts)=>{
-
-  const total = debts.reduce((a,b)=>a+Number(b.amount),0);
-
-  const overdue = debts.filter(d=>d.status!=="Paid").length;
-
-  const score = overdue*15 + total*0.002;
-
-  if(score>80) return "HIGH 🔴";
-
-  if(score>40) return "MEDIUM 🟡";
-
-  return "LOW 🟢";
-
- };
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
 
 
- const autoWidgets = (analytics)=>{
+export default function MiniStoreAI({ debts=[] }){
 
-  const w = [];
+ const [open,setOpen]=useState(false);
+ const [input,setInput]=useState("");
+ const [loading,setLoading]=useState(false);
+ const [widgets,setWidgets]=useState([]);
 
-  w.push({
-   type:"kpi",
-   label:"Total Utang",
-   value:`₱${analytics.totalUtang}`
-  });
 
-  w.push({
-   type:"kpi",
-   label:"Risk Level",
-   value:calculateRisk(analytics.debts || [])
-  });
+ /* SAVE CHAT HISTORY */
 
-  const monthlyData = Object.entries(analytics.monthlyTotals || {}).map(
-   ([label,value])=>({label,value})
+ const [messages,setMessages]=useState(()=>{
+
+  const saved=
+  localStorage.getItem("mini_ai_chat");
+
+  return saved
+  ? JSON.parse(saved)
+  : [
+   {
+    role:"ai",
+    content:
+`Hi 👋 pwede mo itanong:
+
+• pending utang
+• utang ni kuya
+• overdue utang
+• sino dapat singilin
+• utang trend`
+   }
+  ];
+
+ });
+
+
+ useEffect(()=>{
+
+  localStorage.setItem(
+
+   "mini_ai_chat",
+
+   JSON.stringify(messages)
+
   );
 
-  if(monthlyData.length>0){
-   w.push({
-    type:"line",
-    title:"Utang Trend",
-    data:monthlyData
-   });
-  }
-
-  w.push({
-   type:"area",
-   title:"Prediction",
-   data:[
-    {label:"Current",value:analytics.totalUtang},
-    {label:"Forecast",value:analytics.prediction}
-   ]
-  });
-
-  return w;
-
- };
+ },[messages]);
 
 
- const sendPrompt = async ()=>{
+ /* SEND PROMPT */
 
-  if(!messages.length) return;
-
-  const last = messages[messages.length-1];
-
-  if(last.role!=="user") return;
+ const sendPrompt = async(prompt)=>{
 
   setLoading(true);
 
-  const res = await fetch(
-   SUPABASE_URL,
-   {
-    method:"POST",
-    headers:{
-     "Content-Type":"application/json",
-     "apikey":SUPABASE_KEY,
-     "Authorization":`Bearer ${SUPABASE_KEY}`
-    },
-    body:JSON.stringify({
-     prompt:last.content,
-     products,
-     debts
-    })
-   }
-  );
+  try{
 
-  const data = await res.json();
+   const res =
+   await fetch(
 
-  const insight = data.result || "analysis complete";
+    SUPABASE_URL,
 
-  setMessages(prev=>[
-   ...prev,
-   {
-    role:"ai",
-    content:insight
-   }
-  ]);
+    {
 
-  const auto = autoWidgets({
-   ...data.analytics,
-   debts
-  });
+     method:"POST",
 
-  setWidgets(prev=>[...prev,...auto]);
+     headers:{
+
+      "Content-Type":"application/json",
+
+      apikey:SUPABASE_KEY,
+
+      Authorization:`Bearer ${SUPABASE_KEY}`
+
+     },
+
+     body:JSON.stringify({
+
+      prompt,
+      debts
+
+     })
+
+    }
+
+   );
+
+
+   const data=
+   await res.json();
+
+
+   setMessages(prev=>[
+
+    ...prev,
+
+    {
+
+     role:"ai",
+
+     content:
+     data.text ||
+
+     "No result"
+
+    }
+
+   ]);
+
+
+   setWidgets(
+
+    data.widgets || []
+
+   );
+
+  }
+
+  catch{
+
+   setMessages(prev=>[
+
+    ...prev,
+
+    {
+
+     role:"ai",
+
+     content:
+
+     "AI connection error"
+
+    }
+
+   ]);
+
+  }
 
   setLoading(false);
 
  };
 
 
- const sendUser = (text)=>{
+ const sendMessage=()=>{
+
+  if(!input) return;
+
 
   setMessages(prev=>[
+
    ...prev,
+
    {
+
     role:"user",
-    content:text
+
+    content:input
+
    }
+
   ]);
+
+
+  sendPrompt(input);
+
+
+  setInput("");
+
+ };
+
+
+ const removeWidget=(i)=>{
+
+  setWidgets(prev=>
+
+   prev.filter(
+
+    (_,x)=>x!==i
+
+   )
+
+  );
+
+ };
+
+
+ /* EXPORT EXCEL */
+
+ const exportExcel=()=>{
+
+  const rows=[];
+
+
+  widgets.forEach(w=>{
+
+   if(w.type==="kpi"){
+
+    rows.push({
+
+     metric:w.label,
+
+     value:w.value
+
+    });
+
+   }
+
+
+   if(w.data){
+
+    w.data.forEach(d=>{
+
+     rows.push({
+
+      chart:w.title,
+
+      label:d.label,
+
+      value:d.value
+
+     });
+
+    });
+
+   }
+
+  });
+
+
+  const sheet=
+
+  XLSX.utils.json_to_sheet(rows);
+
+
+  const book=
+
+  XLSX.utils.book_new();
+
+
+  XLSX.utils.book_append_sheet(
+
+   book,
+
+   sheet,
+
+   "AI Report"
+
+  );
+
+
+  const file=
+
+  XLSX.write(
+
+   book,
+
+   {
+
+    bookType:"xlsx",
+
+    type:"array"
+
+   }
+
+  );
+
+
+  saveAs(
+
+   new Blob([file]),
+
+   "MiniStoreAI.xlsx"
+
+  );
 
  };
 
@@ -164,82 +305,254 @@ export default function MiniStoreAI({ products = [], debts = [] }){
  <>
 
 
+ {/* FLOAT BUTTON */}
+
  <button
+
   className="ai-float-btn"
-  title="MiniStore AI"
-  onClick={()=>setOpen(!open)}
+
+  onClick={()=>
+
+   setOpen(!open)
+
+  }
+
  >
-  {open ? <X size={20}/> : <BrainCircuit size={20}/>}
+
+  {
+
+   open
+
+   ?
+
+   <X/>
+
+   :
+
+   <BrainCircuit/>
+
+  }
+
  </button>
 
 
- {open && (
 
-  <div className="ai-chat-window glass">
+ {/* CHAT */}
 
+ {open &&(
 
-   <div className="ai-chat-header">
-
-    <BrainCircuit size={16}/>
-
-    MiniStore AI
-
-   </div>
+ <div className="ai-chat-window glass">
 
 
-   <div className="ai-chat-body">
-
-    {messages.map((m,i)=>(
-
-     <div
-      key={i}
-      className={`ai-msg ${m.role==="user" ? "ai-user" : "ai-bot"}`}
-     >
-
-      {m.content}
-
-     </div>
-
-    ))}
+ <div className="ai-chat-header">
 
 
-    {loading && (
-     <div className="ai-msg ai-bot">
-      analyzing...
-     </div>
-    )}
-
-   </div>
+  <BrainCircuit size={16}/>
 
 
-   <ChatInput
-    onSend={sendUser}
-    onTriggerAI={sendPrompt}
-   />
+  MiniStore AI
 
 
-  </div>
+  <Download
+
+   size={16}
+
+   style={{
+
+    marginLeft:"auto",
+
+    cursor:"pointer"
+
+   }}
+
+   onClick={exportExcel}
+
+  />
+
+
+ </div>
+
+
+
+ <div className="ai-chat-body">
+
+
+ {messages.map((m,i)=>(
+
+
+ <div
+
+  key={i}
+
+  className={`
+
+   ai-msg
+
+   ${
+
+    m.role==="user"
+
+    ?
+
+    "ai-user"
+
+    :
+
+    "ai-bot"
+
+   }
+
+  `}
+
+ >
+
+  {m.content}
+
+ </div>
+
+
+ ))}
+
+
+
+ {loading &&(
+
+ <div className="ai-msg ai-bot">
+
+ analyzing...
+
+ </div>
 
  )}
 
 
- <div className="ai-widget-area">
+ </div>
 
-  {widgets.map((w,i)=>(
 
-   <Draggable key={i}>
 
-    <div className="ai-widget glass">
+ <div className="ai-chat-input">
 
-     <Widget config={w}/>
 
-    </div>
+ <input
 
-   </Draggable>
+  value={input}
 
-  ))}
+  onChange={(e)=>
+
+   setInput(e.target.value)
+
+  }
+
+  placeholder="ask AI..."
+
+ />
+
+
+ <button
+
+  className="ai-send"
+
+  onClick={sendMessage}
+
+ >
+
+  <Send size={16}/>
+
+ </button>
+
 
  </div>
+
+
+
+ </div>
+
+ )}
+
+
+
+ {/* WIDGETS */}
+
+
+ <div className="ai-widget-area">
+
+
+ {widgets.map((w,i)=>{
+
+
+ const nodeRef=
+
+ useRef(null);
+
+
+ return(
+
+
+ <Draggable
+
+  key={i}
+
+  nodeRef={nodeRef}
+
+ >
+
+
+ <div
+
+  ref={nodeRef}
+
+  className="ai-widget glass"
+
+ >
+
+
+ <button
+
+  onClick={()=>removeWidget(i)}
+
+  style={{
+
+   position:"absolute",
+
+   top:6,
+
+   right:6,
+
+   border:"none",
+
+   background:"none",
+
+   color:"#94a3b8",
+
+   cursor:"pointer"
+
+  }}
+
+ >
+
+  ✕
+
+ </button>
+
+
+
+ <Widget config={w}/>
+
+
+ </div>
+
+
+ </Draggable>
+
+
+ );
+
+
+ })}
+
+
+ </div>
+
 
 
  </>
@@ -249,62 +562,36 @@ export default function MiniStoreAI({ products = [], debts = [] }){
 }
 
 
-function ChatInput({ onSend,onTriggerAI }){
 
- const [value,setValue] = useState("");
-
- const send = ()=>{
-
-  if(!value) return;
-
-  onSend(value);
-
-  setValue("");
-
-  setTimeout(onTriggerAI,200);
-
- };
-
- return(
-
-  <div className="ai-chat-input">
-
-   <input
-    value={value}
-    onChange={(e)=>setValue(e.target.value)}
-    placeholder="ask AI about utang..."
-   />
-
-   <button
-    className="ai-send"
-    onClick={send}
-   >
-    <Send size={16}/>
-   </button>
-
-  </div>
-
- );
-
-}
+/* WIDGET RENDER */
 
 
-function Widget({ config }){
+function Widget({config}){
+
 
  if(config.type==="kpi"){
 
   return(
-   <div className="ai-kpi">
 
-    <div className="ai-kpi-label">
-     {config.label}
-    </div>
+  <div className="ai-kpi">
 
-    <div className="ai-kpi-value">
-     {config.value}
-    </div>
+
+   <div className="ai-kpi-label">
+
+    {config.label}
 
    </div>
+
+
+   <div className="ai-kpi-value">
+
+    {config.value}
+
+   </div>
+
+
+  </div>
+
   );
 
  }
@@ -313,31 +600,49 @@ function Widget({ config }){
  if(config.type==="line"){
 
   return(
-   <>
 
-    <div className="ai-chart-title">
-     {config.title}
-    </div>
+  <>
 
-    <ResponsiveContainer width="100%" height={200}>
+  <div className="ai-chart-title">
 
-     <LineChart data={config.data}>
+   {config.title}
 
-      <CartesianGrid/>
+  </div>
 
-      <XAxis dataKey="label"/>
 
-      <YAxis/>
+  <ResponsiveContainer
 
-      <Tooltip/>
+   width="100%"
 
-      <Line dataKey="value" stroke="#6366f1" strokeWidth={3}/>
+   height={200}
 
-     </LineChart>
+  >
 
-    </ResponsiveContainer>
 
-   </>
+  <LineChart data={config.data}>
+
+
+   <CartesianGrid/>
+
+
+   <XAxis dataKey="label"/>
+
+
+   <YAxis/>
+
+
+   <Tooltip/>
+
+
+   <Line dataKey="value"/>
+
+
+  </LineChart>
+
+
+  </ResponsiveContainer>
+
+  </>
 
   );
 
@@ -347,71 +652,55 @@ function Widget({ config }){
  if(config.type==="bar"){
 
   return(
-   <>
 
-    <div className="ai-chart-title">
-     {config.title}
-    </div>
+  <>
 
-    <ResponsiveContainer width="100%" height={200}>
+  <div className="ai-chart-title">
 
-     <BarChart data={config.data}>
+   {config.title}
 
-      <CartesianGrid/>
-
-      <XAxis dataKey="label"/>
-
-      <YAxis/>
-
-      <Tooltip/>
-
-      <Bar dataKey="value"/>
-
-     </BarChart>
-
-    </ResponsiveContainer>
-
-   </>
-
-  );
-
- }
+  </div>
 
 
- if(config.type==="area"){
+  <ResponsiveContainer
 
-  return(
-   <>
+   width="100%"
 
-    <div className="ai-chart-title">
-     {config.title}
-    </div>
+   height={200}
 
-    <ResponsiveContainer width="100%" height={200}>
+  >
 
-     <AreaChart data={config.data}>
 
-      <CartesianGrid/>
+  <BarChart data={config.data}>
 
-      <XAxis dataKey="label"/>
 
-      <YAxis/>
+   <CartesianGrid/>
 
-      <Tooltip/>
 
-      <Area dataKey="value" stroke="#ef4444" fill="#fecaca"/>
+   <XAxis dataKey="label"/>
 
-     </AreaChart>
 
-    </ResponsiveContainer>
+   <YAxis/>
 
-   </>
+
+   <Tooltip/>
+
+
+   <Bar dataKey="value"/>
+
+
+  </BarChart>
+
+
+  </ResponsiveContainer>
+
+  </>
 
   );
 
  }
 
 
- return <div>{config.text}</div>;
+ return null;
 
 }
