@@ -21,30 +21,29 @@ const SUPABASE_URL =
 "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
 const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
+"PASTE_PUBLIC_ANON_KEY";
 
 
-export default function MiniStoreAI({ debts=[] }){
+export default function MiniStoreAI({ debts = [] }) {
 
- const [open,setOpen]=useState(false);
- const [input,setInput]=useState("");
- const [loading,setLoading]=useState(false);
- const [widgets,setWidgets]=useState([]);
+ const [open, setOpen] = useState(false);
+ const [input, setInput] = useState("");
+ const [loading, setLoading] = useState(false);
+ const [widgets, setWidgets] = useState([]);
 
 
- /* SAVE CHAT HISTORY */
+ /* CHAT HISTORY */
 
- const [messages,setMessages]=useState(()=>{
+ const [messages, setMessages] = useState(() => {
 
-  const saved=
-  localStorage.getItem("mini_ai_chat");
+  const saved = localStorage.getItem("mini_ai_chat");
 
   return saved
-  ? JSON.parse(saved)
-  : [
-   {
-    role:"ai",
-    content:
+   ? JSON.parse(saved)
+   : [
+      {
+       role: "ai",
+       content:
 `Hi 👋 pwede mo itanong:
 
 • pending utang
@@ -52,57 +51,46 @@ export default function MiniStoreAI({ debts=[] }){
 • overdue utang
 • sino dapat singilin
 • utang trend`
-   }
-  ];
+      }
+     ];
 
  });
 
 
- useEffect(()=>{
+ useEffect(() => {
 
   localStorage.setItem(
-
    "mini_ai_chat",
-
    JSON.stringify(messages)
-
   );
 
- },[messages]);
+ }, [messages]);
 
 
  /* SEND PROMPT */
 
- const sendPrompt = async(prompt)=>{
+ const sendPrompt = async (prompt) => {
 
   setLoading(true);
 
-  try{
+  try {
 
-   const res =
-   await fetch(
+   const res = await fetch(
 
     SUPABASE_URL,
 
     {
+     method: "POST",
 
-     method:"POST",
-
-     headers:{
-
-      "Content-Type":"application/json",
-
-      apikey:SUPABASE_KEY,
-
-      Authorization:`Bearer ${SUPABASE_KEY}`
-
+     headers: {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`
      },
 
-     body:JSON.stringify({
-
+     body: JSON.stringify({
       prompt,
       debts
-
      })
 
     }
@@ -110,50 +98,34 @@ export default function MiniStoreAI({ debts=[] }){
    );
 
 
-   const data=
-   await res.json();
+   const data = await res.json();
 
 
-   setMessages(prev=>[
+   setMessages(prev => [
 
     ...prev,
 
     {
-
-     role:"ai",
-
-     content:
-     data.text ||
-
-     "No result"
-
+     role: "ai",
+     content: data.text || "No result"
     }
 
    ]);
 
 
-   setWidgets(
-
-    data.widgets || []
-
-   );
+   setWidgets(data.widgets || []);
 
   }
 
-  catch{
+  catch {
 
-   setMessages(prev=>[
+   setMessages(prev => [
 
     ...prev,
 
     {
-
-     role:"ai",
-
-     content:
-
-     "AI connection error"
-
+     role: "ai",
+     content: "AI connection error"
     }
 
    ]);
@@ -165,21 +137,18 @@ export default function MiniStoreAI({ debts=[] }){
  };
 
 
- const sendMessage=()=>{
+ const sendMessage = () => {
 
-  if(!input) return;
+  if (!input.trim()) return;
 
 
-  setMessages(prev=>[
+  setMessages(prev => [
 
    ...prev,
 
    {
-
-    role:"user",
-
-    content:input
-
+    role: "user",
+    content: input
    }
 
   ]);
@@ -193,54 +162,45 @@ export default function MiniStoreAI({ debts=[] }){
  };
 
 
- const removeWidget=(i)=>{
+ const removeWidget = (index) => {
 
-  setWidgets(prev=>
-
-   prev.filter(
-
-    (_,x)=>x!==i
-
-   )
-
+  setWidgets(prev =>
+   prev.filter((_, i) => i !== index)
   );
 
  };
 
 
- /* EXPORT EXCEL */
+ /* EXPORT TO EXCEL */
 
- const exportExcel=()=>{
+ const exportExcel = () => {
 
-  const rows=[];
+  const rows = [];
 
 
-  widgets.forEach(w=>{
+  widgets.forEach(w => {
 
-   if(w.type==="kpi"){
+   if (w.type === "kpi") {
 
     rows.push({
 
-     metric:w.label,
-
-     value:w.value
+     metric: w.label,
+     value: w.value
 
     });
 
    }
 
 
-   if(w.data){
+   if (w.data) {
 
-    w.data.forEach(d=>{
+    w.data.forEach(d => {
 
      rows.push({
 
-      chart:w.title,
-
-      label:d.label,
-
-      value:d.value
+      chart: w.title,
+      label: d.label,
+      value: d.value
 
      });
 
@@ -251,42 +211,34 @@ export default function MiniStoreAI({ debts=[] }){
   });
 
 
-  const sheet=
+  const sheet =
+   XLSX.utils.json_to_sheet(rows);
 
-  XLSX.utils.json_to_sheet(rows);
 
-
-  const book=
-
-  XLSX.utils.book_new();
+  const workbook =
+   XLSX.utils.book_new();
 
 
   XLSX.utils.book_append_sheet(
 
-   book,
-
+   workbook,
    sheet,
-
    "AI Report"
 
   );
 
 
-  const file=
+  const file =
+   XLSX.write(
 
-  XLSX.write(
+    workbook,
 
-   book,
+    {
+     bookType: "xlsx",
+     type: "array"
+    }
 
-   {
-
-    bookType:"xlsx",
-
-    type:"array"
-
-   }
-
-  );
+   );
 
 
   saveAs(
@@ -300,75 +252,41 @@ export default function MiniStoreAI({ debts=[] }){
  };
 
 
- return(
+ return (
 
  <>
-
 
  {/* FLOAT BUTTON */}
 
  <button
-
   className="ai-float-btn"
-
-  onClick={()=>
-
-   setOpen(!open)
-
-  }
-
+  onClick={() => setOpen(!open)}
  >
 
-  {
-
-   open
-
-   ?
-
-   <X/>
-
-   :
-
-   <BrainCircuit/>
-
-  }
+  {open ? <X /> : <BrainCircuit />}
 
  </button>
 
 
 
- {/* CHAT */}
+ {/* CHAT WINDOW */}
 
- {open &&(
+ {open && (
 
  <div className="ai-chat-window glass">
 
-
  <div className="ai-chat-header">
 
-
-  <BrainCircuit size={16}/>
-
+  <BrainCircuit size={16} />
 
   MiniStore AI
 
 
   <Download
-
    size={16}
-
-   style={{
-
-    marginLeft:"auto",
-
-    cursor:"pointer"
-
-   }}
-
+   style={{ marginLeft: "auto", cursor: "pointer" }}
    onClick={exportExcel}
-
   />
-
 
  </div>
 
@@ -376,55 +294,31 @@ export default function MiniStoreAI({ debts=[] }){
 
  <div className="ai-chat-body">
 
-
- {messages.map((m,i)=>(
-
+ {messages.map((msg, i) => (
 
  <div
-
   key={i}
-
-  className={`
-
-   ai-msg
-
-   ${
-
-    m.role==="user"
-
-    ?
-
-    "ai-user"
-
-    :
-
-    "ai-bot"
-
-   }
-
-  `}
-
+  className={`ai-msg ${
+   msg.role === "user"
+    ? "ai-user"
+    : "ai-bot"
+  }`}
  >
 
-  {m.content}
+  {msg.content}
 
  </div>
-
 
  ))}
 
 
-
- {loading &&(
+ {loading && (
 
  <div className="ai-msg ai-bot">
-
- analyzing...
-
+  analyzing...
  </div>
 
  )}
-
 
  </div>
 
@@ -432,38 +326,26 @@ export default function MiniStoreAI({ debts=[] }){
 
  <div className="ai-chat-input">
 
-
  <input
-
   value={input}
-
-  onChange={(e)=>
-
+  onChange={(e) =>
    setInput(e.target.value)
-
   }
-
   placeholder="ask AI..."
-
  />
 
 
  <button
-
   className="ai-send"
-
   onClick={sendMessage}
-
  >
 
-  <Send size={16}/>
+  <Send size={16} />
 
  </button>
 
 
  </div>
-
-
 
  </div>
 
@@ -471,63 +353,37 @@ export default function MiniStoreAI({ debts=[] }){
 
 
 
- {/* WIDGETS */}
-
+ {/* AI WIDGETS */}
 
  <div className="ai-widget-area">
 
+ {widgets.map((widget, i) => {
 
- {widgets.map((w,i)=>{
+ const nodeRef = useRef(null);
 
-
- const nodeRef=
-
- useRef(null);
-
-
- return(
-
+ return (
 
  <Draggable
-
   key={i}
-
   nodeRef={nodeRef}
-
  >
-
 
  <div
-
   ref={nodeRef}
-
   className="ai-widget glass"
-
  >
 
-
  <button
-
-  onClick={()=>removeWidget(i)}
-
+  onClick={() => removeWidget(i)}
   style={{
-
-   position:"absolute",
-
-   top:6,
-
-   right:6,
-
-   border:"none",
-
-   background:"none",
-
-   color:"#94a3b8",
-
-   cursor:"pointer"
-
+   position: "absolute",
+   top: 6,
+   right: 6,
+   border: "none",
+   background: "none",
+   color: "#94a3b8",
+   cursor: "pointer"
   }}
-
  >
 
   ✕
@@ -535,25 +391,17 @@ export default function MiniStoreAI({ debts=[] }){
  </button>
 
 
-
- <Widget config={w}/>
-
+ <Widget config={widget} />
 
  </div>
-
 
  </Draggable>
 
-
  );
-
 
  })}
 
-
  </div>
-
-
 
  </>
 
@@ -563,18 +411,16 @@ export default function MiniStoreAI({ debts=[] }){
 
 
 
-/* WIDGET RENDER */
+/* WIDGET DISPLAY */
+
+function Widget({ config }) {
 
 
-function Widget({config}){
+ if (config.type === "kpi") {
 
-
- if(config.type==="kpi"){
-
-  return(
+  return (
 
   <div className="ai-kpi">
-
 
    <div className="ai-kpi-label">
 
@@ -589,7 +435,6 @@ function Widget({config}){
 
    </div>
 
-
   </div>
 
   );
@@ -597,9 +442,10 @@ function Widget({config}){
  }
 
 
- if(config.type==="line"){
 
-  return(
+ if (config.type === "line") {
+
+  return (
 
   <>
 
@@ -610,35 +456,21 @@ function Widget({config}){
   </div>
 
 
-  <ResponsiveContainer
-
-   width="100%"
-
-   height={200}
-
-  >
-
+  <ResponsiveContainer width="100%" height={200}>
 
   <LineChart data={config.data}>
 
+   <CartesianGrid />
 
-   <CartesianGrid/>
+   <XAxis dataKey="label" />
 
+   <YAxis />
 
-   <XAxis dataKey="label"/>
+   <Tooltip />
 
-
-   <YAxis/>
-
-
-   <Tooltip/>
-
-
-   <Line dataKey="value"/>
-
+   <Line dataKey="value" />
 
   </LineChart>
-
 
   </ResponsiveContainer>
 
@@ -649,9 +481,10 @@ function Widget({config}){
  }
 
 
- if(config.type==="bar"){
 
-  return(
+ if (config.type === "bar") {
+
+  return (
 
   <>
 
@@ -662,35 +495,21 @@ function Widget({config}){
   </div>
 
 
-  <ResponsiveContainer
-
-   width="100%"
-
-   height={200}
-
-  >
-
+  <ResponsiveContainer width="100%" height={200}>
 
   <BarChart data={config.data}>
 
+   <CartesianGrid />
 
-   <CartesianGrid/>
+   <XAxis dataKey="label" />
 
+   <YAxis />
 
-   <XAxis dataKey="label"/>
+   <Tooltip />
 
-
-   <YAxis/>
-
-
-   <Tooltip/>
-
-
-   <Bar dataKey="value"/>
-
+   <Bar dataKey="value" />
 
   </BarChart>
-
 
   </ResponsiveContainer>
 
