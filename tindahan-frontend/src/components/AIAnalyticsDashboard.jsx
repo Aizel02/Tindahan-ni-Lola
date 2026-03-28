@@ -1,3 +1,6 @@
+// INDUSTRY STANDARD MINISTORE AI COPILOT
+// chat based analytics + dynamic widgets + risk scoring
+
 import { useState } from "react";
 import { BrainCircuit, Send, X } from "lucide-react";
 import Draggable from "react-draggable";
@@ -17,221 +20,287 @@ import {
 
 const SUPABASE_URL = "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
-const SUPABASE_KEY = "PASTE_YOUR_PUBLIC_ANON_KEY_HERE";
+const SUPABASE_KEY = "PASTE_PUBLIC_ANON_KEY";
 
-export default function MiniStoreAI({ products = [], debts = [] }) {
+export default function MiniStoreAI({ products = [], debts = [] }){
 
  const [open,setOpen] = useState(false);
+ const [loading,setLoading] = useState(false);
 
- const [messages, setMessages] = useState([
+ const [messages,setMessages] = useState([
   {
-   role: "ai",
-   content: "Hi 👋 I am MiniStore AI. Ask about utang, prediction, risk, charts, or customers."
+   role:"ai",
+   content:"Hi 👋 I am MiniStore AI. Ask about utang, prediction, trends or customers."
   }
  ]);
 
- const [widgets, setWidgets] = useState([]);
- const [input, setInput] = useState("");
- const [loading, setLoading] = useState(false);
+ const [widgets,setWidgets] = useState([]);
+
+ const calculateRisk = (debts)=>{
+
+  const total = debts.reduce((a,b)=>a+Number(b.amount),0);
+
+  const overdue = debts.filter(d=>d.status!=="Paid").length;
+
+  const score = overdue*15 + total*0.002;
+
+  if(score>80) return "HIGH 🔴";
+
+  if(score>40) return "MEDIUM 🟡";
+
+  return "LOW 🟢";
+
+ };
 
 
- const sendPrompt = async () => {
+ const autoWidgets = (analytics)=>{
 
-  if(!input) return;
+  const w = [];
 
-  const userMsg = {
-   role:"user",
-   content:input
-  };
+  w.push({
+   type:"kpi",
+   label:"Total Utang",
+   value:`₱${analytics.totalUtang}`
+  });
 
-  setMessages(prev=>[...prev,userMsg]);
+  w.push({
+   type:"kpi",
+   label:"Risk Level",
+   value:calculateRisk(analytics.debts || [])
+  });
 
-  setInput("");
+  const monthlyData = Object.entries(analytics.monthlyTotals || {}).map(
+   ([label,value])=>({label,value})
+  );
+
+  if(monthlyData.length>0){
+   w.push({
+    type:"line",
+    title:"Utang Trend",
+    data:monthlyData
+   });
+  }
+
+  w.push({
+   type:"area",
+   title:"Prediction",
+   data:[
+    {label:"Current",value:analytics.totalUtang},
+    {label:"Forecast",value:analytics.prediction}
+   ]
+  });
+
+  return w;
+
+ };
+
+
+ const sendPrompt = async ()=>{
+
+  if(!messages.length) return;
+
+  const last = messages[messages.length-1];
+
+  if(last.role!=="user") return;
+
   setLoading(true);
 
-  try{
-
-   const res = await fetch(
-    SUPABASE_URL,
-    {
-     method:"POST",
-     headers:{
-      "Content-Type":"application/json",
-      "apikey":SUPABASE_KEY,
-      "Authorization":`Bearer ${SUPABASE_KEY}`
-     },
-     body:JSON.stringify({
-      prompt:input,
-      products,
-      debts
-     })
-    }
-   );
-
-   const data = await res.json();
-
-   setMessages(prev=>[
-    ...prev,
-    {
-     role:"ai",
-     content:data.text || "analysis complete"
-    }
-   ]);
-
-   if(data.widgets){
-    setWidgets(prev=>[
-     ...prev,
-     ...data.widgets
-    ]);
+  const res = await fetch(
+   SUPABASE_URL,
+   {
+    method:"POST",
+    headers:{
+     "Content-Type":"application/json",
+     "apikey":SUPABASE_KEY,
+     "Authorization":`Bearer ${SUPABASE_KEY}`
+    },
+    body:JSON.stringify({
+     prompt:last.content,
+     products,
+     debts
+    })
    }
+  );
 
-  }
-  catch(e){
-   console.log(e);
-  }
+  const data = await res.json();
+
+  const insight = data.result || "analysis complete";
+
+  setMessages(prev=>[
+   ...prev,
+   {
+    role:"ai",
+    content:insight
+   }
+  ]);
+
+  const auto = autoWidgets({
+   ...data.analytics,
+   debts
+  });
+
+  setWidgets(prev=>[...prev,...auto]);
 
   setLoading(false);
+
+ };
+
+
+ const sendUser = (text)=>{
+
+  setMessages(prev=>[
+   ...prev,
+   {
+    role:"user",
+    content:text
+   }
+  ]);
+
  };
 
 
  return(
-  <>
 
+ <>
 
-{/* FLOATING BUTTON */}
-
-<div className="fixed bottom-6 right-6 z-50">
 
  <button
+  className="ai-float-btn"
   title="MiniStore AI"
   onClick={()=>setOpen(!open)}
-  className="bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:scale-105 transition"
  >
-  {
-   open
-   ? <X size={22}/>
-   : <BrainCircuit size={22}/>
-  }
+  {open ? <X size={20}/> : <BrainCircuit size={20}/>}
  </button>
 
-</div>
+
+ {open && (
+
+  <div className="ai-chat-window glass">
 
 
-{/* CHAT WINDOW */}
+   <div className="ai-chat-header">
 
-{open && (
+    <BrainCircuit size={16}/>
 
-<div className="fixed bottom-24 right-6 w-[420px] h-[520px] bg-slate-950 text-white rounded-2xl shadow-2xl border border-slate-800 flex flex-col overflow-hidden">
+    MiniStore AI
 
-
-{/* HEADER */}
-
-<div className="flex items-center gap-2 p-4 border-b border-slate-800 bg-slate-900">
-
- <BrainCircuit size={18}/>
-
- <span className="font-semibold">
-  MiniStore AI
- </span>
-
-</div>
+   </div>
 
 
-{/* CHAT */}
+   <div className="ai-chat-body">
 
-<div className="flex-1 overflow-y-auto p-4 space-y-3">
+    {messages.map((m,i)=>(
 
- {messages.map((m,i)=>(
+     <div
+      key={i}
+      className={`ai-msg ${m.role==="user" ? "ai-user" : "ai-bot"}`}
+     >
 
-  <div
-   key={i}
-   className={`p-3 rounded-xl max-w-[80%] text-sm ${{
-    user:"bg-indigo-600 ml-auto",
-    ai:"bg-slate-800"
-   }[m.role]}`}
-  >
+      {m.content}
 
-   {m.content}
+     </div>
 
-  </div>
+    ))}
 
- ))}
 
- {loading && (
+    {loading && (
+     <div className="ai-msg ai-bot">
+      analyzing...
+     </div>
+    )}
 
-  <div className="bg-slate-800 p-3 rounded-xl text-sm w-fit">
-   analyzing...
+   </div>
+
+
+   <ChatInput
+    onSend={sendUser}
+    onTriggerAI={sendPrompt}
+   />
+
+
   </div>
 
  )}
 
-</div>
+
+ <div className="ai-widget-area">
+
+  {widgets.map((w,i)=>(
+
+   <Draggable key={i}>
+
+    <div className="ai-widget glass">
+
+     <Widget config={w}/>
+
+    </div>
+
+   </Draggable>
+
+  ))}
+
+ </div>
 
 
-{/* INPUT */}
+ </>
 
-<div className="p-3 border-t border-slate-800 flex gap-2">
-
- <input
-  value={input}
-  onChange={(e)=>setInput(e.target.value)}
-  placeholder="ask AI about utang..."
-  className="flex-1 bg-slate-900 p-3 rounded-xl text-sm outline-none"
- />
-
- <button
-  onClick={sendPrompt}
-  className="bg-indigo-600 px-3 rounded-xl"
- >
-  <Send size={18}/>
- </button>
-
-</div>
-
-</div>
-
-)}
-
-
-{/* DRAGGABLE WIDGETS */}
-
-<div className="fixed top-6 left-6 grid gap-4 z-40">
-
- {widgets.map((w,i)=>(
-
-  <Draggable key={i}>
-
-   <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 shadow-xl cursor-move w-[320px]">
-
-    <Widget config={w}/>
-
-   </div>
-
-  </Draggable>
-
- ))}
-
-</div>
-
-
-</>
  );
+
+}
+
+
+function ChatInput({ onSend,onTriggerAI }){
+
+ const [value,setValue] = useState("");
+
+ const send = ()=>{
+
+  if(!value) return;
+
+  onSend(value);
+
+  setValue("");
+
+  setTimeout(onTriggerAI,200);
+
+ };
+
+ return(
+
+  <div className="ai-chat-input">
+
+   <input
+    value={value}
+    onChange={(e)=>setValue(e.target.value)}
+    placeholder="ask AI about utang..."
+   />
+
+   <button
+    className="ai-send"
+    onClick={send}
+   >
+    <Send size={16}/>
+   </button>
+
+  </div>
+
+ );
+
 }
 
 
 function Widget({ config }){
 
-
  if(config.type==="kpi"){
 
   return(
-   <div>
+   <div className="ai-kpi">
 
-    <div className="text-xs text-slate-400">
+    <div className="ai-kpi-label">
      {config.label}
     </div>
 
-    <div className="text-2xl mt-1">
+    <div className="ai-kpi-value">
      {config.value}
     </div>
 
@@ -244,9 +313,9 @@ function Widget({ config }){
  if(config.type==="line"){
 
   return(
-   <div>
+   <>
 
-    <div className="mb-2 text-sm">
+    <div className="ai-chart-title">
      {config.title}
     </div>
 
@@ -268,7 +337,8 @@ function Widget({ config }){
 
     </ResponsiveContainer>
 
-   </div>
+   </>
+
   );
 
  }
@@ -277,9 +347,9 @@ function Widget({ config }){
  if(config.type==="bar"){
 
   return(
-   <div>
+   <>
 
-    <div className="mb-2 text-sm">
+    <div className="ai-chart-title">
      {config.title}
     </div>
 
@@ -301,7 +371,8 @@ function Widget({ config }){
 
     </ResponsiveContainer>
 
-   </div>
+   </>
+
   );
 
  }
@@ -310,9 +381,9 @@ function Widget({ config }){
  if(config.type==="area"){
 
   return(
-   <div>
+   <>
 
-    <div className="mb-2 text-sm">
+    <div className="ai-chart-title">
      {config.title}
     </div>
 
@@ -334,16 +405,13 @@ function Widget({ config }){
 
     </ResponsiveContainer>
 
-   </div>
+   </>
+
   );
 
  }
 
 
- return(
-  <div className="text-sm">
-   {config.text}
-  </div>
- );
+ return <div>{config.text}</div>;
 
 }
