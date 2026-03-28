@@ -21,7 +21,7 @@ const SUPABASE_URL =
 "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
 const SUPABASE_KEY =
-"PASTE_PUBLIC_ANON_KEY";
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
 
 
 export default function MiniStoreAI({ debts = [] }) {

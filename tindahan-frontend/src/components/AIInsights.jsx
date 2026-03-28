@@ -1,8 +1,6 @@
-import { useState, useEffect, useRef } from "react";
-import { BrainCircuit, Send, X, Mic, Download } from "lucide-react";
+import { useState } from "react";
+import { BrainCircuit, Send, X } from "lucide-react";
 import Draggable from "react-draggable";
-import jsPDF from "jspdf";
-
 import {
  ResponsiveContainer,
  LineChart,
@@ -29,36 +27,15 @@ export default function MiniStoreAI({ debts=[] }){
  const [loading,setLoading]=useState(false);
  const [input,setInput]=useState("");
 
- const [messages,setMessages]=useState(()=>{
-
-  const saved=localStorage.getItem("ai_chat");
-
-  return saved
-   ? JSON.parse(saved)
-   : [
-    {
-     role:"ai",
-     content:
-"Hi 👋 pwede mo itanong:\n• pending utang\n• utang ni kuya\n• overdue list\n• sino dapat singilin\n• utang trend"
-    }
-   ];
-
- });
+ const [messages,setMessages]=useState([
+  {
+   role:"ai",
+   content:
+   "Hi 👋 pwede mo itanong:\n• utang ni kuya\n• overdue list\n• sino dapat singilin\n• total utang\n• utang trend"
+  }
+ ]);
 
  const [widgets,setWidgets]=useState([]);
-
- const recognitionRef=useRef(null);
-
- useEffect(()=>{
-
-  localStorage.setItem(
-   "ai_chat",
-   JSON.stringify(messages)
-  );
-
- },[messages]);
-
-
 
  const sendPrompt=async(promptText)=>{
 
@@ -69,55 +46,30 @@ export default function MiniStoreAI({ debts=[] }){
   try{
 
    const res=await fetch(
-
     SUPABASE_URL,
-
     {
-
      method:"POST",
-
      headers:{
-
       "Content-Type":"application/json",
-
       "apikey":SUPABASE_KEY,
-
-      "Authorization":
-      `Bearer ${SUPABASE_KEY}`
-
+      "Authorization":`Bearer ${SUPABASE_KEY}`
      },
-
      body:JSON.stringify({
-
       prompt:promptText,
-
       debts
-
      })
-
     }
-
    );
 
    const data=await res.json();
 
-
-
    setMessages(prev=>[
-
     ...prev,
-
     {
-
      role:"ai",
-
      content:data.text
-
     }
-
    ]);
-
-
 
    setWidgets(data.widgets || []);
 
@@ -126,251 +78,77 @@ export default function MiniStoreAI({ debts=[] }){
   catch{
 
    setMessages(prev=>[
-
     ...prev,
-
     {
-
      role:"ai",
-
      content:"AI error"
-
     }
-
    ]);
 
   }
-
-
 
   setLoading(false);
 
  };
 
-
-
  const sendMessage=()=>{
 
   if(!input) return;
 
-
-
   setMessages(prev=>[
-
    ...prev,
-
    {
-
     role:"user",
-
     content:input
-
    }
-
   ]);
 
-
-
   sendPrompt(input);
-
-
 
   setInput("");
 
  };
 
-
-
- const removeWidget=index=>{
+ const removeWidget=(index)=>{
 
   setWidgets(prev=>
-
    prev.filter((_,i)=>i!==index)
-
   );
 
  };
-
-
-
- /* voice input */
-
- const startVoice=()=>{
-
-  const SpeechRecognition=
-
-  window.SpeechRecognition ||
-
-  window.webkitSpeechRecognition;
-
-
-
-  if(!SpeechRecognition) return;
-
-
-
-  const recognition=
-
-  new SpeechRecognition();
-
-
-
-  recognition.lang="tl-PH";
-
-
-
-  recognition.onresult=e=>{
-
-   const text=
-
-   e.results[0][0].transcript;
-
-
-
-   setInput(text);
-
-  };
-
-
-
-  recognition.start();
-
- };
-
-
-
- /* export PDF */
-
- const exportPDF=()=>{
-
-  const pdf=new jsPDF();
-
-
-
-  pdf.text(
-
-   "MiniStore AI Report",
-
-   20,
-
-   20
-
-  );
-
-
-
-  widgets.forEach((w,i)=>{
-
-   pdf.text(
-
-    `${w.label || w.title}`,
-
-    20,
-
-    40 + i*10
-
-   );
-
-  });
-
-
-
-  pdf.save(
-
-   "ai-dashboard.pdf"
-
-  );
-
- };
-
-
 
  return(
 
  <>
 
-
-
  <button
-
   className="ai-float-btn"
-
   title="MiniStore AI"
-
   onClick={()=>setOpen(!open)}
-
  >
-
-  {
-
-   open
-
-   ? <X/>
-
-   : <BrainCircuit/>
-
-  }
-
+  {open ? <X/> : <BrainCircuit/>}
  </button>
-
-
 
  {open && (
 
  <div className="ai-chat-window glass">
 
-
-
  <div className="ai-chat-header">
-
   <BrainCircuit size={16}/>
-
   MiniStore AI
-
-
-
-  <Download
-
-   size={16}
-
-   style={{
-
-    marginLeft:"auto",
-
-    cursor:"pointer"
-
-   }}
-
-   onClick={exportPDF}
-
-  />
-
-
-
  </div>
 
-
-
  <div className="ai-chat-body">
-
-
 
  {messages.map((m,i)=>(
 
  <div
-
   key={i}
-
   className={`ai-msg ${
-
    m.role==="user"
-
    ? "ai-user"
-
    : "ai-bot"
-
   }`}
-
  >
 
   {m.content}
@@ -379,149 +157,67 @@ export default function MiniStoreAI({ debts=[] }){
 
  ))}
 
-
-
  {loading && (
-
- <div className="ai-msg ai-bot">
-
- analyzing...
-
- </div>
-
+  <div className="ai-msg ai-bot">
+   analyzing...
+  </div>
  )}
 
-
-
  </div>
-
-
 
  <div className="ai-chat-input">
 
-
-
  <input
-
   value={input}
-
-  onChange={e=>
-
-   setInput(e.target.value)
-
-  }
-
+  onChange={(e)=>setInput(e.target.value)}
   placeholder="ask AI..."
-
  />
-
-
-
- <Mic
-
-  size={18}
-
-  style={{
-
-   cursor:"pointer"
-
-  }}
-
-  onClick={startVoice}
-
- />
-
-
 
  <button
-
   className="ai-send"
-
   onClick={sendMessage}
-
  >
-
   <Send size={16}/>
-
  </button>
 
-
-
  </div>
-
-
 
  </div>
 
  )}
 
-
-
  <div className="ai-widget-area">
-
-
 
  {widgets.map((w,i)=>(
 
-
-
  <Draggable key={i}>
-
-
 
  <div className="ai-widget glass">
 
-
-
  <button
-
   onClick={()=>removeWidget(i)}
-
   style={{
-
    position:"absolute",
-
    top:6,
-
    right:6,
-
    background:"none",
-
    border:"none",
-
    color:"#94a3b8",
-
    cursor:"pointer"
-
   }}
-
  >
-
   ✕
-
  </button>
-
-
 
  <Widget config={w}/>
 
-
-
  </div>
-
-
 
  </Draggable>
 
-
-
  ))}
 
-
-
  </div>
-
-
 
  </>
 
@@ -529,13 +225,7 @@ export default function MiniStoreAI({ debts=[] }){
 
 }
 
-
-
-/* widget renderer */
-
 function Widget({config}){
-
-
 
  if(config.type==="kpi"){
 
@@ -544,17 +234,11 @@ function Widget({config}){
   <div className="ai-kpi">
 
    <div className="ai-kpi-label">
-
     {config.label}
-
    </div>
 
-
-
    <div className="ai-kpi-value">
-
     {config.value}
-
    </div>
 
   </div>
@@ -562,8 +246,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  if(config.type==="line"){
 
@@ -572,58 +254,24 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
-
    {config.title}
-
   </div>
 
+  <ResponsiveContainer width="100%" height={200}>
 
+   <LineChart data={config.data}>
 
-  <ResponsiveContainer
+    <CartesianGrid/>
 
-   width="100%"
+    <XAxis dataKey="label"/>
 
-   height={200}
+    <YAxis/>
 
-  >
+    <Tooltip/>
 
+    <Line dataKey="value"/>
 
-
-  <LineChart
-
-   data={config.data}
-
-  >
-
-
-
-   <CartesianGrid/>
-
-
-
-   <XAxis dataKey="label"/>
-
-
-
-   <YAxis/>
-
-
-
-   <Tooltip/>
-
-
-
-   <Line
-
-    dataKey="value"
-
-   />
-
-
-
-  </LineChart>
-
-
+   </LineChart>
 
   </ResponsiveContainer>
 
@@ -632,8 +280,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  if(config.type==="bar"){
 
@@ -642,58 +288,24 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
-
    {config.title}
-
   </div>
 
+  <ResponsiveContainer width="100%" height={200}>
 
+   <BarChart data={config.data}>
 
-  <ResponsiveContainer
+    <CartesianGrid/>
 
-   width="100%"
+    <XAxis dataKey="label"/>
 
-   height={200}
+    <YAxis/>
 
-  >
+    <Tooltip/>
 
+    <Bar dataKey="value"/>
 
-
-  <BarChart
-
-   data={config.data}
-
-  >
-
-
-
-   <CartesianGrid/>
-
-
-
-   <XAxis dataKey="label"/>
-
-
-
-   <YAxis/>
-
-
-
-   <Tooltip/>
-
-
-
-   <Bar
-
-    dataKey="value"
-
-   />
-
-
-
-  </BarChart>
-
-
+   </BarChart>
 
   </ResponsiveContainer>
 
@@ -702,8 +314,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  if(config.type==="area"){
 
@@ -712,58 +322,24 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
-
    {config.title}
-
   </div>
 
+  <ResponsiveContainer width="100%" height={200}>
 
+   <AreaChart data={config.data}>
 
-  <ResponsiveContainer
+    <CartesianGrid/>
 
-   width="100%"
+    <XAxis dataKey="label"/>
 
-   height={200}
+    <YAxis/>
 
-  >
+    <Tooltip/>
 
+    <Area dataKey="value"/>
 
-
-  <AreaChart
-
-   data={config.data}
-
-  >
-
-
-
-   <CartesianGrid/>
-
-
-
-   <XAxis dataKey="label"/>
-
-
-
-   <YAxis/>
-
-
-
-   <Tooltip/>
-
-
-
-   <Area
-
-    dataKey="value"
-
-   />
-
-
-
-  </AreaChart>
-
-
+   </AreaChart>
 
   </ResponsiveContainer>
 
@@ -772,8 +348,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  return null;
 
