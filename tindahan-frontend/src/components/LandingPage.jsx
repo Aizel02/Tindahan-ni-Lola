@@ -7,13 +7,13 @@ Sun,
 CheckSquare,
 Zap,
 BarChart3,
-Users
+Users,
+Store
 } from "lucide-react";
 
 import useTheme from "../hooks/useTheme";
 
 import "./LandingPage.css";
-import "./theme.css";
 
 export default function LandingPage(){
 
@@ -25,14 +25,20 @@ return(
 
 <div className="landing-container">
 
-<nav className="navbar glass gradient-border">
+<nav className="navbar">
 
-<h2>🏪 Tindahan ni Lola</h2>
+<h2 className="logo">
 
-<div>
+<Store size={20} className="logo-icon"/>
+
+Tindahan ni Lola
+
+</h2>
+
+<div className="nav-actions">
 
 <button
-className="icon-btn"
+className="theme-toggle"
 onClick={()=>setDark(!dark)}
 >
 
@@ -41,7 +47,7 @@ onClick={()=>setDark(!dark)}
 </button>
 
 <button
-className="btn"
+className="login-btn"
 onClick={()=>navigate("/auth")}
 >
 
@@ -69,7 +75,7 @@ Inventory, utang tracking, and analytics in one dashboard.
 </p>
 
 <button
-className="btn"
+className="primary-btn"
 onClick={()=>navigate("/auth")}
 >
 
@@ -109,7 +115,7 @@ text="For teams"
 </section>
 
 
-<section className="cta glass">
+<section className="cta">
 
 <h2>
 
@@ -118,7 +124,7 @@ Ready to grow your business?
 </h2>
 
 <button
-className="btn"
+className="secondary-btn"
 onClick={()=>navigate("/auth")}
 >
 
@@ -127,6 +133,23 @@ Enter Store
 </button>
 
 </section>
+
+
+<footer className="footer">
+
+<p>
+
+© {new Date().getFullYear()} Tindahan ni Lola
+
+</p>
+
+<p className="footer-sub">
+
+Simple inventory system for sari-sari stores
+
+</p>
+
+</footer>
 
 </div>
 
@@ -138,7 +161,7 @@ function Card({icon,title,text}){
 
 return(
 
-<div className="glass gradient-border feature-card">
+<div className="feature-card">
 
 {icon}
 

@@ -10,7 +10,15 @@ localStorage.getItem("theme")==="dark"
 
 useEffect(()=>{
 
-document.body.classList.toggle("dark",dark);
+if(dark){
+
+document.body.classList.add("dark");
+
+}else{
+
+document.body.classList.remove("dark");
+
+}
 
 localStorage.setItem("theme",dark?"dark":"light");
 

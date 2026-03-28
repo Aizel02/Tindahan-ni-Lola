@@ -1,6 +1,42 @@
-/* =========================
-BASE LAYOUT
-========================= */
+/* =============================
+LIGHT MODE BACKGROUND
+============================= */
+
+body{
+
+background:
+
+radial-gradient(circle at 20% 20%, #dbeafe 0%, transparent 45%),
+radial-gradient(circle at 80% 80%, #eff6ff 0%, transparent 45%),
+
+#f8fafc;
+
+transition:.35s;
+
+}
+
+
+/* =============================
+DARK MODE BACKGROUND
+============================= */
+
+body.dark{
+
+background:
+
+radial-gradient(circle at 20% 20%, #0f172a 0%, transparent 45%),
+radial-gradient(circle at 80% 80%, #020617 0%, transparent 45%),
+
+#020617;
+
+color:#e5e7eb;
+
+}
+
+
+/* =============================
+LAYOUT
+============================= */
 
 .landing-container{
 
@@ -12,42 +48,9 @@ text-align:center;
 }
 
 
-/* =========================
-BACKGROUND
-========================= */
-
-body{
-
-background:
-
-radial-gradient(circle at 10% 20%, #dbeafe 0%, transparent 40%),
-radial-gradient(circle at 90% 80%, #e0f2fe 0%, transparent 40%),
-
-#f8fafc;
-
-transition:.3s;
-
-}
-
-/* DARK MODE */
-
-body.dark{
-
-background:
-
-radial-gradient(circle at 10% 20%, #1e293b 0%, transparent 40%),
-radial-gradient(circle at 90% 80%, #0f172a 0%, transparent 40%),
-
-#020617;
-
-color:#e5e7eb;
-
-}
-
-
-/* =========================
-NAVBAR
-========================= */
+/* =============================
+NAVBAR GLASS
+============================= */
 
 .navbar{
 
@@ -59,170 +62,258 @@ padding:14px 22px;
 
 margin-bottom:40px;
 
-border-radius:14px;
+border-radius:16px;
 
-background:rgba(255,255,255,.6);
+/* glass */
 
-backdrop-filter:blur(10px);
+background:rgba(255,255,255,.65);
 
-border:1px solid rgba(255,255,255,.3);
+backdrop-filter:blur(14px);
 
-box-shadow:0 6px 18px rgba(0,0,0,.05);
+border:1px solid rgba(148,163,184,.25);
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.06);
 
 transition:.3s;
 
 }
 
-/* dark */
 
 body.dark .navbar{
 
-background:rgba(15,23,42,.6);
+background:rgba(2,6,23,.55);
 
-border:1px solid rgba(255,255,255,.06);
+backdrop-filter:blur(16px);
 
-box-shadow:0 6px 18px rgba(0,0,0,.4);
+border:1px solid rgba(148,163,184,.18);
+
+box-shadow:
+0 12px 40px rgba(0,0,0,.45);
 
 }
 
+
+/* =============================
+LOGO
+============================= */
 
 .logo{
 
+display:flex;
+align-items:center;
+gap:8px;
+
 font-family:"Space Grotesk";
+
 font-size:20px;
 font-weight:600;
+
+color:#0f172a;
+
+cursor:pointer;
+
+}
+
+body.dark .logo{
+
+color:#e5e7eb;
 
 }
 
 
-/* =========================
-BUTTONS
-========================= */
+.logo-icon{
 
-.login-register{
+color:#2563eb;
+transition:.3s;
 
-border:none;
+}
 
-padding:8px 16px;
+body.dark .logo-icon{
+
+color:#60a5fa;
+
+}
+
+
+/* glow hover */
+
+.logo:hover .logo-icon{
+
+filter:
+drop-shadow(0 0 6px rgba(59,130,246,.6))
+drop-shadow(0 0 14px rgba(59,130,246,.35));
+
+transform:scale(1.05);
+
+}
+
+
+/* =============================
+NAV ACTIONS
+============================= */
+
+.nav-actions{
+
+display:flex;
+align-items:center;
+gap:12px;
+
+}
+
+
+/* theme toggle */
+
+.theme-toggle{
+
+width:38px;
+height:38px;
+
+display:flex;
+align-items:center;
+justify-content:center;
 
 border-radius:10px;
 
 cursor:pointer;
 
-font-weight:500;
+border:1px solid rgba(148,163,184,.25);
 
-background:#2563eb;
+background:rgba(255,255,255,.45);
 
-color:white;
+backdrop-filter:blur(8px);
 
 transition:.25s;
 
 }
 
-.login-register:hover{
+body.dark .theme-toggle{
 
-background:#1d4ed8;
+background:rgba(15,23,42,.6);
 
-transform:translateY(-1px);
+border:1px solid rgba(148,163,184,.18);
+
+color:#60a5fa;
+
+}
+
+
+.theme-toggle:hover{
+
+transform:rotate(12deg);
+
+}
+
+
+/* =============================
+BUTTONS
+============================= */
+
+.login-btn,
+.primary-btn,
+.secondary-btn{
+
+background:linear-gradient(
+120deg,
+#2563eb,
+#3b82f6
+);
+
+border:none;
+
+color:white;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+
+.login-btn{
+
+padding:9px 18px;
+border-radius:12px;
+font-size:14px;
 
 }
 
 
 .primary-btn{
 
-margin-top:18px;
+margin-top:14px;
 
-border:none;
+padding:8px 16px;
 
-padding:12px 26px;
+font-size:13px;
 
-border-radius:12px;
-
-cursor:pointer;
-
-font-weight:600;
-
-background:#2563eb;
-
-color:white;
-
-transition:.25s;
-
-}
-
-.primary-btn:hover{
-
-background:#1d4ed8;
-
-transform:translateY(-2px);
+border-radius:10px;
 
 }
 
 
 .secondary-btn{
 
-margin-top:12px;
+margin-top:14px;
 
-border:none;
+padding:9px 18px;
 
-padding:10px 20px;
+border-radius:12px;
 
-border-radius:10px;
-
-cursor:pointer;
-
-font-weight:600;
-
-background:#2563eb;
-
-color:white;
-
-transition:.25s;
+font-size:13px;
 
 }
 
+
+/* hover animation */
+
+.login-btn:hover,
+.primary-btn:hover,
 .secondary-btn:hover{
 
-background:#1d4ed8;
+transform:translateY(-2px);
+
+box-shadow:
+0 10px 25px rgba(37,99,235,.35);
 
 }
 
 
-/* =========================
+/* =============================
 HERO
-========================= */
-
-.hero{
-
-margin-top:20px;
-padding:20px;
-
-}
+============================= */
 
 .hero h1{
 
 font-family:"Space Grotesk";
 
-font-size:clamp(28px,4vw,44px);
+font-size:42px;
 
 margin-bottom:10px;
 
 }
 
+
 .hero p{
 
 opacity:.65;
 
-max-width:600px;
+max-width:580px;
 
 margin:auto;
 
 }
 
+body.dark .hero p{
 
-/* =========================
-FEATURES
-========================= */
+color:#94a3b8;
+
+}
+
+
+/* =============================
+FEATURE GRID
+============================= */
 
 .features{
 
@@ -230,51 +321,93 @@ display:grid;
 
 grid-template-columns:repeat(4,1fr);
 
-gap:20px;
+gap:22px;
 
 margin-top:45px;
 
 }
 
+
+/* =============================
+CARDS
+============================= */
+
 .feature-card{
+
+position:relative;
 
 padding:24px;
 
-border-radius:14px;
+border-radius:16px;
 
-background:rgba(255,255,255,.6);
+background:white;
 
-backdrop-filter:blur(10px);
-
-border:1px solid rgba(255,255,255,.3);
+box-shadow:0 8px 24px rgba(0,0,0,.05);
 
 transition:.25s;
 
 }
 
-body.dark .feature-card{
 
-background:rgba(15,23,42,.6);
+/* gradient border */
 
-border:1px solid rgba(255,255,255,.05);
+.feature-card::before{
+
+content:"";
+
+position:absolute;
+
+inset:-1px;
+
+border-radius:16px;
+
+background:
+
+linear-gradient(
+120deg,
+#2563eb,
+#60a5fa
+);
+
+opacity:.35;
+
+z-index:-1;
 
 }
 
+
+/* dark glass */
+
+body.dark .feature-card{
+
+background:rgba(15,23,42,.55);
+
+backdrop-filter:blur(16px);
+
+border:1px solid rgba(148,163,184,.15);
+
+}
+
+
+/* hover */
 
 .feature-card:hover{
 
-transform:translateY(-4px);
+transform:translateY(-6px);
 
-box-shadow:0 8px 20px rgba(0,0,0,.08);
+box-shadow:
+0 18px 40px rgba(37,99,235,.18);
 
 }
 
 
+/* icon */
+
 .feature-card svg{
 
-margin-bottom:8px;
-
 color:#2563eb;
+
+margin-bottom:8px;
 
 }
 
@@ -285,27 +418,9 @@ color:#60a5fa;
 }
 
 
-.feature-card h3{
-
-margin:6px 0;
-
-font-size:16px;
-
-}
-
-
-.feature-card p{
-
-font-size:14px;
-
-opacity:.7;
-
-}
-
-
-/* =========================
+/* =============================
 CTA
-========================= */
+============================= */
 
 .cta{
 
@@ -315,41 +430,83 @@ padding:40px;
 
 border-radius:16px;
 
-background:rgba(255,255,255,.6);
+background:white;
 
-backdrop-filter:blur(10px);
+box-shadow:0 8px 24px rgba(0,0,0,.05);
 
-border:1px solid rgba(255,255,255,.3);
+position:relative;
 
 }
+
+
+.cta::before{
+
+content:"";
+
+position:absolute;
+
+inset:-1px;
+
+border-radius:16px;
+
+background:
+
+linear-gradient(
+120deg,
+#2563eb,
+#60a5fa
+);
+
+opacity:.25;
+
+z-index:-1;
+
+}
+
 
 body.dark .cta{
 
-background:rgba(15,23,42,.6);
+background:rgba(15,23,42,.55);
 
-border:1px solid rgba(255,255,255,.05);
+backdrop-filter:blur(16px);
+
+border:1px solid rgba(148,163,184,.15);
 
 }
 
 
-/* =========================
+/* =============================
 FOOTER
-========================= */
+============================= */
 
-footer{
+.footer{
 
-margin-top:40px;
+margin-top:70px;
+
+padding-top:20px;
+
+border-top:1px solid rgba(148,163,184,.2);
+
+opacity:.7;
+
+font-size:14px;
+
+}
+
+.footer-sub{
 
 font-size:13px;
 
-opacity:.5;
+opacity:.6;
+
+margin-top:4px;
 
 }
 
 
-/* =========================
+/* =============================
 RESPONSIVE
-========================= */
+============================= */
 
 @media(max-width:1024px){
 
@@ -361,21 +518,60 @@ grid-template-columns:repeat(2,1fr);
 
 }
 
+
 @media(max-width:600px){
 
-.features{
-
-grid-template-columns:1fr;
-
-}
+/* NAVBAR MOBILE */
 
 .navbar{
 
 flex-direction:column;
 
-gap:10px;
+align-items:center;
+
+gap:14px;
+
+padding:18px;
 
 }
+
+
+/* center logo */
+
+.logo{
+
+justify-content:center;
+
+}
+
+
+/* button row */
+
+.nav-actions{
+
+width:100%;
+
+display:flex;
+
+justify-content:center;
+
+gap:12px;
+
+}
+
+
+/* login width */
+
+.login-btn{
+
+flex:1;
+
+max-width:220px;
+
+}
+
+
+/* hero */
 
 .hero h1{
 
@@ -383,15 +579,30 @@ font-size:26px;
 
 }
 
+
+/* buttons full width */
+
 .primary-btn{
 
 width:100%;
 
 }
 
+
+/* cards */
+
+.features{
+
+grid-template-columns:1fr;
+
+}
+
+
+/* cta */
+
 .cta{
 
-padding:25px;
+padding:26px;
 
 }
 
