@@ -1,85 +1,102 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
-import { BarChart3, CheckSquare, Users, Zap } from "lucide-react";
+import { BarChart3, CheckSquare, Users, Zap, Moon, Sun } from "lucide-react";
 
 function LandingPage() {
   const navigate = useNavigate();
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("dark", dark);
+  }, [dark]);
 
   return (
     <div className="landing-container">
-      <nav className="navbar">
-        <div className="logo">🏪Tindahan ni Lola</div>
-        <button
-  className="login-register"
-  onClick={() => navigate("/auth")}
->
-  Login / Register
-</button>
 
+      <nav className="navbar glass">
+        <div className="logo">🏪 Tindahan ni Lola</div>
+
+        <div className="nav-actions">
+          <button
+            className="icon-btn"
+            onClick={() => setDark(!dark)}
+          >
+            {dark ? <Sun size={18}/> : <Moon size={18}/>}
+          </button>
+
+          <button
+            className="login-register glass-btn"
+            onClick={() => navigate("/auth")}
+          >
+            Login / Register
+          </button>
+        </div>
       </nav>
 
       <section className="hero">
         <h1>
-          Manage Your Sari-Sari Store <br /> with Ease
+          Manage Your Sari-Sari Store <br/>
+          with Ease
         </h1>
+
         <p>
-          Keep track of your inventory, manage prices, and grow your business
-          with our simple and powerful store management tool.
+          Smart inventory. Faster search. Smooth operations.
+          Built for modern sari-sari store owners.
         </p>
-        <button className="primary-btn" onClick={() => navigate("/auth")}>
+
+        <button
+          className="primary-btn glass-btn"
+          onClick={() => navigate("/auth")}
+        >
           Start Managing Now
         </button>
       </section>
 
-      <section className="features-wrapper">
-  <div className="feature-card">
-    <div className="feature-icon">
-      <CheckSquare size={28} />
-    </div>
-    <h3>Easy Inventory</h3>
-    <p>Add, edit, and organize your products in seconds.</p>
-  </div>
+      <section className="features">
 
-  <div className="feature-card">
-    <div className="feature-icon">
-      <Zap size={28} />
-    </div>
-    <h3>Quick Search</h3>
-    <p>Find products instantly with powerful search and filters.</p>
-  </div>
+        <div className="feature-card glass">
+          <CheckSquare/>
+          <h3>Easy Inventory</h3>
+          <p>Add and organize products quickly.</p>
+        </div>
 
-  <div className="feature-card">
-    <div className="feature-icon">
-      <BarChart3 size={28} />
-    </div>
-    <h3>Price Management</h3>
-    <p>Update prices and track your product catalog effortlessly.</p>
-  </div>
+        <div className="feature-card glass">
+          <Zap/>
+          <h3>Quick Search</h3>
+          <p>Instant search with filters.</p>
+        </div>
 
-  <div className="feature-card">
-    <div className="feature-icon">
-      <Users size={28} />
-    </div>
-    <h3>For Everyone</h3>
-    <p>Simple interface designed for all skill levels.</p>
-  </div>
-</section>
+        <div className="feature-card glass">
+          <BarChart3/>
+          <h3>Price Management</h3>
+          <p>Track prices and profits easily.</p>
+        </div>
 
+        <div className="feature-card glass">
+          <Users/>
+          <h3>For Everyone</h3>
+          <p>Simple and beginner friendly.</p>
+        </div>
 
-      <section className="cta">
+      </section>
+
+      <section className="cta glass">
         <h2>Ready to grow your business?</h2>
-        <p>
-          Built to help sari-sari stores manage inventory with ease.
-        </p>
-        <button className="secondary-btn" onClick={() => navigate("/auth")}>
+
+        <button
+          className="secondary-btn glass-btn"
+          onClick={() => navigate("/auth")}
+        >
           Enter Your Store
         </button>
+
       </section>
 
       <footer>
-        <p>© 2025 Tindahan ni Lola. Developed by Aizel Joy Lopez</p>
+        © 2025 Tindahan ni Lola • Aizel Joy Lopez
       </footer>
+
     </div>
   );
 }

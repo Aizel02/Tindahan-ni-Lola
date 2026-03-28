@@ -1,12 +1,10 @@
-.header {
-  background: #0077b6;
-  color: white;
-  padding: 20px 24px;
-  border-radius: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.header{
+  backdrop-filter:blur(14px);
+  background:rgba(255,255,255,0.55);
+  border:1px solid rgba(255,255,255,0.3);
+
+  padding:20px;
+  border-radius:16px;
 }
 
 .header-left h1 {
