@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { Home, ShoppingCart } from "lucide-react";
+import "./theme.css";
 
 export default function Header({ cartCount = 0, onCartClick }) {
   const navigate = useNavigate();

@@ -1,104 +1,153 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+
+import {
+Moon,
+Sun,
+CheckSquare,
+Zap,
+BarChart3,
+Users
+} from "lucide-react";
+
+import useTheme from "../hooks/useTheme";
+
 import "./LandingPage.css";
-import { BarChart3, CheckSquare, Users, Zap, Moon, Sun } from "lucide-react";
+import "./theme.css";
 
-function LandingPage() {
-  const navigate = useNavigate();
-  const [dark, setDark] = useState(false);
+export default function LandingPage(){
 
-  useEffect(() => {
-    document.body.classList.toggle("dark", dark);
-  }, [dark]);
+const navigate = useNavigate();
 
-  return (
-    <div className="landing-container">
+const [dark,setDark] = useTheme();
 
-      <nav className="navbar glass">
-        <div className="logo">🏪 Tindahan ni Lola</div>
+return(
 
-        <div className="nav-actions">
-          <button
-            className="icon-btn"
-            onClick={() => setDark(!dark)}
-          >
-            {dark ? <Sun size={18}/> : <Moon size={18}/>}
-          </button>
+<div className="landing-container">
 
-          <button
-            className="login-register glass-btn"
-            onClick={() => navigate("/auth")}
-          >
-            Login / Register
-          </button>
-        </div>
-      </nav>
+<nav className="navbar glass gradient-border">
 
-      <section className="hero">
-        <h1>
-          Manage Your Sari-Sari Store <br/>
-          with Ease
-        </h1>
+<h2>🏪 Tindahan ni Lola</h2>
 
-        <p>
-          Smart inventory. Faster search. Smooth operations.
-          Built for modern sari-sari store owners.
-        </p>
+<div>
 
-        <button
-          className="primary-btn glass-btn"
-          onClick={() => navigate("/auth")}
-        >
-          Start Managing Now
-        </button>
-      </section>
+<button
+className="icon-btn"
+onClick={()=>setDark(!dark)}
+>
 
-      <section className="features">
+{dark ? <Sun size={18}/> : <Moon size={18}/>}
 
-        <div className="feature-card glass">
-          <CheckSquare/>
-          <h3>Easy Inventory</h3>
-          <p>Add and organize products quickly.</p>
-        </div>
+</button>
 
-        <div className="feature-card glass">
-          <Zap/>
-          <h3>Quick Search</h3>
-          <p>Instant search with filters.</p>
-        </div>
+<button
+className="btn"
+onClick={()=>navigate("/auth")}
+>
 
-        <div className="feature-card glass">
-          <BarChart3/>
-          <h3>Price Management</h3>
-          <p>Track prices and profits easily.</p>
-        </div>
+Login / Register
 
-        <div className="feature-card glass">
-          <Users/>
-          <h3>For Everyone</h3>
-          <p>Simple and beginner friendly.</p>
-        </div>
+</button>
 
-      </section>
+</div>
 
-      <section className="cta glass">
-        <h2>Ready to grow your business?</h2>
+</nav>
 
-        <button
-          className="secondary-btn glass-btn"
-          onClick={() => navigate("/auth")}
-        >
-          Enter Your Store
-        </button>
 
-      </section>
+<section className="hero">
 
-      <footer>
-        © 2025 Tindahan ni Lola • Aizel Joy Lopez
-      </footer>
+<h1>
 
-    </div>
-  );
+Manage your sari-sari store smarter
+
+</h1>
+
+<p>
+
+Inventory, utang tracking, and analytics in one dashboard.
+
+</p>
+
+<button
+className="btn"
+onClick={()=>navigate("/auth")}
+>
+
+Start Managing Now
+
+</button>
+
+</section>
+
+
+<section className="features">
+
+<Card
+icon={<CheckSquare/>}
+title="Easy Inventory"
+text="Add products quickly"
+/>
+
+<Card
+icon={<Zap/>}
+title="Quick Search"
+text="Find items instantly"
+/>
+
+<Card
+icon={<BarChart3/>}
+title="Reports"
+text="Track profits"
+/>
+
+<Card
+icon={<Users/>}
+title="Multi user"
+text="For teams"
+/>
+
+</section>
+
+
+<section className="cta glass">
+
+<h2>
+
+Ready to grow your business?
+
+</h2>
+
+<button
+className="btn"
+onClick={()=>navigate("/auth")}
+>
+
+Enter Store
+
+</button>
+
+</section>
+
+</div>
+
+);
+
 }
 
-export default LandingPage;
+function Card({icon,title,text}){
+
+return(
+
+<div className="glass gradient-border feature-card">
+
+{icon}
+
+<h3>{title}</h3>
+
+<p>{text}</p>
+
+</div>
+
+);
+
+}

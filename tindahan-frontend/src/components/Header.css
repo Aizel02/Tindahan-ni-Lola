@@ -1,128 +1,235 @@
-.header{
-  backdrop-filter:blur(14px);
-  background:rgba(255,255,255,0.55);
-  border:1px solid rgba(255,255,255,0.3);
+/* HEADER */
 
-  padding:20px;
-  border-radius:16px;
+.header {
+
+display: flex;
+
+justify-content: space-between;
+
+align-items: center;
+
+padding: 18px 22px;
+
+border-radius: 16px;
+
+background: rgba(255,255,255,0.65);
+
+backdrop-filter: blur(14px);
+
+border: 1px solid rgba(255,255,255,0.25);
+
+margin-bottom: 18px;
+
 }
 
+
+/* LEFT */
+
 .header-left h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 700;
+
+margin: 0;
+
+font-family: "Space Grotesk";
+
+font-size: 22px;
+
 }
 
 .header-left p {
-  margin: 6px 0 0;
-  font-size: 14px;
-  opacity: 0.9;
+
+margin: 4px 0 0;
+
+font-size: 13px;
+
+opacity: .6;
+
 }
+
+
+/* RIGHT */
 
 .header-right {
-  display: flex;
-  gap: 12px;
+
+display: flex;
+
+gap: 10px;
+
 }
 
+
+/* BUTTONS */
+
 .back-btn {
-  position: relative;
-  background: transparent;
-  color: white;
-  border: 1.5px solid #7e96de;
-  padding: 6px 12px;        /* smaller */
-  border-radius: 6px;       /* slightly tighter */
-  font-size: 13px;          /* smaller text */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: 0.2s ease;
+
+border: none;
+
+padding: 7px 14px;
+
+border-radius: 10px;
+
+cursor: pointer;
+
+font-size: 13px;
+
+background: linear-gradient(120deg,#6366f1,#22c55e);
+
+color: white;
+
+display: flex;
+
+align-items: center;
+
+gap: 4px;
+
+transition: .2s;
+
 }
 
 .back-btn:hover {
-  background: #023e8a;
+
+transform: translateY(-2px);
+
 }
+
+
 .cart-btn {
-  position: relative;
-  background: transparent;
-  color: white;
-  border: 1.5px solid #7e96de;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: 0.2s ease;
+
+border: none;
+
+padding: 7px 14px;
+
+border-radius: 10px;
+
+cursor: pointer;
+
+font-size: 13px;
+
+background: rgba(255,255,255,0.6);
+
+backdrop-filter: blur(10px);
+
+border: 1px solid rgba(255,255,255,0.3);
+
+display: flex;
+
+align-items: center;
+
+gap: 5px;
+
+position: relative;
+
 }
 
-.cart-btn:hover {
-  background: #023e8a;
-}
+
 .cart-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #ef4444;
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 5px;
-  border-radius: 50%;
-  min-width: 16px;
-  text-align: center;
-  line-height: 1;
+
+position: absolute;
+
+top: -6px;
+
+right: -6px;
+
+background: #ef4444;
+
+color: white;
+
+font-size: 10px;
+
+padding: 2px 6px;
+
+border-radius: 50%;
+
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
 
-  .header-right {
-    width: 100%;
-    justify-content: flex-end;
-  }
-}
+/* TABS */
+
 .page-tabs {
-  display: flex;
-  gap: 24px;
-  border-bottom: 1px solid #e5e7eb;
-  margin-top: 16px;
+
+display: flex;
+
+gap: 24px;
+
+border-bottom: 1px solid rgba(0,0,0,.06);
+
+margin-bottom: 20px;
+
 }
+
 
 .tab {
-  position: relative;
-  padding: 10px 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #6b7280;
-  text-decoration: none;
+
+padding: 10px 0;
+
+text-decoration: none;
+
+color: #6b7280;
+
+font-size: 15px;
+
+font-weight: 500;
+
+position: relative;
+
 }
 
-.tab:hover {
-  color: #4f46e5;
-}
 
 .tab.active {
-  color: #4f46e5;
-  font-weight: 600;
+
+color: #6366f1;
+
 }
 
+
 .tab.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 100%;
-  height: 3px;
-  background-color: #4f46e5;
-  border-radius: 2px;
+
+content: "";
+
+position: absolute;
+
+left: 0;
+
+bottom: -1px;
+
+width: 100%;
+
+height: 3px;
+
+border-radius: 3px;
+
+background: linear-gradient(120deg,#6366f1,#22c55e);
+
 }
-.page-tabs a {
-  line-height: 1.2;
+
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+
+.header {
+
+flex-direction: column;
+
+align-items: flex-start;
+
+gap: 12px;
+
+}
+
+.header-right {
+
+width: 100%;
+
+justify-content: flex-end;
+
+}
+
+.page-tabs {
+
+overflow-x: auto;
+
+gap: 16px;
+
+}
+
 }
