@@ -1,8 +1,7 @@
 import { BrainCircuit } from "lucide-react";
 import { useState } from "react";
 
-import AIAnalyticsDashboard
-from "./AIAnalyticsDashboard";
+import AIAnalyticsDashboard from "./AIAnalyticsDashboard";
 
 const SUPABASE_URL =
 "https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
@@ -12,24 +11,24 @@ const SUPABASE_KEY =
 
 export default function AIInsights({
 
- products=[],
- debts=[]
+ products = [],
+ debts = []
 
 }){
 
- const [loading,setLoading]=useState(false);
+ const [loading,setLoading] = useState(false);
 
- const [insight,setInsight]=useState("");
+ const [insight,setInsight] = useState("");
 
- const [risk,setRisk]=useState("");
+ const [risk,setRisk] = useState("");
 
- const [analytics,setAnalytics]=useState(null);
+ const [analytics,setAnalytics] = useState(null);
 
- const [warning,setWarning]=useState("");
+ const [warning,setWarning] = useState("");
 
- const [overdueList,setOverdueList]=useState([]);
+ const [overdueList,setOverdueList] = useState([]);
 
- const [topCustomers,setTopCustomers]=useState([]);
+ const [topCustomers,setTopCustomers] = useState([]);
 
  const runAI = async ()=>{
 
@@ -37,74 +36,65 @@ export default function AIInsights({
 
   try{
 
-   const res =
-   await fetch(
-
+   const res = await fetch(
     SUPABASE_URL,
-
     {
-
      method:"POST",
-
      headers:{
-
       "Content-Type":"application/json",
-
       "apikey":SUPABASE_KEY,
-
-      "Authorization":
-      `Bearer ${SUPABASE_KEY}`
-
+      "Authorization":`Bearer ${SUPABASE_KEY}`
      },
-
      body:JSON.stringify({
-
       products,
       debts
-
      })
-
     }
-
    );
+
+   if(!res.ok){
+
+    throw new Error("API error " + res.status);
+
+   }
 
    const data = await res.json();
 
-   setInsight(data.result);
+   setInsight(data.result || "");
 
-   setRisk(data.risk);
+   setRisk(data.risk || "");
 
-   setAnalytics(data.analytics);
+   setAnalytics(data.analytics || null);
 
-   setWarning(data.warning);
+   setWarning(data.warning || "");
 
-   // overdue
-
+   // overdue detection
    const overdue = debts.filter(d=>
 
     d.status !== "Paid"
-
     && d.due_date
-
     && new Date(d.due_date) < new Date()
 
    );
 
    setOverdueList(overdue);
 
-   // ranking
-
-   const ranking={};
+   // ranking personal utang
+   const ranking = {};
 
    debts.forEach(d=>{
 
-    if(!ranking[d.debtor_name])
+    if(!ranking[d.debtor_name]){
 
-     ranking[d.debtor_name]=0;
+     ranking[d.debtor_name] = 0;
 
-    if(d.status!=="Paid")
+    }
 
-     ranking[d.debtor_name]+=Number(d.amount);
+    if(d.status !== "Paid"){
+
+     ranking[d.debtor_name] += Number(d.amount);
+
+    }
 
    });
 
@@ -125,9 +115,11 @@ export default function AIInsights({
 
   }
 
-  catch(e){
+  catch(error){
 
-   console.log(e);
+   console.error("AI error:",error);
+
+   setInsight("AI connection failed");
 
   }
 
@@ -148,22 +140,11 @@ export default function AIInsights({
    </div>
 
    <button
-
     className="ai-button"
-
     onClick={runAI}
-
    >
 
-    {
-
-     loading
-
-     ? "Analyzing..."
-
-     : "Generate AI Insights"
-
-    }
+    {loading ? "Analyzing..." : "Generate AI Insights"}
 
    </button>
 
@@ -176,50 +157,40 @@ export default function AIInsights({
     </div>
 
    }
-{insight &&
 
- <div className="ai-result">
+   {insight &&
 
-  {insight}
+    <div className="ai-result">
 
- </div>
+     {insight}
 
-}
+    </div>
 
+   }
 
-{/* reminder generator */}
+   {analytics && (
 
-{analytics && (
+    <div className="ai-reminder">
 
- <div className="ai-reminder">
+     <strong>Collection Message Suggestion</strong>
 
-  <strong>Collection Message Suggestion</strong>
+     <p>
 
-  <p>
+      Hi {topCustomers[0]?.name || "po"},  
+      paalala lang po sa utang nyo.  
+      Sana mabayaran nyo po soon.  
 
-   Hi {analytics.topCustomer || "po"},  
+      salamat po 🙏
 
-   paalala lang po sa utang nyo.
+     </p>
 
-   Sana mabayaran nyo po soon.
+    </div>
 
-   Maraming salamat!
-
-  </p>
-
- </div>
-
-)}
-
-   {/* charts */}
+   )}
 
    <AIAnalyticsDashboard
-
     analytics={analytics}
-
    />
-
-   {/* overdue */}
 
    {overdueList.length>0 &&
 
@@ -227,51 +198,35 @@ export default function AIInsights({
 
      <h3>Overdue Customers</h3>
 
-     {
+     {overdueList.map(d=>(
 
-      overdueList.map(d=>(
+      <div key={d.id}>
 
-       <div key={d.id}>
+       {d.debtor_name} – ₱{d.amount}
 
-        {d.debtor_name}
+      </div>
 
-        – ₱{d.amount}
-
-       </div>
-
-      ))
-
-     }
+     ))}
 
     </div>
 
    }
 
-   {/* ranking */}
-
    {topCustomers.length>0 &&
 
     <div className="ai-section">
 
-     <h3>Top Utang</h3>
+     <h3>Top Personal Utang</h3>
 
-     {
+     {topCustomers.slice(0,5).map(c=>(
 
-      topCustomers.slice(0,5)
+      <div key={c.name}>
 
-      .map(c=>(
+       {c.name} – ₱{c.total}
 
-       <div key={c.name}>
+      </div>
 
-        {c.name}
-
-        – ₱{c.total}
-
-       </div>
-
-      ))
-
-     }
+     ))}
 
     </div>
 
@@ -280,4 +235,5 @@ export default function AIInsights({
   </div>
 
  );
+
 }
