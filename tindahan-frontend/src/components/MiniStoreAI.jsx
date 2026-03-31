@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { BrainCircuit, Send, X } from "lucide-react";
 import Draggable from "react-draggable";
 
@@ -31,6 +31,9 @@ export default function MiniStoreAI({
  const [input,setInput]=useState("");
  const [showSuggest,setShowSuggest]=useState(false);
 
+ const inputRef = useRef(null);
+
+
 
  const [messages,setMessages]=useState([
 
@@ -39,12 +42,13 @@ export default function MiniStoreAI({
    role:"ai",
 
    content:
-`Hi 👋 ask me about your store
+`Hi 👋 ask me anything about your store
 
 example:
 • utang ni nanay
 • pending utang ni kuya
 • sino dapat singilin
+• overdue list
 • generate chart`
 
   }
@@ -52,8 +56,27 @@ example:
  ]);
 
 
+ const [widgets,setWidgets]=[];
 
- const [widgets,setWidgets]=useState([]);
+
+
+/* =========================
+   AUTO FOCUS INPUT
+========================= */
+
+ useEffect(()=>{
+
+  if(open){
+
+   setTimeout(()=>{
+
+    inputRef.current?.focus();
+
+   },200);
+
+  }
+
+ },[open]);
 
 
 
@@ -100,7 +123,6 @@ example:
 
   if(!input) return [];
 
-
   const q =
    input.toLowerCase();
 
@@ -124,7 +146,6 @@ example:
   if(!promptText.trim()) return;
 
   setLoading(true);
-
   setShowSuggest(false);
 
 
@@ -139,9 +160,7 @@ example:
      method:"POST",
 
      headers:{
-
       "Content-Type":"application/json"
-
      },
 
      body:JSON.stringify({
@@ -157,7 +176,8 @@ example:
    );
 
 
-   const data = await res.json();
+   const data =
+    await res.json();
 
 
    setMessages(prev=>[
@@ -250,8 +270,9 @@ example:
  const useSuggestion = (name)=>{
 
   setInput(`utang ni ${name}`);
-
   setShowSuggest(false);
+
+  inputRef.current?.focus();
 
  };
 
@@ -281,20 +302,14 @@ example:
 
   className="ai-float-btn"
 
-  onClick={()=>
-
-   setOpen(!open)
-
-  }
+  onClick={()=>setOpen(!open)}
 
  >
 
   {
 
    open
-
    ? <X/>
-
    : <BrainCircuit/>
 
   }
@@ -327,13 +342,9 @@ example:
   key={i}
 
   className={`ai-msg ${
-
    m.role==="user"
-
     ? "ai-user"
-
     : "ai-bot"
-
   }`}
 
  >
@@ -360,40 +371,51 @@ example:
 
 
 
- <div className="ai-chat-input">
+ {/* =========================
+     INPUT FORM
+========================= */}
+
+ <form
+
+  className="ai-chat-input"
+
+  onSubmit={(e)=>{
+
+   e.preventDefault();
+   sendMessage();
+
+  }}
+
+ >
 
 
  <input
- value={input}
 
- onChange={(e)=>{
-  setInput(e.target.value);
-  setShowSuggest(true);
- }}
+  ref={inputRef}
 
- onKeyDown={(e)=>{
+  value={input}
 
-  if(e.key==="Enter"){
+  onChange={(e)=>{
 
-   e.preventDefault();
+   setInput(e.target.value);
+   setShowSuggest(true);
 
-   sendMessage();
+  }}
 
-  }
+  placeholder="ask AI..."
 
- }}
+  enterKeyHint="send"
 
- placeholder="ask AI..."
-
- enterKeyHint="send"
-/>
+ />
 
 
  <button
 
+  type="submit"
+
   className="ai-send"
 
-  onClick={sendMessage}
+  disabled={loading}
 
  >
 
@@ -403,7 +425,7 @@ example:
 
 
 
- {/* suggestion dropdown */}
+ {/* suggestions */}
 
  {
 
@@ -446,7 +468,8 @@ example:
  }
 
 
- </div>
+ </form>
+
 
  </div>
 
@@ -455,7 +478,6 @@ example:
 
 
  <div className="ai-widget-area">
-
 
  {widgets.map((w,i)=>(
 
@@ -490,7 +512,6 @@ example:
  </button>
 
 
-
  <Widget config={w}/>
 
  </div>
@@ -498,7 +519,6 @@ example:
  </Draggable>
 
  ))}
-
 
  </div>
 
@@ -508,7 +528,6 @@ example:
  );
 
 }
-
 
 
 
