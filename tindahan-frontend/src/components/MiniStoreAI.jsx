@@ -364,19 +364,29 @@ example:
 
 
  <input
+ value={input}
 
-  value={input}
+ onChange={(e)=>{
+  setInput(e.target.value);
+  setShowSuggest(true);
+ }}
 
-  onChange={(e)=>{
+ onKeyDown={(e)=>{
 
-   setInput(e.target.value);
-   setShowSuggest(true);
+  if(e.key==="Enter"){
 
-  }}
+   e.preventDefault();
 
-  placeholder="ask AI..."
+   sendMessage();
 
- />
+  }
+
+ }}
+
+ placeholder="ask AI..."
+
+ enterKeyHint="send"
+/>
 
 
  <button
