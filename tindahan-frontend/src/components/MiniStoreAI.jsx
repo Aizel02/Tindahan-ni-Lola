@@ -25,11 +25,12 @@ export default function MiniStoreAI({
 
 }){
 
-
  const [open,setOpen]=useState(false);
  const [loading,setLoading]=useState(false);
  const [input,setInput]=useState("");
  const [showSuggest,setShowSuggest]=useState(false);
+
+ const [widgets,setWidgets]=useState([]);
 
  const inputRef = useRef(null);
 
@@ -56,13 +57,8 @@ example:
  ]);
 
 
- const [widgets,setWidgets]=[];
 
-
-
-/* =========================
-   AUTO FOCUS INPUT
-========================= */
+/* auto focus */
 
  useEffect(()=>{
 
@@ -80,9 +76,7 @@ example:
 
 
 
-/* =========================
-   EXTRACT UNIQUE NAMES
-========================= */
+/* extract names */
 
  const names =
  useMemo(()=>{
@@ -98,13 +92,11 @@ example:
 
   );
 
-
   return [
 
    ...new Set(
 
-    list
-    .filter(Boolean)
+    list.filter(Boolean)
 
    )
 
@@ -114,9 +106,7 @@ example:
 
 
 
-/* =========================
-   FILTER SUGGESTIONS
-========================= */
+/* suggestions */
 
  const suggestions =
  useMemo(()=>{
@@ -125,7 +115,6 @@ example:
 
   const q =
    input.toLowerCase();
-
 
   return names.filter(n=>
 
@@ -137,9 +126,7 @@ example:
 
 
 
-/* =========================
-   SEND PROMPT
-========================= */
+/* call AI */
 
  const sendPrompt = async(promptText)=>{
 
@@ -147,7 +134,6 @@ example:
 
   setLoading(true);
   setShowSuggest(false);
-
 
   try{
 
@@ -175,10 +161,8 @@ example:
 
    );
 
-
    const data =
     await res.json();
-
 
    setMessages(prev=>[
 
@@ -195,7 +179,6 @@ example:
     }
 
    ]);
-
 
    if(data.widgets){
 
@@ -224,21 +207,17 @@ example:
 
   }
 
-
   setLoading(false);
 
  };
 
 
 
-/* =========================
-   SEND MESSAGE
-========================= */
+/* send message */
 
  const sendMessage = ()=>{
 
   if(!input.trim()) return;
-
 
   setMessages(prev=>[
 
@@ -254,7 +233,6 @@ example:
 
   ]);
 
-
   sendPrompt(input);
 
   setInput("");
@@ -263,13 +241,12 @@ example:
 
 
 
-/* =========================
-   CLICK SUGGESTION
-========================= */
+/* click suggestion */
 
  const useSuggestion = (name)=>{
 
   setInput(`utang ni ${name}`);
+
   setShowSuggest(false);
 
   inputRef.current?.focus();
@@ -290,9 +267,7 @@ example:
 
 
 
-/* =========================
-   UI
-========================= */
+/* UI */
 
  return(
 
@@ -371,9 +346,7 @@ example:
 
 
 
- {/* =========================
-     INPUT FORM
-========================= */}
+ {/* FORM = ENTER KEY WORKS */}
 
  <form
 
@@ -382,6 +355,7 @@ example:
   onSubmit={(e)=>{
 
    e.preventDefault();
+
    sendMessage();
 
   }}
@@ -398,6 +372,7 @@ example:
   onChange={(e)=>{
 
    setInput(e.target.value);
+
    setShowSuggest(true);
 
   }}
@@ -415,13 +390,15 @@ example:
 
   className="ai-send"
 
-  disabled={loading}
-
  >
 
   <Send size={16}/>
 
  </button>
+
+
+
+ </form>
 
 
 
@@ -468,8 +445,6 @@ example:
  }
 
 
- </form>
-
 
  </div>
 
@@ -488,11 +463,7 @@ example:
 
  <button
 
-  onClick={()=>
-
-   removeWidget(i)
-
-  }
+  onClick={()=>removeWidget(i)}
 
   style={{
 
@@ -531,12 +502,9 @@ example:
 
 
 
-/* =========================
-   CHART WIDGET
-========================= */
+/* charts */
 
 function Widget({config}){
-
 
  if(config.type==="kpi"){
 
@@ -549,7 +517,6 @@ function Widget({config}){
     {config.label}
 
    </div>
-
 
    <div className="ai-kpi-value">
 
@@ -576,7 +543,6 @@ function Widget({config}){
    {config.title}
 
   </div>
-
 
   <ResponsiveContainer
 
@@ -607,7 +573,6 @@ function Widget({config}){
   );
 
  }
-
 
  return null;
 
