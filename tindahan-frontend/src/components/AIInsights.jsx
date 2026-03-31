@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrainCircuit, Send, X } from "lucide-react";
 import Draggable from "react-draggable";
+
 import {
  ResponsiveContainer,
  LineChart,
@@ -15,74 +16,128 @@ import {
  Area
 } from "recharts";
 
-const SUPABASE_URL =
-"https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
+/* use your express AI server */
+const API_URL =
+"http://localhost:5000/ai-insights";
 
-export default function MiniStoreAI({ debts=[] }){
+
+export default function MiniStoreAI({
+
+ debts = [],
+ products = []
+
+}){
 
  const [open,setOpen]=useState(false);
  const [loading,setLoading]=useState(false);
  const [input,setInput]=useState("");
 
  const [messages,setMessages]=useState([
+
   {
    role:"ai",
    content:
-   "Hi 👋 pwede mo itanong:\n• utang ni kuya\n• overdue list\n• sino dapat singilin\n• total utang\n• utang trend"
+`Hi 👋 ask me anything about your store
+
+example:
+• sino may utang
+• magkano total utang
+• sino overdue
+• sino dapat singilin
+• utang trend`
   }
+
  ]);
 
  const [widgets,setWidgets]=useState([]);
 
- const sendPrompt=async(promptText)=>{
 
-  if(!promptText) return;
+
+/* send prompt to AI */
+
+ const sendPrompt = async(promptText)=>{
+
+  if(!promptText.trim()) return;
 
   setLoading(true);
 
   try{
 
-   const res=await fetch(
-    SUPABASE_URL,
-    {
-     method:"POST",
-     headers:{
-      "Content-Type":"application/json",
-      "apikey":SUPABASE_KEY,
-      "Authorization":`Bearer ${SUPABASE_KEY}`
-     },
-     body:JSON.stringify({
-      prompt:promptText,
-      debts
-     })
-    }
-   );
+   const res =
+    await fetch(
 
-   const data=await res.json();
+     API_URL,
+
+     {
+
+      method:"POST",
+
+      headers:{
+
+       "Content-Type":"application/json"
+
+      },
+
+      body:JSON.stringify({
+
+       prompt:promptText,
+       debts,
+       products
+
+      })
+
+     }
+
+    );
+
+
+   const data =
+    await res.json();
+
 
    setMessages(prev=>[
+
     ...prev,
+
     {
+
      role:"ai",
-     content:data.text
+
+     content:
+      data.text ||
+      "no result"
+
     }
+
    ]);
 
-   setWidgets(data.widgets || []);
+
+   /* avoid widget duplication */
+
+   if(data.widgets){
+
+    setWidgets(data.widgets);
+
+   }
 
   }
 
   catch{
 
    setMessages(prev=>[
+
     ...prev,
+
     {
+
      role:"ai",
-     content:"AI error"
+
+     content:
+      "AI connection error"
+
     }
+
    ]);
 
   }
@@ -91,17 +146,27 @@ export default function MiniStoreAI({ debts=[] }){
 
  };
 
- const sendMessage=()=>{
 
-  if(!input) return;
+
+ const sendMessage = ()=>{
+
+  if(!input.trim()) return;
+
 
   setMessages(prev=>[
+
    ...prev,
+
    {
+
     role:"user",
+
     content:input
+
    }
+
   ]);
+
 
   sendPrompt(input);
 
@@ -109,46 +174,77 @@ export default function MiniStoreAI({ debts=[] }){
 
  };
 
- const removeWidget=(index)=>{
+
+
+ const removeWidget = (index)=>{
 
   setWidgets(prev=>
+
    prev.filter((_,i)=>i!==index)
+
   );
 
  };
+
+
 
  return(
 
  <>
 
+ {/* floating AI button */}
+
  <button
+
   className="ai-float-btn"
-  title="MiniStore AI"
-  onClick={()=>setOpen(!open)}
+
+  onClick={()=>
+
+   setOpen(!open)
+
+  }
+
  >
-  {open ? <X/> : <BrainCircuit/>}
+
+  {open
+   ? <X/>
+   : <BrainCircuit/>
+  }
+
  </button>
 
- {open && (
+
+
+ {/* chat window */}
+
+ {open &&(
 
  <div className="ai-chat-window glass">
 
  <div className="ai-chat-header">
+
   <BrainCircuit size={16}/>
+
   MiniStore AI
+
  </div>
+
+
 
  <div className="ai-chat-body">
 
  {messages.map((m,i)=>(
 
  <div
+
   key={i}
+
   className={`ai-msg ${
    m.role==="user"
-   ? "ai-user"
-   : "ai-bot"
+    ? "ai-user"
+    : "ai-bot"
   }`}
+
  >
 
   {m.content}
@@ -157,27 +253,49 @@ export default function MiniStoreAI({ debts=[] }){
 
  ))}
 
- {loading && (
-  <div className="ai-msg ai-bot">
-   analyzing...
-  </div>
+
+
+ {loading &&(
+
+ <div className="ai-msg ai-bot">
+
+  analyzing...
+
+ </div>
+
  )}
 
  </div>
 
+
+
  <div className="ai-chat-input">
 
  <input
+
   value={input}
-  onChange={(e)=>setInput(e.target.value)}
+
+  onChange={(e)=>
+
+   setInput(e.target.value)
+
+  }
+
   placeholder="ask AI..."
+
  />
 
+
  <button
+
   className="ai-send"
+
   onClick={sendMessage}
+
  >
+
   <Send size={16}/>
+
  </button>
 
  </div>
@@ -185,6 +303,10 @@ export default function MiniStoreAI({ debts=[] }){
  </div>
 
  )}
+
+
+
+ {/* widgets */}
 
  <div className="ai-widget-area">
 
@@ -195,19 +317,31 @@ export default function MiniStoreAI({ debts=[] }){
  <div className="ai-widget glass">
 
  <button
-  onClick={()=>removeWidget(i)}
+
+  onClick={()=>
+
+   removeWidget(i)
+
+  }
+
   style={{
+
    position:"absolute",
    top:6,
    right:6,
-   background:"none",
    border:"none",
+   background:"none",
    color:"#94a3b8",
    cursor:"pointer"
+
   }}
+
  >
+
   ✕
+
  </button>
+
 
  <Widget config={w}/>
 
@@ -225,7 +359,12 @@ export default function MiniStoreAI({ debts=[] }){
 
 }
 
+
+
+/* widget renderer */
+
 function Widget({config}){
+
 
  if(config.type==="kpi"){
 
@@ -234,11 +373,16 @@ function Widget({config}){
   <div className="ai-kpi">
 
    <div className="ai-kpi-label">
+
     {config.label}
+
    </div>
 
+
    <div className="ai-kpi-value">
+
     {config.value}
+
    </div>
 
   </div>
@@ -246,6 +390,8 @@ function Widget({config}){
   );
 
  }
+
+
 
  if(config.type==="line"){
 
@@ -254,24 +400,32 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
+
    {config.title}
+
   </div>
 
-  <ResponsiveContainer width="100%" height={200}>
 
-   <LineChart data={config.data}>
+  <ResponsiveContainer
+   width="100%"
+   height={200}
+  >
 
-    <CartesianGrid/>
+  <LineChart
+   data={config.data}
+  >
 
-    <XAxis dataKey="label"/>
+   <CartesianGrid/>
 
-    <YAxis/>
+   <XAxis dataKey="label"/>
 
-    <Tooltip/>
+   <YAxis/>
 
-    <Line dataKey="value"/>
+   <Tooltip/>
 
-   </LineChart>
+   <Line dataKey="value"/>
+
+  </LineChart>
 
   </ResponsiveContainer>
 
@@ -280,6 +434,8 @@ function Widget({config}){
   );
 
  }
+
+
 
  if(config.type==="bar"){
 
@@ -288,24 +444,32 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
+
    {config.title}
+
   </div>
 
-  <ResponsiveContainer width="100%" height={200}>
 
-   <BarChart data={config.data}>
+  <ResponsiveContainer
+   width="100%"
+   height={200}
+  >
 
-    <CartesianGrid/>
+  <BarChart
+   data={config.data}
+  >
 
-    <XAxis dataKey="label"/>
+   <CartesianGrid/>
 
-    <YAxis/>
+   <XAxis dataKey="label"/>
 
-    <Tooltip/>
+   <YAxis/>
 
-    <Bar dataKey="value"/>
+   <Tooltip/>
 
-   </BarChart>
+   <Bar dataKey="value"/>
+
+  </BarChart>
 
   </ResponsiveContainer>
 
@@ -314,6 +478,8 @@ function Widget({config}){
   );
 
  }
+
+
 
  if(config.type==="area"){
 
@@ -322,24 +488,32 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
+
    {config.title}
+
   </div>
 
-  <ResponsiveContainer width="100%" height={200}>
 
-   <AreaChart data={config.data}>
+  <ResponsiveContainer
+   width="100%"
+   height={200}
+  >
 
-    <CartesianGrid/>
+  <AreaChart
+   data={config.data}
+  >
 
-    <XAxis dataKey="label"/>
+   <CartesianGrid/>
 
-    <YAxis/>
+   <XAxis dataKey="label"/>
 
-    <Tooltip/>
+   <YAxis/>
 
-    <Area dataKey="value"/>
+   <Tooltip/>
 
-   </AreaChart>
+   <Area dataKey="value"/>
+
+  </AreaChart>
 
   </ResponsiveContainer>
 
@@ -348,6 +522,7 @@ function Widget({config}){
   );
 
  }
+
 
  return null;
 

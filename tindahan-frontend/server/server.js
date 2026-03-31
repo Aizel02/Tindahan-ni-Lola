@@ -10,79 +10,116 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-/* debug check if key exists */
+/* check API key */
 if (!process.env.OPENAI_API_KEY) {
-  console.log("OPENAI KEY MISSING ❌");
+ console.log("OPENAI KEY MISSING ❌");
 } else {
-  console.log("OPENAI KEY LOADED ✅");
+ console.log("OPENAI KEY LOADED ✅");
 }
 
 /* connect to OpenAI */
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+ apiKey: process.env.OPENAI_API_KEY
 });
 
 /* test route */
 app.get("/", (req, res) => {
-  res.send("AI server running 🚀");
+ res.send("AI server running 🚀");
 });
 
-/* AI INSIGHTS ROUTE */
+/* AI ASSISTANT ROUTE */
 app.post("/ai-insights", async (req, res) => {
 
-  try {
+ try {
 
-    const { products = [], debts = [] } = req.body;
+  /* get data from frontend */
+  const {
+   prompt,
+   products = [],
+   debts = []
+  } = req.body;
 
-    const completion = await openai.chat.completions.create({
+  /* ask AI */
+  const completion =
+   await openai.chat.completions.create({
 
-      model: "gpt-4o-mini",
+   model: "gpt-4o-mini",
 
-      messages: [
+   messages: [
 
-        {
-          role: "system",
-          content: `
-You analyze sari-sari store data.
+    {
+     role: "system",
+     content: `
+You are an AI assistant for a sari-sari store owner.
 
-Give SHORT insights:
-• store summary
-• possible popular products
-• debt observation
-• recommendation
+You help analyze:
 
-Keep answer simple.
+• customer utang
+• total utang
+• overdue payments
+• payment trends
+• frequent borrowers
+• who to follow up
+
+You understand:
+- Taglish
+- English
+- small typos
+
+Rules:
+- answer ONLY based on given data
+- compute totals if needed
+- identify patterns
+- give short clear answers
+- if no data found, say "no record found"
 `
-        },
+    },
 
-        {
-          role: "user",
-          content: `
+    {
+     role: "user",
+     content: `
+
+USER QUESTION:
+${prompt}
+
+STORE DATA:
+
 PRODUCTS:
 ${JSON.stringify(products)}
 
 DEBTS:
 ${JSON.stringify(debts)}
+
 `
-        }
+    }
 
-      ]
+   ]
 
-    });
+  });
 
-    res.json({
-      result: completion.choices[0].message.content
-    });
+  /* send response to frontend */
+  res.json({
 
-  } catch (error) {
+   text:
+    completion
+    .choices[0]
+    .message.content
 
-    console.log("AI ERROR:", error);
+  });
 
-    res.status(500).json({
-      error: "AI failed to analyze data"
-    });
+ }
 
-  }
+ catch (error) {
+
+  console.log("AI ERROR:", error);
+
+  res.status(500).json({
+
+   text: "AI error"
+
+  });
+
+ }
 
 });
 
@@ -90,5 +127,9 @@ ${JSON.stringify(debts)}
 const PORT = 5000;
 
 app.listen(PORT, () => {
-  console.log(`AI server running on http://localhost:${PORT}`);
+
+ console.log(
+  `AI server running on http://localhost:${PORT}`
+ );
+
 });
