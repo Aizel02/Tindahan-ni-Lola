@@ -43,14 +43,7 @@ export default function MiniStoreAI({
    role:"ai",
 
    content:
-`Hi 👋 ask me anything about your store
-
-example:
-• utang ni nanay
-• pending utang ni kuya
-• sino dapat singilin
-• overdue list
-• generate chart`
+`Hi 👋 ask me anything about your store`
 
   }
 
