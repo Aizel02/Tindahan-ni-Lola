@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BrainCircuit, Send, X } from "lucide-react";
 import Draggable from "react-draggable";
-
 import {
  ResponsiveContainer,
  LineChart,
@@ -16,128 +15,74 @@ import {
  Area
 } from "recharts";
 
+const SUPABASE_URL =
+"https://ljtwvvvtdjhchnfbwvhz.supabase.co/functions/v1/ai-insights";
 
-/* use your express AI server */
-const API_URL =
-"http://localhost:5000/ai-insights";
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHd2dnZ0ZGpoY2huZmJ3dmh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMzI1NjMsImV4cCI6MjA4MzYwODU2M30.iuF7dowazzJnGMILsjTguNu1OguNwTpB5KZiGz6RjOk";
 
-
-export default function MiniStoreAI({
-
- debts = [],
- products = []
-
-}){
+export default function MiniStoreAI({ debts=[] }){
 
  const [open,setOpen]=useState(false);
  const [loading,setLoading]=useState(false);
  const [input,setInput]=useState("");
 
  const [messages,setMessages]=useState([
-
   {
    role:"ai",
    content:
-`Hi 👋 ask me anything about your store
-
-example:
-• sino may utang
-• magkano total utang
-• sino overdue
-• sino dapat singilin
-• utang trend`
+   "Hi 👋 pwede mo itanong:\n• utang ni kuya\n• overdue list\n• sino dapat singilin\n• total utang\n• utang trend"
   }
-
  ]);
 
  const [widgets,setWidgets]=useState([]);
 
+ const sendPrompt=async(promptText)=>{
 
-
-/* send prompt to AI */
-
- const sendPrompt = async(promptText)=>{
-
-  if(!promptText.trim()) return;
+  if(!promptText) return;
 
   setLoading(true);
 
   try{
 
-   const res =
-    await fetch(
+   const res=await fetch(
+    SUPABASE_URL,
+    {
+     method:"POST",
+     headers:{
+      "Content-Type":"application/json",
+      "apikey":SUPABASE_KEY,
+      "Authorization":`Bearer ${SUPABASE_KEY}`
+     },
+     body:JSON.stringify({
+      prompt:promptText,
+      debts
+     })
+    }
+   );
 
-     API_URL,
-
-     {
-
-      method:"POST",
-
-      headers:{
-
-       "Content-Type":"application/json"
-
-      },
-
-      body:JSON.stringify({
-
-       prompt:promptText,
-       debts,
-       products
-
-      })
-
-     }
-
-    );
-
-
-   const data =
-    await res.json();
-
+   const data=await res.json();
 
    setMessages(prev=>[
-
     ...prev,
-
     {
-
      role:"ai",
-
-     content:
-      data.text ||
-      "no result"
-
+     content:data.text
     }
-
    ]);
 
-
-   /* avoid widget duplication */
-
-   if(data.widgets){
-
-    setWidgets(data.widgets);
-
-   }
+   setWidgets(data.widgets || []);
 
   }
 
   catch{
 
    setMessages(prev=>[
-
     ...prev,
-
     {
-
      role:"ai",
-
-     content:
-      "AI connection error"
-
+     content:"AI error"
     }
-
    ]);
 
   }
@@ -146,27 +91,17 @@ example:
 
  };
 
+ const sendMessage=()=>{
 
-
- const sendMessage = ()=>{
-
-  if(!input.trim()) return;
-
+  if(!input) return;
 
   setMessages(prev=>[
-
    ...prev,
-
    {
-
     role:"user",
-
     content:input
-
    }
-
   ]);
-
 
   sendPrompt(input);
 
@@ -174,77 +109,46 @@ example:
 
  };
 
-
-
- const removeWidget = (index)=>{
+ const removeWidget=(index)=>{
 
   setWidgets(prev=>
-
    prev.filter((_,i)=>i!==index)
-
   );
 
  };
-
-
 
  return(
 
  <>
 
- {/* floating AI button */}
-
  <button
-
   className="ai-float-btn"
-
-  onClick={()=>
-
-   setOpen(!open)
-
-  }
-
+  title="MiniStore AI"
+  onClick={()=>setOpen(!open)}
  >
-
-  {open
-   ? <X/>
-   : <BrainCircuit/>
-  }
-
+  {open ? <X/> : <BrainCircuit/>}
  </button>
 
-
-
- {/* chat window */}
-
- {open &&(
+ {open && (
 
  <div className="ai-chat-window glass">
 
  <div className="ai-chat-header">
-
   <BrainCircuit size={16}/>
-
   MiniStore AI
-
  </div>
-
-
 
  <div className="ai-chat-body">
 
  {messages.map((m,i)=>(
 
  <div
-
   key={i}
-
   className={`ai-msg ${
    m.role==="user"
-    ? "ai-user"
-    : "ai-bot"
+   ? "ai-user"
+   : "ai-bot"
   }`}
-
  >
 
   {m.content}
@@ -253,49 +157,27 @@ example:
 
  ))}
 
-
-
- {loading &&(
-
- <div className="ai-msg ai-bot">
-
-  analyzing...
-
- </div>
-
+ {loading && (
+  <div className="ai-msg ai-bot">
+   analyzing...
+  </div>
  )}
 
  </div>
 
-
-
  <div className="ai-chat-input">
 
  <input
-
   value={input}
-
-  onChange={(e)=>
-
-   setInput(e.target.value)
-
-  }
-
+  onChange={(e)=>setInput(e.target.value)}
   placeholder="ask AI..."
-
  />
 
-
  <button
-
   className="ai-send"
-
   onClick={sendMessage}
-
  >
-
   <Send size={16}/>
-
  </button>
 
  </div>
@@ -303,10 +185,6 @@ example:
  </div>
 
  )}
-
-
-
- {/* widgets */}
 
  <div className="ai-widget-area">
 
@@ -317,31 +195,19 @@ example:
  <div className="ai-widget glass">
 
  <button
-
-  onClick={()=>
-
-   removeWidget(i)
-
-  }
-
+  onClick={()=>removeWidget(i)}
   style={{
-
    position:"absolute",
    top:6,
    right:6,
-   border:"none",
    background:"none",
+   border:"none",
    color:"#94a3b8",
    cursor:"pointer"
-
   }}
-
  >
-
   ✕
-
  </button>
-
 
  <Widget config={w}/>
 
@@ -359,12 +225,7 @@ example:
 
 }
 
-
-
-/* widget renderer */
-
 function Widget({config}){
-
 
  if(config.type==="kpi"){
 
@@ -373,16 +234,11 @@ function Widget({config}){
   <div className="ai-kpi">
 
    <div className="ai-kpi-label">
-
     {config.label}
-
    </div>
 
-
    <div className="ai-kpi-value">
-
     {config.value}
-
    </div>
 
   </div>
@@ -390,8 +246,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  if(config.type==="line"){
 
@@ -400,32 +254,24 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
-
    {config.title}
-
   </div>
 
+  <ResponsiveContainer width="100%" height={200}>
 
-  <ResponsiveContainer
-   width="100%"
-   height={200}
-  >
+   <LineChart data={config.data}>
 
-  <LineChart
-   data={config.data}
-  >
+    <CartesianGrid/>
 
-   <CartesianGrid/>
+    <XAxis dataKey="label"/>
 
-   <XAxis dataKey="label"/>
+    <YAxis/>
 
-   <YAxis/>
+    <Tooltip/>
 
-   <Tooltip/>
+    <Line dataKey="value"/>
 
-   <Line dataKey="value"/>
-
-  </LineChart>
+   </LineChart>
 
   </ResponsiveContainer>
 
@@ -434,8 +280,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  if(config.type==="bar"){
 
@@ -444,32 +288,24 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
-
    {config.title}
-
   </div>
 
+  <ResponsiveContainer width="100%" height={200}>
 
-  <ResponsiveContainer
-   width="100%"
-   height={200}
-  >
+   <BarChart data={config.data}>
 
-  <BarChart
-   data={config.data}
-  >
+    <CartesianGrid/>
 
-   <CartesianGrid/>
+    <XAxis dataKey="label"/>
 
-   <XAxis dataKey="label"/>
+    <YAxis/>
 
-   <YAxis/>
+    <Tooltip/>
 
-   <Tooltip/>
+    <Bar dataKey="value"/>
 
-   <Bar dataKey="value"/>
-
-  </BarChart>
+   </BarChart>
 
   </ResponsiveContainer>
 
@@ -478,8 +314,6 @@ function Widget({config}){
   );
 
  }
-
-
 
  if(config.type==="area"){
 
@@ -488,32 +322,24 @@ function Widget({config}){
   <>
 
   <div className="ai-chart-title">
-
    {config.title}
-
   </div>
 
+  <ResponsiveContainer width="100%" height={200}>
 
-  <ResponsiveContainer
-   width="100%"
-   height={200}
-  >
+   <AreaChart data={config.data}>
 
-  <AreaChart
-   data={config.data}
-  >
+    <CartesianGrid/>
 
-   <CartesianGrid/>
+    <XAxis dataKey="label"/>
 
-   <XAxis dataKey="label"/>
+    <YAxis/>
 
-   <YAxis/>
+    <Tooltip/>
 
-   <Tooltip/>
+    <Area dataKey="value"/>
 
-   <Area dataKey="value"/>
-
-  </AreaChart>
+   </AreaChart>
 
   </ResponsiveContainer>
 
@@ -522,7 +348,6 @@ function Widget({config}){
   );
 
  }
-
 
  return null;
 

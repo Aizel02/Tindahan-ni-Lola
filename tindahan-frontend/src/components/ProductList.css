@@ -1482,3 +1482,25 @@
  }
 
 }
+.ai-suggest-box{
+ position:absolute;
+ bottom:55px;
+ left:10px;
+ right:60px;
+ background:#0f172a;
+ border-radius:10px;
+ padding:6px;
+ max-height:150px;
+ overflow:auto;
+ z-index:20;
+}
+
+.ai-suggest-item{
+ padding:6px 10px;
+ cursor:pointer;
+ border-radius:6px;
+}
+
+.ai-suggest-item:hover{
+ background:#1e293b;
+}

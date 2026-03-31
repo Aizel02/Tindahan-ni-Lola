@@ -1,121 +1,420 @@
-require("dotenv").config({ path: "./.env" });
-
 const express = require("express");
-const OpenAI = require("openai");
 const cors = require("cors");
 
 const app = express();
 
-/* middlewares */
 app.use(cors());
 app.use(express.json());
 
-/* check API key */
-if (!process.env.OPENAI_API_KEY) {
- console.log("OPENAI KEY MISSING ❌");
-} else {
- console.log("OPENAI KEY LOADED ✅");
+
+
+function clean(text=""){
+
+ return text
+  .toLowerCase()
+  .replace(/[^a-z0-9\s]/g,"");
+
 }
 
-/* connect to OpenAI */
-const openai = new OpenAI({
- apiKey: process.env.OPENAI_API_KEY
+
+function has(q,words){
+
+ return words.some(w=>q.includes(w));
+
+}
+
+
+
+app.get("/",(req,res)=>{
+
+ res.send("MiniStore AI running 🚀");
+
 });
 
-/* test route */
-app.get("/", (req, res) => {
- res.send("AI server running 🚀");
-});
 
-/* AI ASSISTANT ROUTE */
-app.post("/ai-insights", async (req, res) => {
 
- try {
+app.post("/ai-insights",(req,res)=>{
 
-  /* get data from frontend */
+ try{
+
   const {
-   prompt,
-   products = [],
-   debts = []
+   prompt="",
+   debts=[]
   } = req.body;
 
-  /* ask AI */
-  const completion =
-   await openai.chat.completions.create({
 
-   model: "gpt-4o-mini",
 
-   messages: [
+  const q = clean(prompt);
+
+
+
+  let text =
+   "No matching data found.";
+
+
+
+  let widgets = [];
+
+
+
+/* normalize liabilities */
+
+  const records =
+   debts.map(d=>({
+
+    name:
+
+     (
+      d.name ||
+      d.customer ||
+      d.person ||
+      d.personName ||
+      ""
+     )
+     .toLowerCase(),
+
+
+    label:
+
+      d.name ||
+      d.customer ||
+      d.person ||
+      d.personName ||
+      "Unknown",
+
+
+    amount:
+
+     Number(
+
+      d.amount ||
+      d.value ||
+      d.total ||
+      d.balance ||
+      0
+
+     ),
+
+
+    paid:
+
+     d.paid ||
+     d.status==="Paid",
+
+
+    dueDate:
+
+     d.dueDate ||
+     d.due ||
+     d.deadline ||
+     null
+
+   }));
+
+
+
+/* total */
+
+  if(
+
+   has(q,[
+
+    "total",
+    "lahat",
+    "overall",
+    "sum"
+
+   ])
+
+  ){
+
+   const total =
+    records.reduce(
+     (s,r)=>s+r.amount,
+     0
+    );
+
+
+   text =
+    `Total utang is ₱${total}.`;
+
+
+   widgets = [
 
     {
-     role: "system",
-     content: `
-You are an AI assistant for a sari-sari store owner.
 
-You help analyze:
+     type:"kpi",
+     label:"Total Utang",
+     value:total
 
-• customer utang
-• total utang
-• overdue payments
-• payment trends
-• frequent borrowers
-• who to follow up
-
-You understand:
-- Taglish
-- English
-- small typos
-
-Rules:
-- answer ONLY based on given data
-- compute totals if needed
-- identify patterns
-- give short clear answers
-- if no data found, say "no record found"
-`
-    },
-
-    {
-     role: "user",
-     content: `
-
-USER QUESTION:
-${prompt}
-
-STORE DATA:
-
-PRODUCTS:
-${JSON.stringify(products)}
-
-DEBTS:
-${JSON.stringify(debts)}
-
-`
     }
 
-   ]
+   ];
 
-  });
+  }
 
-  /* send response to frontend */
+
+
+/* person utang */
+
+  else if(
+
+   has(q,[
+
+    "utang",
+    "balance",
+    "magkano"
+
+   ])
+
+  ){
+
+   const found =
+    records.find(r=>
+
+     q.includes(r.name)
+
+    );
+
+
+   if(found){
+
+    text =
+     `${found.label} has utang ₱${found.amount}.`;
+
+   }
+
+  }
+
+
+
+/* pending */
+
+  else if(
+
+   has(q,[
+
+    "pending",
+    "unpaid"
+
+   ])
+
+  ){
+
+   const pending =
+    records.filter(
+     r=>!r.paid
+    );
+
+
+   text =
+    pending.length
+
+    ? `Pending customers:
+       ${pending.map(p=>p.label).join(", ")}`
+
+    : "No pending utang.";
+
+
+   widgets = [
+
+    {
+
+     type:"bar",
+     title:"Pending Utang",
+
+     data:
+
+      pending.map(p=>({
+
+       label:p.label,
+       value:p.amount
+
+      }))
+
+    }
+
+   ];
+
+  }
+
+
+
+/* overdue */
+
+  else if(
+
+   has(q,[
+
+    "overdue",
+    "late",
+    "delay"
+
+   ])
+
+  ){
+
+   const today =
+    new Date();
+
+
+   const overdue =
+    records.filter(r=>
+
+     r.dueDate &&
+     new Date(r.dueDate)<today &&
+     !r.paid
+
+    );
+
+
+   text =
+    overdue.length
+
+    ? `Overdue:
+       ${overdue.map(o=>o.label).join(", ")}`
+
+    : "No overdue customers.";
+
+
+   widgets = [
+
+    {
+
+     type:"bar",
+     title:"Overdue Utang",
+
+     data:
+
+      overdue.map(o=>({
+
+       label:o.label,
+       value:o.amount
+
+      }))
+
+    }
+
+   ];
+
+  }
+
+
+
+/* suggest collect */
+
+  else if(
+
+   has(q,[
+
+    "singilin",
+    "collect",
+    "priority"
+
+   ])
+
+  ){
+
+   const sorted =
+    [...records]
+    .sort((a,b)=>b.amount-a.amount);
+
+
+   const top =
+    sorted[0];
+
+
+   text =
+    top
+
+    ? `Collect from ${top.label} first. Amount ₱${top.amount}.`
+
+    : "No data.";
+
+
+   widgets = [
+
+    {
+
+     type:"bar",
+     title:"Collection Priority",
+
+     data:
+
+      sorted.map(r=>({
+
+       label:r.label,
+       value:r.amount
+
+      }))
+
+    }
+
+   ];
+
+  }
+
+
+
+/* chart */
+
+  else if(
+
+   has(q,[
+
+    "chart",
+    "graph",
+    "trend"
+
+   ])
+
+  ){
+
+   widgets = [
+
+    {
+
+     type:"bar",
+     title:"Utang Chart",
+
+     data:
+
+      records.map(r=>({
+
+       label:r.label,
+       value:r.amount
+
+      }))
+
+    }
+
+   ];
+
+
+   text =
+    "Here is the utang chart.";
+
+  }
+
+
+
   res.json({
 
-   text:
-    completion
-    .choices[0]
-    .message.content
+   text,
+   widgets
 
   });
 
  }
 
- catch (error) {
+ catch(e){
 
-  console.log("AI ERROR:", error);
+  console.log(e);
+
 
   res.status(500).json({
 
-   text: "AI error"
+   text:"AI error"
 
   });
 
@@ -123,13 +422,20 @@ ${JSON.stringify(debts)}
 
 });
 
-/* start server */
-const PORT = 5000;
 
-app.listen(PORT, () => {
 
- console.log(
-  `AI server running on http://localhost:${PORT}`
- );
+app.listen(
 
-});
+ 5000,
+
+ ()=>{
+
+  console.log(
+
+   "MiniStore AI running on http://localhost:5000"
+
+  );
+
+ }
+
+);
